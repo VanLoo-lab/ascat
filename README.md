@@ -9,4 +9,4 @@ Installation
 --------
 Use the devtools R package to install ASCAT:
 
-  > library(devtools); install_github("FCI-CancerGenomics/ASCAT")
+    > library(devtools); install_github("FCI-CancerGenomics/ASCAT")
