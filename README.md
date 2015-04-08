@@ -8,4 +8,5 @@ This R package contains the R code of ASCAT, described in [this](http://www.ncbi
 Installation
 --------
 Use the devtools R package to install ASCAT:
+
   > library(devtools); install_github("FCI-CancerGenomics/ASCAT")
