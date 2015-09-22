@@ -4,22 +4,29 @@
 # GC correction: Jiqiu Cheng
 
 
-
-
-# function to read in SNP array data
-# input: filenames of tumor LogR, tumor BAF, germline LogR and germline BAF data
-# germline data files can be NULL - in that case these are not read in
-# output: a data structure containing:
-# 1. Tumor_LogR data matrix
-# 2. Tumor_BAF data matrix
-# 3. Tumor_LogR_segmented: placeholder, NULL
-# 4. Tumor_BAF_segmented: placeholder, NULL
-# 5. Germline_LogR data matrix
-# 6. Germline_BAF data matrix
-# 7. SNPpos: position of all SNPs
-# 8. ch: a list containing vectors with the indices for each chromosome (e.g. Tumor_LogR[ch[[13]],] will output the Tumor_LogR data of chromosome 13
-# 9. chr: a list containing vectors with the indices for each distinct part that can be segmented separately (e.g. chromosome arm, stretch of DNA between gaps in the array design)
-# 10. gender: a vector of gender for each cases ("XX" or "XY"). Default = NULL: all female ("XX")
+#' @title ascat.loadData
+#' @description Function to read in SNP array data
+#' @details germline data files can be NULL - in that case these are not read in
+#' @param Tumor_LogR_file file containing logR of tumour sample(s)
+#' @param Tumor_BAF_file file containing BAF of tumour sample(s)
+#' @param Germline_LogR_file file containing logR of germline sample(s), NULL
+#' @param Germline_BAF_file file containing BAF of germline sample(s), NULL
+#' @param chrs
+#' @param gender a vector of gender for each cases ("XX" or "XY"). Default = all female ("XX")
+#' @param sexchromosomes
+#'
+#' @return ascat data structure containing:\cr
+#' 1. Tumor_LogR data matrix\cr
+#' 2. Tumor_BAF data matrix\cr
+#' 3. Tumor_LogR_segmented: placeholder, NULL\cr
+#' 4. Tumor_BAF_segmented: placeholder, NULL\cr
+#' 5. Germline_LogR data matrix\cr
+#' 6. Germline_BAF data matrix\cr
+#' 7. SNPpos: position of all SNPs\cr
+#' 8. ch: a list containing vectors with the indices for each chromosome (e.g. Tumor_LogR[ch[[13]],] will output the Tumor_LogR data of chromosome 13\cr
+#' 9. chr: a list containing vectors with the indices for each distinct part that can be segmented separately (e.g. chromosome arm, stretch of DNA between gaps in the array design)\cr
+#' 10. gender: a vector of gender for each cases ("XX" or "XY"). Default = NULL: all female ("XX")\cr
+#'
 ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = NULL, Germline_BAF_file = NULL, chrs = c(1:22,"X","Y"), gender = NULL, sexchromosomes = c("X","Y")) {
 
   # read in SNP array data files
@@ -69,7 +76,7 @@ ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = 
       Germline_BAF[,cc]=as.numeric(as.vector(Germline_BAF[,cc]))
     }
   }
- 
+
   # sort all data by genomic position
   last = 0;
   ch = list();
@@ -79,7 +86,7 @@ ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = 
     chrpos = chrke[,2]
     names(chrpos) = rownames(chrke)
     chrpos = sort(chrpos)
-    ch[[i]] = (last+1):(last+length(chrpos))  
+    ch[[i]] = (last+1):(last+length(chrpos))
     SNPorder[ch[[i]]] = names(chrpos)
     last = last+length(chrpos)
   }
@@ -99,20 +106,22 @@ ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = 
   if (is.null(gender)) {
     gender = rep("XX",dim(Tumor_LogR)[2])
   }
-  return(list(Tumor_LogR = Tumor_LogR, Tumor_BAF = Tumor_BAF, 
-              Tumor_LogR_segmented = NULL, Tumor_BAF_segmented = NULL, 
-              Germline_LogR = Germline_LogR, Germline_BAF = Germline_BAF, 
-              SNPpos = SNPpos, ch = ch, chr = chr, chrs = chrs, 
-              samples = colnames(Tumor_LogR), gender = gender, 
+  return(list(Tumor_LogR = Tumor_LogR, Tumor_BAF = Tumor_BAF,
+              Tumor_LogR_segmented = NULL, Tumor_BAF_segmented = NULL,
+              Germline_LogR = Germline_LogR, Germline_BAF = Germline_BAF,
+              SNPpos = SNPpos, ch = ch, chr = chr, chrs = chrs,
+              samples = colnames(Tumor_LogR), gender = gender,
               sexchromosomes = sexchromosomes,
               failedarrays = NULL))
 }
 
 
 
-
-# plots SNP array data
-# input: an ASCAT object (e.g. from ASCAT.loaddata and plots the SNP array data
+#' @title ascat.plotRawData
+#' @description Plots SNP array data
+#' @param ASCATobj an ASCAT object (e.g. data structure from ascat.loadData)
+#'
+#' @return Produces png files showing the logR and BAF values for tumour and germline samples
 ascat.plotRawData = function(ASCATobj) {
   print.noquote("Plotting tumor data")
   for (i in 1:dim(ASCATobj$Tumor_LogR)[2]) {
@@ -184,7 +193,12 @@ ascat.plotRawData = function(ASCATobj) {
 }
 
 
-# note that probes not present in the GCcontentfile will be lost from the results
+#' @title ascat.GCcorrect
+#' @description Corrects logR of the tumour sample(s) with genomic GC content
+#' @param ASCATobj an ASCAT object
+#' @param GCcontentfile File containing the GC content around every SNP for increasing window sizes
+#' @details Note that probes not present in the GCcontentfile will be lost from the results
+#' @return ASCAT object with corrected tumour logR
 ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
   if(is.null(GCcontentfile)) {
     print.noquote("Error: no GC content file given!")
@@ -196,13 +210,13 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
     GC_newlist$Position<-as.numeric(as.character(GC_newlist$Position))
 
     ovl = intersect(row.names(ASCATobj$Tumor_LogR),row.names(GC_newlist))
-    
+
     GC_newlist<-GC_newlist[ovl,]
 
     SNPpos = ASCATobj$SNPpos[ovl,]
     Tumor_LogR = ASCATobj$Tumor_LogR[ovl,,drop=F]
     Tumor_BAF = ASCATobj$Tumor_BAF[ovl,,drop=F]
-    
+
     Germline_LogR = NULL
     Germline_BAF = NULL
     if(!is.null(ASCATobj$Germline_LogR)) {
@@ -221,7 +235,7 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
       for(chrindex in unique(SNPpos[,1])) {
         GC_newlist_chr<-GC_newlist[GC_newlist$Chr==chrindex,]
         td_chr<-Tumordata[GC_newlist$Chr==chrindex]
-        
+
         flag_nona<-(complete.cases(td_chr) & complete.cases(GC_newlist_chr))
         corr<-cor(GC_newlist_chr[flag_nona,3:ncol(GC_newlist_chr)],td_chr[flag_nona])
         corr_tot<-cbind(corr_tot,corr)
@@ -231,13 +245,13 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
       index_1M<-c(which(names(corr)=="X1M"),which(names(corr)=="X1Mb"))
       maxGCcol_short<-which(corr[1:(index_1M-1)]==max(corr[1:(index_1M-1)]))
       maxGCcol_long<-which(corr[index_1M:length(corr)]==max(corr[index_1M:length(corr)]))
-      maxGCcol_long<-(maxGCcol_long+(index_1M-1))    
-   
-      cat("weighted correlation: ",paste(names(corr),format(corr,digits=2), ";"),"\n")   
+      maxGCcol_long<-(maxGCcol_long+(index_1M-1))
+
+      cat("weighted correlation: ",paste(names(corr),format(corr,digits=2), ";"),"\n")
       cat("Short window size: ",names(GC_newlist)[maxGCcol_short+2],"\n")
       cat("Long window size: ",names(GC_newlist)[maxGCcol_long+2],"\n")
 
-      # Multiple regression 
+      # Multiple regression
       flag_NA<-(is.na(Tumordata))|(is.na(GC_newlist[,2+maxGCcol_short]))|(is.na(GC_newlist[,2+maxGCcol_long]))
       td_select<-Tumordata[!flag_NA]
       GC_newlist_select <- GC_newlist[!flag_NA,]
@@ -248,45 +262,46 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
       model<-lm(td_select~x1+x2+x3+x4,y=TRUE)
 
       GCcorrected<-Tumordata
-      GCcorrected[]<-NA     
+      GCcorrected[]<-NA
       GCcorrected[!flag_NA] <- model$residuals
-    
+
       Tumor_LogR[,s] = GCcorrected
     }
 
   # add some plotting code for each sample while it is generated!!!!
-  
-    return(list(Tumor_LogR = Tumor_LogR, Tumor_BAF = Tumor_BAF, 
-                Tumor_LogR_segmented = NULL, Tumor_BAF_segmented = NULL, 
-                Germline_LogR = Germline_LogR, Germline_BAF = Germline_BAF, 
-                SNPpos = SNPpos, ch = ASCATobj$ch, chr = ASCATobj$chr, chrs = ASCATobj$chrs, 
-                samples = colnames(Tumor_LogR), gender = ASCATobj$gender, 
+
+    return(list(Tumor_LogR = Tumor_LogR, Tumor_BAF = Tumor_BAF,
+                Tumor_LogR_segmented = NULL, Tumor_BAF_segmented = NULL,
+                Germline_LogR = Germline_LogR, Germline_BAF = Germline_BAF,
+                SNPpos = SNPpos, ch = ASCATobj$ch, chr = ASCATobj$chr, chrs = ASCATobj$chrs,
+                samples = colnames(Tumor_LogR), gender = ASCATobj$gender,
                 sexchromosomes = ASCATobj$sexchromosomes))
-  }  
+  }
 }
 
 
-
-
-# run ASPCF segmentation
-# input: (i) an ASCAT object from e.g. ASCAT.loaddata; 
-# (ii) selectsamples: a vector containing the sample(number)s to PCF otherwise
-# (iii) germline genotypes (NULL if germline data is available)
-# (iv) penalty: penalty of introducing an additional ASPCF breakpoint (expert parameter, don't adapt unless you know what you're doing)
-# output: a data structure containing:
-# 1. Tumor_LogR data matrix
-# 2. Tumor_BAF data matrix
-# 3. Tumor_LogR_segmented: matrix of LogR segmented values
-# 4. Tumor_BAF_segmented: list of BAF segmented values; each element in the list is a matrix containing the segmented values for one sample (only for probes that are germline homozygous)
-# 5. Germline_LogR data matrix
-# 6. Germline_BAF data matrix
-# 7. SNPpos: position of all SNPs
-# 8. ch: a list containing vectors with the indices for each chromosome (e.g. Tumor_LogR[ch[[13]],] will output the Tumor_LogR data of chromosome 13
-# 9. chr: a list containing vectors with the indices for each distinct part that can be segmented separately (e.g. chromosome arm, stretch of DNA between gaps in the array design)
-# note: this function can be easily parallelized by controlling the selectsamples parameter
-# it saves the results in LogR_PCFed[sample]_[segment].txt and BAF_PCFed[sample]_[segment].txt
-# if these files exist, the results are read from the files
-# hence, after parallelization, copy all the files into the current directory, and run this function to read in the results
+#' @title ascat.aspcf
+#' @description run ASPCF segmentation
+#' @details This function can be easily parallelised by controlling the selectsamples parameter\cr
+#' it saves the results in LogR_PCFed[sample]_[segment].txt and BAF_PCFed[sample]_[segment].txt;
+#' if these files exist, the results are read from them.\cr
+#' Hence, after parallelisation, copy all the files into the current directory, and run this function to read in the results
+#' @param ASCATobj an ASCAT object
+#' @param selectsamples a vector containing the sample number(s) to PCF. Default = all
+#' @param ascat.gg germline genotypes (NULL if germline data is available)
+#' @param penalty penalty of introducing an additional ASPCF breakpoint (expert parameter, don't adapt unless you know what you're doing)
+#'
+#' @return output: ascat data structure containing:\cr
+#' 1. Tumor_LogR data matrix\cr
+#' 2. Tumor_BAF data matrix\cr
+#' 3. Tumor_LogR_segmented: matrix of LogR segmented values\cr
+#' 4. Tumor_BAF_segmented: list of BAF segmented values; each element in the list is a matrix containing the segmented values for one sample (only for probes that are germline homozygous)\cr
+#' 5. Germline_LogR data matrix\cr
+#' 6. Germline_BAF data matrix\cr
+#' 7. SNPpos: position of all SNPs\cr
+#' 8. ch: a list containing vectors with the indices for each chromosome (e.g. Tumor_LogR[ch[[13]],] will output the Tumor_LogR data of chromosome 13\cr
+#' 9. chr: a list containing vectors with the indices for each distinct part that can be segmented separately (e.g. chromosome arm, stretch of DNA between gaps in the array design)\cr
+#'
 ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), ascat.gg = NULL, penalty = 25) {
   #first, set germline genotypes
   gg = NULL
@@ -387,7 +402,7 @@ ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), asc
                   if(bp!=totall) {
                     dis = sum(dis, sum(abs(lr[((bp+1):totall)+indices[probe]]-logRASPCF[probe+1]), na.rm=T), na.rm=T)
                   }
-                  d = c(d,dis)  
+                  d = c(d,dis)
                 }
                 breakpoint = which.min(d)-1
                 logRc = c(logRc,rep(logRASPCF[probe],breakpoint),rep(logRASPCF[probe+1],totall-breakpoint))
@@ -411,10 +426,10 @@ ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), asc
           else {
             level = mean(lr,na.rm=T)
             reps = length(lr)
-            logRPCFed = c(logRPCFed,rep(level,reps)) 
+            logRPCFed = c(logRPCFed,rep(level,reps))
           }
           # correct wrong segments in germline homozygous stretches:
-          homsegs = ghs[[sample]][ghs[[sample]][,1]==chrke,]  
+          homsegs = ghs[[sample]][ghs[[sample]][,1]==chrke,]
           startchr = min(ASCATobj$chr[[chrke]])
           endchr = max(ASCATobj$chr[[chrke]])
           # to solve an annoying error when homsegs has length 1:
@@ -500,17 +515,17 @@ ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), asc
     Tumor_LogR_segmented[,sample] = logRPCFed
     Tumor_BAF_segmented[[sample]] = 1-bafPCFed
   }
-  
-  ASCATobj = list(Tumor_LogR = ASCATobj$Tumor_LogR, 
-                  Tumor_BAF = ASCATobj$Tumor_BAF, 
-                  Tumor_LogR_segmented = Tumor_LogR_segmented, 
-                  Tumor_BAF_segmented = Tumor_BAF_segmented, 
-                  Germline_LogR = ASCATobj$Germline_LogR, 
-                  Germline_BAF = ASCATobj$Germline_BAF, 
-                  SNPpos = ASCATobj$SNPpos, 
-                  ch = ASCATobj$ch, 
-                  chr = ASCATobj$chr, 
-                  chrs = ASCATobj$chrs, 
+
+  ASCATobj = list(Tumor_LogR = ASCATobj$Tumor_LogR,
+                  Tumor_BAF = ASCATobj$Tumor_BAF,
+                  Tumor_LogR_segmented = Tumor_LogR_segmented,
+                  Tumor_BAF_segmented = Tumor_BAF_segmented,
+                  Germline_LogR = ASCATobj$Germline_LogR,
+                  Germline_BAF = ASCATobj$Germline_BAF,
+                  SNPpos = ASCATobj$SNPpos,
+                  ch = ASCATobj$ch,
+                  chr = ASCATobj$chr,
+                  chrs = ASCATobj$chrs,
                   samples = colnames(ASCATobj$Tumor_LogR), gender = ASCATobj$gender,
                   sexchromosomes = ASCATobj$sexchromosomes, failedarrays = ascat.gg$failedarrays)
   return(ASCATobj)
@@ -659,13 +674,13 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, text
     seg[,5]=as.numeric(seg[,5])
     seg[,6]=as.numeric(seg[,6])
 
-    seg_raw = NULL  
+    seg_raw = NULL
     for (i in 1:length(goodarrays)) {
       segje = res[[goodarrays[i]]]$seg_raw
       seg_raw = rbind(seg_raw,cbind(ASCATobj$samples[goodarrays[i]],as.vector(ASCATobj$SNPpos[segje[,1],1]),
                               ASCATobj$SNPpos[segje[,1],2],
                               ASCATobj$SNPpos[segje[,2],2],segje[,3],segje[,4:ncol(segje)]))
-                    
+
     }
     colnames(seg_raw) = c("sample","chr","startpos","endpos","nMajor","nMinor","nAraw","nBraw")
 
@@ -741,7 +756,7 @@ split_genome = function(SNPpos) {
   #  holes=holes[-length(holes)]
   #  joincandidates=which(diff(c(0,holes,dim(SNPpos)[1]))<200)
   #}
- 
+
   #while(length(joincandidates)!=0) {
     # the while loop is because after joining, segments may still be too small..
 
@@ -750,14 +765,14 @@ split_genome = function(SNPpos) {
 
     # for each segment that is too short, see if it has the same chromosome as the segments before and after
     # the next always works because neither the first or the last segment is in joincandidates now
-    #previoussamechr = SNPpos[endseg[joincandidates-1],1]==SNPpos[startseg[joincandidates],1] 
+    #previoussamechr = SNPpos[endseg[joincandidates-1],1]==SNPpos[startseg[joincandidates],1]
     #nextsamechr = SNPpos[endseg[joincandidates],1]==SNPpos[startseg[joincandidates+1],1]
 
     #distanceprevious = SNPpos[startseg[joincandidates],2]-SNPpos[endseg[joincandidates-1],2]
     #distancenext = SNPpos[startseg[joincandidates+1],2]-SNPpos[endseg[joincandidates],2]
 
     # if both the same, decide based on distance, otherwise if one the same, take the other, if none, just take one.
-    #joins = ifelse(previoussamechr&nextsamechr, 
+    #joins = ifelse(previoussamechr&nextsamechr,
     #               ifelse(distanceprevious>distancenext, joincandidates, joincandidates-1),
     #               ifelse(nextsamechr, joincandidates, joincandidates-1))
 
@@ -774,7 +789,7 @@ split_genome = function(SNPpos) {
   for (i in 1:length(startseg)) {
     chr[[i]]=startseg[i]:endseg[i]
   }
-  
+
   return(chr)
 }
 
@@ -818,11 +833,11 @@ predictGermlineHomozygousStretches = function(chr, hom) {
           allhprobes = rbind(allhprobes,c(chrke,chr[[chrke]][min(hprobes)],chr[[chrke]][max(hprobes)]))
         }
       }
-   
+
     }
 
     HomoStretches[[sam]]=allhprobes
-  
+
   }
 
   return(HomoStretches)
@@ -832,7 +847,7 @@ predictGermlineHomozygousStretches = function(chr, hom) {
 
 
 
-# function to make segments of constant LRR and BAF 
+# function to make segments of constant LRR and BAF
 # this function is more general and does not depend on specifically ASPCF output
 # it can also handle segmention performed on LRR and BAF separately
 make_segments = function(r,b) {
@@ -869,7 +884,7 @@ make_segments = function(r,b) {
 # input: segmented LRR and BAF and the value for gamma
 create_distance_matrix = function(segments, gamma) {
   s = segments
-  psi_pos = seq(1,6,0.05) 
+  psi_pos = seq(1,6,0.05)
   rho_pos = seq(0.1,1.05,0.01)
   d = matrix(nrow = length(psi_pos), ncol = length(rho_pos))
   rownames(d) = psi_pos
@@ -889,7 +904,7 @@ create_distance_matrix = function(segments, gamma) {
       else {
         nMinor = nB
       }
-      d[i,j] = sum(abs(nMinor - pmax(round(nMinor),0))^2 * s[,"length"] * ifelse(s[,"b"]==0.5,0.05,1), na.rm=T) 
+      d[i,j] = sum(abs(nMinor - pmax(round(nMinor),0))^2 * s[,"length"] * ifelse(s[,"b"]==0.5,0.05,1), na.rm=T)
     }
   }
   return(d)
@@ -911,7 +926,7 @@ create_distance_matrix = function(segments, gamma) {
 # nonroundedprofilepng: if NA: copy number profile before rounding is plotted (total copy number as well as the copy number of the minor allele), if filename is given, the plot is written to a .png file
 # aberrationreliabilitypng: if NA: aberration reliability score is plotted, if filename is given, the plot is written to a .png file
 # gamma: technology parameter, compaction of Log R profiles (expected decrease in case of deletion in diploid sample, 100 % aberrant cells; 1 in ideal case, 0.55 of Illumina 109K arrays)
-runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromosomes, chrnames, sexchromosomes, failedqualitycheck = F, 
+runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromosomes, chrnames, sexchromosomes, failedqualitycheck = F,
                     distancepng = NA, copynumberprofilespng = NA, nonroundedprofilepng = NA, aberrationreliabilitypng = NA, gamma = 0.55,
 		    rho_manual = NA, psi_manual = NA, pdfPlot = F, y_limit = 5, textFlag = F) {
   ch = chromosomes
@@ -983,12 +998,12 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
           rho = as.numeric(colnames(d)[j])
           nA = (rho-1-(s[,"b"]-1)*2^(s[,"r"]/gamma)*((1-rho)*2+rho*psi))/rho
           nB = (rho-1+s[,"b"]*2^(s[,"r"]/gamma)*((1-rho)*2+rho*psi))/rho
-        
+
           # ploidy is recalculated based on results, to avoid bias (due to differences in normalization of LogR)
           ploidy = sum((nA+nB) * s[,"length"]) / sum(s[,"length"]);
-      
+
           percentzero = (sum((round(nA)==0)*s[,"length"])+sum((round(nB)==0)*s[,"length"]))/sum(s[,"length"])
-   
+
           goodnessOfFit = (1-m/TheoretMaxdist) * 100
 
           if (!nonaberrant & ploidy > MINPLOIDY & ploidy < MAXPLOIDY & rho >= MINRHO & goodnessOfFit > MINGOODNESSOFFIT & percentzero > MINPERCZERO) {
@@ -996,7 +1011,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
             optima[[nropt]] = c(m,i,j,ploidy,goodnessOfFit)
             localmin[nropt] = m
           }
-        }     
+        }
       }
     }
 
@@ -1012,12 +1027,12 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
             rho = as.numeric(colnames(d)[j])
             nA = (rho-1-(s[,"b"]-1)*2^(s[,"r"]/gamma)*((1-rho)*2+rho*psi))/rho
             nB = (rho-1+s[,"b"]*2^(s[,"r"]/gamma)*((1-rho)*2+rho*psi))/rho
-        
+
             # ploidy is recalculated based on results, to avoid bias (due to differences in normalization of LogR)
             ploidy = sum((nA+nB) * s[,"length"]) / sum(s[,"length"]);
-      
+
             perczeroAbb = (sum((round(nA)==0)*s[,"length"]*ifelse(s[,"b"]==0.5,0,1))+sum((round(nB)==0)*s[,"length"]*ifelse(s[,"b"]==0.5,0,1)))/sum(s[,"length"]*ifelse(s[,"b"]==0.5,0,1))
-            # the next can happen if BAF is a flat line at 0.5 
+            # the next can happen if BAF is a flat line at 0.5
             if (is.na(perczeroAbb)) {
               perczeroAbb = 0
             }
@@ -1029,7 +1044,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
               optima[[nropt]] = c(m,i,j,ploidy,goodnessOfFit)
               localmin[nropt] = m
             }
-          }     
+          }
         }
       }
     }
@@ -1049,20 +1064,20 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
             rho = as.numeric(colnames(d)[j])
             nA = (rho-1-(s[,"b"]-1)*2^(s[,"r"]/gamma)*((1-rho)*2+rho*psi))/rho
             nB = (rho-1+s[,"b"]*2^(s[,"r"]/gamma)*((1-rho)*2+rho*psi))/rho
-        
+
             # ploidy is recalculated based on results, to avoid bias (due to differences in normalization of LogR)
             ploidy = sum((nA+nB) * s[,"length"]) / sum(s[,"length"]);
- 
+
             percentzero = (sum((round(nA)==0)*s[,"length"])+sum((round(nB)==0)*s[,"length"]))/sum(s[,"length"])
             percOddEven = sum((round(nA)%%2==0&round(nB)%%2==1|round(nA)%%2==1&round(nB)%%2==0)*s[,"length"])/sum(s[,"length"])
             perczeroAbb = (sum((round(nA)==0)*s[,"length"]*ifelse(s[,"b"]==0.5,0,1))+sum((round(nB)==0)*s[,"length"]*ifelse(s[,"b"]==0.5,0,1)))/sum(s[,"length"]*ifelse(s[,"b"]==0.5,0,1))
             if (is.na(perczeroAbb)) {
               perczeroAbb = 0
             }
-     
+
             goodnessOfFit = (1-m/TheoretMaxdist) * 100
 
-            if (!nonaberrant & ploidy > MINPLOIDY & ploidy < MAXPLOIDY & rho >= MINRHO & goodnessOfFit > MINGOODNESSOFFIT & 
+            if (!nonaberrant & ploidy > MINPLOIDY & ploidy < MAXPLOIDY & rho >= MINRHO & goodnessOfFit > MINGOODNESSOFFIT &
                 (perczeroAbb > MINPERCZEROABB | percentzero > MINPERCZERO | percOddEven > MINPERCODDEVEN)) {
               nropt = nropt + 1
               optima[[nropt]] = c(m,i,j,ploidy,goodnessOfFit)
@@ -1085,12 +1100,12 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
             rho = as.numeric(colnames(d)[j])
             nA = (rho-1-(s[,"b"]-1)*2^(s[,"r"]/gamma)*((1-rho)*2+rho*psi))/rho
             nB = (rho-1+s[,"b"]*2^(s[,"r"]/gamma)*((1-rho)*2+rho*psi))/rho
-        
+
             # ploidy is recalculated based on results, to avoid bias (due to differences in normalization of LogR)
             ploidy = sum((nA+nB) * s[,"length"]) / sum(s[,"length"]);
- 
+
             perczeroAbb = (sum((round(nA)==0)*s[,"length"]*ifelse(s[,"b"]==0.5,0,1))+sum((round(nB)==0)*s[,"length"]*ifelse(s[,"b"]==0.5,0,1)))/sum(s[,"length"]*ifelse(s[,"b"]==0.5,0,1))
-            # the next can happen if BAF is a flat line at 0.5 
+            # the next can happen if BAF is a flat line at 0.5
             if (is.na(perczeroAbb)) {
               perczeroAbb = 0
             }
@@ -1115,7 +1130,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
 
     nA = (rho-1-(s[,"b"]-1)*2^(s[,"r"]/gamma)*((1-rho)*2+rho*psi))/rho
     nB = (rho-1+s[,"b"]*2^(s[,"r"]/gamma)*((1-rho)*2+rho*psi))/rho
-        
+
     # ploidy is recalculated based on results, to avoid bias (due to differences in normalization of LogR)
     ploidy = sum((nA+nB) * s[,"length"]) / sum(s[,"length"]);
 
@@ -1126,7 +1141,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     else {
       nMinor = nB
     }
-    m = sum(abs(nMinor - pmax(round(nMinor),0))^2 * s[,"length"] * ifelse(s[,"b"]==0.5,0.05,1), na.rm=T) 
+    m = sum(abs(nMinor - pmax(round(nMinor),0))^2 * s[,"length"] * ifelse(s[,"b"]==0.5,0.05,1), na.rm=T)
 
     goodnessOfFit = (1-m/TheoretMaxdist) * 100
 
@@ -1141,7 +1156,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     if (is.na(rho_manual)) {
       optlim = sort(localmin)[1]
       for (i in 1:length(optima)) {
-        if(optima[[i]][1] == optlim) {  
+        if(optima[[i]][1] == optlim) {
           psi_opt1 = as.numeric(rownames(d)[optima[[i]][2]])
           rho_opt1 = as.numeric(colnames(d)[optima[[i]][3]])
           if(rho_opt1 > 1) {
@@ -1167,7 +1182,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
 
 
   if(nropt>0) {
-    
+
     rho = rho_opt1
     psi = psi_opt1
     SNPposhet = SNPpos[names(bafsegmented),]
@@ -1189,11 +1204,11 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
                            ifelse(b<0.5,0,(rho-1+((1-rho)*2+rho*psi)*2^(r/gamma))/rho)))
     nA = pmax(round(nAfull),0)
     nB = pmax(round(nBfull),0)
-    
+
     if (is.na(nonroundedprofilepng)) {
       windows(10,5)
-    } 
-    else {  
+    }
+    else {
       if(pdfPlot){
         pdf(file = nonroundedprofilepng, width = 20, height = y_limit, pointsize=20)
       }
@@ -1201,9 +1216,9 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
         png(filename = nonroundedprofilepng, width = 2000, height = (y_limit*100), res = 200)
       }
     }
-    
+
     plot.nonRounded(ploidy_opt1, rho_opt1, goodnessOfFit_opt1, nonaberrant, nAfull, nBfull, y_limit, ch, bafsegmented, lrr, chrs, textFlag)
-  
+
     if (!is.na(nonroundedprofilepng)) {
       dev.off()
     }
@@ -1246,18 +1261,18 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
       }
       else if (nAraw<0) {
         nBraw = nAraw+nBraw
-        nAraw = 0  
+        nAraw = 0
       }
       else if (nBraw<0) {
         nAraw = nAraw+nBraw
-        nBraw = 0  
+        nBraw = 0
       }
-      # when evidence for odd copy number in segments of BAF = 0.5, assume a deviation.. 
+      # when evidence for odd copy number in segments of BAF = 0.5, assume a deviation..
       limitround = 0.5
       nA = ifelse(bafke==0.5,
              ifelse(nAraw+nBraw>round(nAraw)+round(nBraw)+limitround,
                round(nAraw)+1,
-               ifelse(nAraw+nBraw<round(nAraw)+round(nBraw)-limitround, 
+               ifelse(nAraw+nBraw<round(nAraw)+round(nBraw)-limitround,
                  round(nAraw),
                  round(nAraw))),
              round(nAraw))
@@ -1270,7 +1285,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
              round(nBraw))
       if (is.null(seg)) {
         seg = t(as.matrix(c(start,end,nA,nB)))
-        seg_raw = t(as.matrix(c(start,end,nA,nB,nAraw,nBraw))) 
+        seg_raw = t(as.matrix(c(start,end,nA,nB,nAraw,nBraw)))
       }
       else {
         seg = rbind(seg,c(start,end,nA,nB))
@@ -1285,7 +1300,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     for (chrnr in 1:length(ch)) {
       chrke = ch[[chrnr]]
       chrhelp[chrke] = chrnr
-    }    
+    }
 
     # every repeat joins 2 ends. 20 repeats will join about 1 million ends..
     for (rep in 1:20) {
@@ -1294,7 +1309,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
       skipnext = F
       for(i in 1:dim(seg2)[1]) {
         if(!skipnext) {
-          if(i != dim(seg2)[1] && seg2[i,"nA"]==seg2[i+1,"nA"] && seg2[i,"nB"]==seg2[i+1,"nB"] && 
+          if(i != dim(seg2)[1] && seg2[i,"nA"]==seg2[i+1,"nA"] && seg2[i,"nB"]==seg2[i+1,"nB"] &&
               chrhelp[seg2[i,"end"]]==chrhelp[seg2[i+1,"start"]]) {
             segline = c(seg2[i,"start"],seg2[i+1,"end"],seg2[i,3:4])
             skipnext = T
@@ -1322,7 +1337,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     names(nMajor) = names(lrrsegmented)
     nMinor = vector(length = length(lrrsegmented))
     names(nMinor) = names(lrrsegmented)
- 
+
     for (i in 1:dim(seg)[1]) {
       nMajor[seg[i,"start"]:seg[i,"end"]] = seg[i,"nA"]
       nMinor[seg[i,"start"]:seg[i,"end"]] = seg[i,"nB"]
@@ -1338,7 +1353,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     heteroprobes = setdiff(which(names(lrrsegmented)%in%names(bafsegmented)),NAprobes)
     homoprobes = setdiff(setdiff(which(!is.na(baf)),heteroprobes),NAprobes)
     CNprobes = setdiff(which(is.na(baf)),NAprobes)
- 
+
     n1all[NAprobes] = NA
     n2all[NAprobes] = NA
     n1all[CNprobes] = nMajor[CNprobes]+nMinor[CNprobes]
@@ -1353,8 +1368,8 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     # plot ASCAT profile
     if (is.na(copynumberprofilespng)) {
       windows(10,2.5)
-    } 
-    else {  
+    }
+    else {
       if(pdfPlot){
         pdf(file = copynumberprofilespng, width = 20, height = y_limit, pointsize=20)
       }
@@ -1372,8 +1387,8 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
 
     if (!is.na(aberrationreliabilitypng)) {
       png(filename = aberrationreliabilitypng, width = 2000, height = 500, res = 200)
-    } 
-    else {      
+    }
+    else {
       windows(10,2.5)
     }
 
@@ -1422,7 +1437,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
   else {
     return(list(rho = NA, psi = NA, goodnessOfFit = NA, nonaberrant = F, nA = NA, nB = NA, seg = NA, seg_raw = NA))
   }
-  
+
 }
 
 
@@ -1432,12 +1447,12 @@ plot.nonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant,nAfull,nBful
   maintitle = paste("Ploidy: ",sprintf("%1.2f",ploidy),", aberrant cell fraction: ",sprintf("%2.0f",rho*100),"%, goodness of fit: ",sprintf("%2.1f",goodnessOfFit),"%", ifelse(nonaberrant,", non-aberrant",""),sep="")
   plot(c(1,length(nAfull)), c(0,y_limit), type = "n", xaxt = "n", yaxt="n", main = maintitle, xlab = "", ylab = "")
   axis(side = 2, at = ticks)
-  
+
   nBfullPlot<-ifelse(nBfull<y_limit, nBfull, y_limit+0.1)
   nAfullPlot<-ifelse((nAfull+nBfull)<y_limit, nAfull+nBfull, y_limit+0.1)
-  
+
   abline(h=ticks, col="lightgrey", lty=1)
-  
+
   A_rle<-rle(nAfullPlot)
   start=0
   #plot purple rectangles
@@ -1447,7 +1462,7 @@ plot.nonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant,nAfull,nBful
     rect(start, (val-0.07), (start+size-1), (val+0.07), col=ifelse(val<y_limit, "purple", "violet"), border=ifelse(val<y_limit, "purple", "violet"))
     start=start+size
   }
-  
+
   B_rle<-rle(nBfullPlot)
   start=0
   #plot blue rectangles
@@ -1457,13 +1472,13 @@ plot.nonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant,nAfull,nBful
     rect(start, (val-0.07), (start+size-1), (val+0.07), col=ifelse(val<y_limit, "blue", "dodgerblue"), border=ifelse(val<y_limit, "blue", "dodgerblue"))
     start=start+size
   }
-  
-  
+
+
   #points(nAfullPlot,pch = "|", col=ifelse(nAfullPlot<y_limit, "purple", "violet"))
   #points(nBfullPlot,pch = "|", col=ifelse(nBfullPlot<y_limit, "blue", "dodgerblue"))
-  
+
   # don't ask me why, but the "|" sign is not centered, so the lines may need to be shifted..
-  
+
    abline(v=0,lty=1,col="lightgrey")
    chrk_tot_len = 0
    for (i in 1:length(ch)) {
@@ -1476,7 +1491,7 @@ plot.nonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant,nAfull,nBful
    text(tpos,y_limit,chrs[i], pos = 1, cex = 2)
    abline(v=vpos,lty=1,col="lightgrey")
    }
-   
+
    #add text to too high fragments
    if(textFlag){
 #      rleB<-rle(nBfullPlot>y_limit)
@@ -1488,7 +1503,7 @@ plot.nonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant,nAfull,nBful
 #        }
 #        pos=pos+rleB$lengths[i]
 #      }
-     
+
      rleA<-rle(nAfullPlot>y_limit)
      pos<-0
      for(i in 1:length(rleA$values)){
@@ -1502,23 +1517,23 @@ plot.nonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant,nAfull,nBful
 }
 
 plot.ascatProfile<-function(n1all, n2all, heteroprobes, ploidy, rho, goodnessOfFit, nonaberrant, y_limit, nAfull, ch, lrr, bafsegmented, chrs, textFlag){
-  
+
   par(mar = c(0.5,5,5,0.5), cex = 0.4, cex.main=3, cex.axis = 2.5)
   ticks=seq(0, y_limit, 1)
   nA2 = n1all[heteroprobes]
   nB2 = n2all[heteroprobes]
   nA = ifelse(nA2>nB2,nA2,nB2)
   nB = ifelse(nA2>nB2,nB2,nA2)
-  
+
   maintitle = paste("Ploidy: ",sprintf("%1.2f",ploidy),", aberrant cell fraction: ",sprintf("%2.0f",rho*100),"%, goodness of fit: ",sprintf("%2.1f",goodnessOfFit),"%", ifelse(nonaberrant,", non-aberrant",""),sep="")
   plot(c(1,length(nAfull)), c(0,y_limit), type = "n", xaxt = "n", yaxt="n", main = maintitle, xlab = "", ylab = "")
   axis(side = 2, at = ticks)
-  
+
   nBPlot<-ifelse(nB<=y_limit, nB, y_limit)
   nAPlot<-ifelse(nA<=y_limit, nA, y_limit+0.2)
-  
+
   abline(h=ticks, col="lightgrey", lty=1)
-  
+
   A_rle<-rle(nAPlot)
   start=0
   #plot purple rectangles
@@ -1528,7 +1543,7 @@ plot.ascatProfile<-function(n1all, n2all, heteroprobes, ploidy, rho, goodnessOfF
     rect(start, (val-0.17), (start+size-1), (val-0.03), col=ifelse(val<=y_limit, "red", "red4"), border=ifelse(val<=y_limit, "red", "red4"))
     start=start+size
   }
-  
+
   B_rle<-rle(nBPlot)
   start=0
   #plot blue rectangles
@@ -1538,11 +1553,11 @@ plot.ascatProfile<-function(n1all, n2all, heteroprobes, ploidy, rho, goodnessOfF
     rect(start, (val+0.03), (start+size-1), (val+0.17), col=ifelse(val<=y_limit, "green", "green4"), border=ifelse(val<=y_limit, "green", "green4"))
     start=start+size
   }
-  
-  
+
+
   #points(nAPlot-0.1,pch = "|", col=ifelse(nAPlot<=y_limit, "red", "red4"))
   #points(nBPlot+0.1,pch = "|", col=ifelse(nBPlot<=y_limit, "green", "green4"))
-  
+
   # don't ask me why, but the "|" sign is not centered, so the lines may need to be shifted..
   abline(v=0,lty=1,col="lightgrey")
   chrk_tot_len = 0
@@ -1556,7 +1571,7 @@ plot.ascatProfile<-function(n1all, n2all, heteroprobes, ploidy, rho, goodnessOfF
     text(tpos,y_limit,chrs[i], pos = 1, cex = 2)
     abline(v=vpos,lty=1,col="lightgrey")
   }
-  
+
   #add text to too high fragments
   if(textFlag){
 #     rleB<-rle(nBPlot>y_limit)
@@ -1568,8 +1583,8 @@ plot.ascatProfile<-function(n1all, n2all, heteroprobes, ploidy, rho, goodnessOfF
 #       }
 #       pos=pos+rleB$lengths[i]
 #     }
-    
-    
+
+
     rleA<-rle(nAPlot>y_limit)
     pos<-0
     for(i in 1:length(rleA$values)){
@@ -1580,12 +1595,12 @@ plot.ascatProfile<-function(n1all, n2all, heteroprobes, ploidy, rho, goodnessOfF
       pos=pos+rleA$lengths[i]
     }
   }
-  
+
 }
 
 
 
-# 
+#
 # Enhanced bivariate PCF filter for aCGH data (v. 08.02.2010)
 # Whole chromosomes/chromosome arms wrapper function
 #
@@ -1598,7 +1613,7 @@ fastAspcf <- function(logR, allB, kmin, gamma){
 
   startw = -d
   stopw = w-d
-  
+
   nseg = 0
   var2 = 0
   breakpts = 0
@@ -1627,28 +1642,28 @@ fastAspcf <- function(logR, allB, kmin, gamma){
       var2 <- var2 + sd2^2
       nseg = nseg+1
     }
-    
+
     if(stopw < N+d){
       startw <- min(stopw-2*d + 1,N-2*d)
       stopw <- startw + w
     }else{
       break
     }
-    
+
   }#end repeat
   breakpts <- unique(c(breakpts, N))
   if(nseg==0){nseg=1}  #just in case the sd-test never passes.
   sd2 <- sqrt(var2/nseg)
-  
+
   # On each segment calculate mean of unflipped B allele data
   frst <- breakpts[1:length(breakpts)-1] + 1
   last <- breakpts[2:length(breakpts)]
   nseg <- length(frst)
-  	
+
 	yhat1 <- rep(NA,N)
   yhat2 <- rep(NA,N)
 
-  for(i in 1:nseg){ 
+  for(i in 1:nseg){
     yhat1[frst[i]:last[i]] <- rep(mean(logR[frst[i]:last[i]]), last[i]-frst[i]+1)
     yi2 <- allB[frst[i]:last[i]]
     # Center data around zero (by subtracting 0.5) and estimate mean
@@ -1657,7 +1672,7 @@ fastAspcf <- function(logR, allB, kmin, gamma){
     }else{
       mu <- mean(abs(yi2-0.5))
     }
-    
+
     # Make a (slightly arbitrary) decision concerning branches
     # This may be improved by a test of equal variances
     if(sqrt(sd2^2+mu^2) < 2*sd2){
@@ -1677,21 +1692,21 @@ aspcfpart <- function(logRpart, allBflip, a, b, d, sd1, sd2, N, kmin, gamma){
 	from <- max(c(1,a))
   usefrom <- max(c(1,a+d))
   useto <- min(c(N,b-d))
-  
+
   N <- length(logRpart)
-	y1 <- logRpart	
+	y1 <- logRpart
 	y2 <- allBflip
-	
+
 	#Check that vectors are long enough to run algorithm:
 	if(N < 2*kmin){
 	 breakpts <- 0
-   return(list(breakpts=breakpts))  
+   return(list(breakpts=breakpts))
 	}
- 
+
 	# Find initSum, initKvad, initAve for segment y[1..kmin]
 	initSum1 <- sum(y1[1:kmin])
 	initKvad1 <- sum(y1[1:kmin]^2)
-	initAve1 <- initSum1/kmin     
+	initAve1 <- initSum1/kmin
 	initSum2 <- sum(y2[1:kmin])
 	initKvad2 <- sum(y2[1:kmin]^2)
 	initAve2 <- initSum2/kmin
@@ -1704,14 +1719,14 @@ aspcfpart <- function(logRpart, allBflip, a, b, d, sd1, sd2, N, kmin, gamma){
 
 	# Define vector of best splits
 	bestSplit <- rep(0,N)
-		
+
 	# Define vector of best averages
 	bestAver1 <- rep(0,N)
 	bestAver2 <- rep(0,N)
 	bestAver1[kmin] <- initAve1
 	bestAver2[kmin] <- initAve2
 
-	
+
 	#Initialize
 	Sum1 <- rep(0,N)
   Sum2 <- rep(0,N)
@@ -1720,7 +1735,7 @@ aspcfpart <- function(logRpart, allBflip, a, b, d, sd1, sd2, N, kmin, gamma){
   Aver1 <- rep(0,N)
   Aver2 <- rep(0,N)
   Cost <- rep(0,N)
-  
+
   # We have to treat the region y(1..2*kmin-1) separately, as it
 	# cannot be split into two full segments
   kminP1 <- kmin+1
@@ -1731,38 +1746,38 @@ aspcfpart <- function(logRpart, allBflip, a, b, d, sd1, sd2, N, kmin, gamma){
 		Sum2[kminP1:k] <- Sum2[kminP1:k]+y2[k]
 		Aver2[kminP1:k] <- Sum2[kminP1:k]/((k-kmin):1)
 		Kvad2[kminP1:k] <- Kvad2[kminP1:k]+y2[k]^2
-		
-		
+
+
 		bestAver1[k] <- (initSum1+Sum1[kminP1])/k
 		bestAver2[k] <- (initSum2+Sum2[kminP1])/k
     cost1 <- ((initKvad1+Kvad1[kminP1])-k*bestAver1[k]^2)/sd1^2
     cost2 <- ((initKvad2+Kvad2[kminP1])-k*bestAver2[k]^2)/sd2^2
-  
+
     bestCost[k] <- cost1 + cost2
-	  
+
  	}
-  
+
 
   for (n in (2*kmin):N) {
-		
+
    		nMkminP1=n-kmin+1
-   		
+
    		Sum1[kminP1:n] <- Sum1[kminP1:n]+ y1[n]
    		Aver1[kminP1:n] <- Sum1[kminP1:n]/((n-kmin):1)
    		Kvad1[kminP1:n] <- Kvad1[kminP1:n]+ (y1[n])^2
-   		                          
+
    		cost1 <- (Kvad1[kminP1:nMkminP1]-Sum1[kminP1:nMkminP1]*Aver1[kminP1:nMkminP1])/sd1^2
-   		
+
       Sum2[kminP1:n] <- Sum2[kminP1:n]+ y2[n]
    		Aver2[kminP1:n] <- Sum2[kminP1:n]/((n-kmin):1)
    		Kvad2[kminP1:n] <- Kvad2[kminP1:n]+ (y2[n])^2
    		cost2 <- (Kvad2[kminP1:nMkminP1]-Sum2[kminP1:nMkminP1]*Aver2[kminP1:nMkminP1])/sd2^2
-   		
+
       Cost[kminP1:nMkminP1] <- bestCost[kmin:(n-kmin)] + cost1 + cost2
-      
+
       Pos <- which.min(Cost[kminP1:nMkminP1])+kmin
    		cost <- Cost[Pos] + gamma
-   		
+
    		aver1 <- Aver1[Pos]
    		aver2 <- Aver2[Pos]
    		totAver1 <- (Sum1[kminP1]+initSum1)/n
@@ -1770,7 +1785,7 @@ aspcfpart <- function(logRpart, allBflip, a, b, d, sd1, sd2, N, kmin, gamma){
       totAver2 <- (Sum2[kminP1]+initSum2)/n
       totCost2 <- ((Kvad2[kminP1]+initKvad2) - n*totAver2*totAver2)/sd2^2
       totCost <- totCost1 + totCost2
-   		
+
       if (totCost < cost) {
        		Pos <- 1
           cost <- totCost
@@ -1781,10 +1796,10 @@ aspcfpart <- function(logRpart, allBflip, a, b, d, sd1, sd2, N, kmin, gamma){
    		bestAver1[n] <- aver1
    		bestAver2[n] <- aver2
    		bestSplit[n] <- Pos-1
- 	
-	  
+
+
    }#endfor
- 	
+
 
 	# Trace back
 	n <- N
@@ -1795,10 +1810,10 @@ aspcfpart <- function(logRpart, allBflip, a, b, d, sd1, sd2, N, kmin, gamma){
 	}#endwhile
 
   breakpts <- breakpts + from -1
-  breakpts <- breakpts[breakpts>=usefrom & breakpts<=useto] 
-  
+  breakpts <- breakpts[breakpts>=usefrom & breakpts<=useto]
+
   return(list(breakpts=breakpts))
-  
+
 }#end aspcfpart
 
 
@@ -1811,13 +1826,13 @@ div <- function(a, b, c){
 	if(nargs() < 3){
 	 	c <- 0
 	 }#endif
- 
+
 	if(b > 0){
 		v <-  a/b
 	}else{
     v <- c
 	}#endif
- 
+
 	 return(v)
 }#endfunction
 
@@ -1837,16 +1852,16 @@ div <- function(a, b, c){
 
 #Get mad SD (based on KL code)
 getMad <- function(x,k=25){
-  
+
   #Remove observations that are equal to zero; are likely to be imputed, should not contribute to sd:
   x <- x[x!=0]
-  
-  #Calculate runMedian  
+
+  #Calculate runMedian
   runMedian <- medianFilter(x,k)
-  
+
   dif <- x-runMedian
   SD <- mad(dif)
- 
+
 	return(SD)
 }
 
@@ -1952,7 +1967,7 @@ madWins <- function(x,tau,k){
 medianFilter <- function(x,k){
   n <- length(x)
   filtWidth <- 2*k + 1
-  
+
   #Make sure filtWidth does not exceed n
   if(filtWidth > n){
     if(n==0){
@@ -1964,7 +1979,7 @@ medianFilter <- function(x,k){
       filtWidth <- n
     }
   }
-  
+
   runMedian <- runmed(x,k=filtWidth,endrule="median")
 
   return(runMedian)
@@ -2153,7 +2168,7 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6") {
     }
 
     Hom = ifelse(bsm<homoLimit,T,NA)
-  
+
     Hetero = sum(Hom==F, na.rm=T)
     Homo = sum(Hom==T, na.rm=T)
     Undecided = sum(is.na(Hom))
@@ -2176,7 +2191,7 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6") {
         chrNonHomoProbes = intersect(nonHomoProbes,chrke)
 
         # there must be a minimum number of probes on the chromosome, otherwise these are called homozygous anyway
-        if (length(chrNonHomoProbes)>5) {        
+        if (length(chrNonHomoProbes)>5) {
 
           #make sure we're not going over any borders..
           segmentLength2 = min(length(chrNonHomoProbes)-1,segmentLength)
@@ -2261,7 +2276,7 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6") {
     Hom[is.na(Hom)] = T
 
     dev.off()
-  
+
     Homozygous[names(Hom),i] = Hom
   }
 
