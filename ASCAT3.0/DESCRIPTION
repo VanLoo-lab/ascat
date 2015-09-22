@@ -1,10 +1,15 @@
-Package: ASCAT3.0
+Package: ASCAT
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1
+Title: Allele-Specific Copy Number Analysis of Tumours
+Version: 3.0
 Date: 2015-09-22
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Authors@R: c(person("Peter", "Van Loo", role=c("aut","cre"), email="Peter.VanLoo@crick.ac.uk"),
+    person("Gro", "Nielsen", role="ctb"),
+    person("Jiqiu","Cheng", role="ctb"),
+    person("Stefan","Dentro", role="ctb"),
+    person("Kerstin","Haase", role="ctb"))
+Maintainer: Kerstin Haase <Kerstin.Haase@crick.ac.uk>
+Description: R package of ASCAT as published in http://www.ncbi.nlm.nih.gov/pubmed/20837533
+License: GPL-3
 LazyData: TRUE
+LazyLoad: yes
