@@ -1,8 +1,7 @@
-# ASCAT version 3.0, 22/09/2015
+# ASCAT 3.0
 # author: Peter Van Loo
 # PCF and ASPCF: Gro Nilsen
 # GC correction: Jiqiu Cheng
-
 
 #' @title ascat.loadData
 #' @description Function to read in SNP array data
@@ -11,9 +10,9 @@
 #' @param Tumor_BAF_file file containing BAF of tumour sample(s)
 #' @param Germline_LogR_file file containing logR of germline sample(s), NULL
 #' @param Germline_BAF_file file containing BAF of germline sample(s), NULL
-#' @param chrs
+#' @param chrs a vector containing the names for the chromosomes (e.g. c(1:22,"X"))
 #' @param gender a vector of gender for each cases ("XX" or "XY"). Default = all female ("XX")
-#' @param sexchromosomes
+#' @param sexchromosomes a vector containing the names for the sex chromosomes
 #'
 #' @return ascat data structure containing:\cr
 #' 1. Tumor_LogR data matrix\cr
@@ -533,8 +532,12 @@ ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), asc
 
 
 
-# plots SNP array data
-# input: an ASCAT object (e.g. from ASCAT.ASPCF) and plots the SNP array data before and after segmentation
+#' @title ascat.plotSegmentedData
+#' @description plots the SNP array data before and after segmentation
+#'
+#' @param ASCATobj an ASCAT object (e.g. from ascat.aspcf)
+#'
+#' @return png files showing raw and segmented tumour logR and BAF
 ascat.plotSegmentedData = function(ASCATobj) {
   for (arraynr in 1:dim(ASCATobj$Tumor_LogR)[2]) {
     Select_nonNAs = rownames(ASCATobj$Tumor_BAF_segmented[[arraynr]])
@@ -579,21 +582,26 @@ ascat.plotSegmentedData = function(ASCATobj) {
 }
 
 
-# the ASCAT main function, calculating the allele-specific copy numbers
-# input: (i) an ASCAT object from ascat.aspcf.
-# (ii) gamma: technology parameter, compaction of Log R profiles (expected decrease in case of deletion in diploid sample, 100 % aberrant cells; 1 in ideal case, 0.55 of Illumina 109K arrays)
-# (iii) rho_manual: optional argument to override ASCAT optimization and supply rho and psi parameters (not recommended)
-# (iv) psi_manual: optional argument to override ASCAT optimization and supply rho and psi parameters (not recommended)
-# output: an ASCAT output object, containing:
-# 1. nA: copy number of the A allele
-# 2. nB: copy number of the B allele
-# 3. aberrantcellfraction: the aberrant cell fraction of all arrays
-# 4. ploidy: the ploidy of all arrays
-# 5. failedarrays: arrays on which ASCAT analysis failed
-# 6. nonaberrantarrays = arrays on which ASCAT analysis indicates that they so virtually no aberrations
-# 7. segments: an array containing the copy number segments of each sample (not including failed arrays)
-# 8. segments_raw: an array containing the copy number segments of each sample without any rounding applied
-# note: for copy number only probes, nA contains the copy number value and nB = 0.
+
+#' @title ascat.runAscat
+#' @description ASCAT main function, calculating the allele-specific copy numbers
+#' @param ASCATobj an ASCAT object from ascat.aspcf
+#' @param gamma technology parameter, compaction of Log R profiles (expected decrease in case of deletion in diploid sample, 100\% aberrant cells; 1 in ideal case, 0.55 of Illumina 109K arrays)
+#' @param pdfPlot Optional flag if nonrounded plots and ASCAT profile in pdf format are desired. Default=F
+#' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
+#' @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
+#' @param rho_manual optional argument to override ASCAT optimization and supply rho parameter (not recommended)
+#' @param psi_manual optional argument to override ASCAT optimization and supply psi parameter (not recommended)
+#' @details Note: for copy number only probes, nA contains the copy number value and nB = 0.
+#' @return an ASCAT output object, containing:\cr
+#' 1. nA: copy number of the A allele\cr
+#' 2. nB: copy number of the B allele\cr
+#' 3. aberrantcellfraction: the aberrant cell fraction of all arrays\cr
+#' 4. ploidy: the ploidy of all arrays\cr
+#' 5. failedarrays: arrays on which ASCAT analysis failed\cr
+#' 6. nonaberrantarrays: arrays on which ASCAT analysis indicates that they show virtually no aberrations\cr
+#' 7. segments: an array containing the copy number segments of each sample (not including failed arrays)\cr
+#' 8. segments_raw: an array containing the copy number segments of each sample without any rounding applied\cr
 ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, textFlag=F, rho_manual = NA, psi_manual = NA) {
   goodarrays=NULL
   res = vector("list",dim(ASCATobj$Tumor_LogR)[2])
@@ -912,20 +920,31 @@ create_distance_matrix = function(segments, gamma) {
 
 
 
-# the ASCAT main function
-# lrr: (unsegmented) log R, in genomic sequence (all probes), with probe IDs
-# baf: (unsegmented) B Allele Frequency, in genomic sequence (all probes), with probe IDs
-# lrrsegmented: log R, segmented, in genomic sequence (all probes), with probe IDs
-# bafsegmented: B Allele Frequency, segmented, in genomic sequence (only probes heterozygous in germline), with probe IDs
-# chromosomes: a list containing c vectors, where c is the number of chromosomes and every vector contains all probe numbers per chromosome
-# chrnames: a vector containing the names for the chromosomes (e.g. c(1:22,"X"))
-# sexchromosomes: a vector containing the names for the sex chromosomes
-# failedqualitycheck: did the sample fail any previous quality check or not?
-# distancepng: if NA: distance is plotted, if filename is given, the plot is written to a .png file
-# copynumberprofilespng: if NA: possible copy number profiles are plotted, if filename is given, the plot is written to a .png file
-# nonroundedprofilepng: if NA: copy number profile before rounding is plotted (total copy number as well as the copy number of the minor allele), if filename is given, the plot is written to a .png file
-# aberrationreliabilitypng: if NA: aberration reliability score is plotted, if filename is given, the plot is written to a .png file
-# gamma: technology parameter, compaction of Log R profiles (expected decrease in case of deletion in diploid sample, 100 % aberrant cells; 1 in ideal case, 0.55 of Illumina 109K arrays)
+
+#' @title runASCAT
+#' @description the ASCAT main function
+#' @param lrr (unsegmented) log R, in genomic sequence (all probes), with probe IDs
+#' @param baf (unsegmented) B Allele Frequency, in genomic sequence (all probes), with probe IDs
+#' @param lrrsegmented log R, segmented, in genomic sequence (all probes), with probe IDs
+#' @param bafsegmented B Allele Frequency, segmented, in genomic sequence (only probes heterozygous in germline), with probe IDs
+#' @param gender: a vector of gender for each cases ("XX" or "XY"). Default = NULL: all female ("XX")
+#' @param SNPpos position of all SNPs
+#' @param chromosomes a list containing c vectors, where c is the number of chromosomes and every vector contains all probe numbers per chromosome
+#' @param chrnames a vector containing the names for the chromosomes (e.g. c(1:22,"X"))
+#' @param sexchromosomes a vector containing the names for the sex chromosomes
+#' @param failedqualitycheck did the sample fail any previous quality check or not?
+#' @param distancepng if NA: distance is plotted, if filename is given, the plot is written to a .png file
+#' @param copynumberprofilespng if NA: possible copy number profiles are plotted, if filename is given, the plot is written to a .png file
+#' @param nonroundedprofilepng if NA: copy number profile before rounding is plotted (total copy number as well as the copy number of the minor allele), if filename is given, the plot is written to a .png file
+#' @param aberrationreliabilitypng if NA: aberration reliability score is plotted, if filename is given, the plot is written to a .png file
+#' @param gamma technology parameter, compaction of Log R profiles (expected decrease in case of deletion in diploid sample, 100\% aberrant cells; 1 in ideal case, 0.55 of Illumina 109K arrays)
+#' @param rho_manual optional argument to override ASCAT optimization and supply rho parameter (not recommended)
+#' @param psi_manual optional argument to override ASCAT optimization and supply psi parameter (not recommended)
+#' @param pdfPlot Optional flag if nonrounded plots and ASCAT profile in pdf format are desired. Default=F
+#' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
+#' @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
+#'
+#' @return a list containing optimal purity and ploidy
 runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromosomes, chrnames, sexchromosomes, failedqualitycheck = F,
                     distancepng = NA, copynumberprofilespng = NA, nonroundedprofilepng = NA, aberrationreliabilitypng = NA, gamma = 0.55,
 		    rho_manual = NA, psi_manual = NA, pdfPlot = F, y_limit = 5, textFlag = F) {
@@ -1217,7 +1236,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
       }
     }
 
-    plot.nonRounded(ploidy_opt1, rho_opt1, goodnessOfFit_opt1, nonaberrant, nAfull, nBfull, y_limit, ch, bafsegmented, lrr, chrs, textFlag)
+    ascat.plotNonRounded(ploidy_opt1, rho_opt1, goodnessOfFit_opt1, nonaberrant, nAfull, nBfull, y_limit, ch, bafsegmented, lrr, chrs, textFlag)
 
     if (!is.na(nonroundedprofilepng)) {
       dev.off()
@@ -1378,7 +1397,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
       }
     }
     #plot ascat profile
-    plot.ascatProfile(n1all, n2all, heteroprobes, ploidy_opt1, rho_opt1, goodnessOfFit_opt1, nonaberrant,y_limit, nAfull, ch, lrr, bafsegmented, chrs, textFlag)
+    ascat.plotAscatProfile(n1all, n2all, heteroprobes, ploidy_opt1, rho_opt1, goodnessOfFit_opt1, nonaberrant,y_limit, nAfull, ch, lrr, bafsegmented, chrs, textFlag)
 
     if (!is.na(copynumberprofilespng)) {
       dev.off()
@@ -1441,7 +1460,24 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
 }
 
 
-plot.nonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant,nAfull,nBfull,y_limit,ch,bafsegmented,lrr,chrs, textFlag){
+#' @title ascat.plotNonRounded
+#'
+#' @param ploidy ploidy of the sample
+#' @param rho purity of the sample
+#' @param goodnessOfFit estimated goodness of fit
+#' @param nonaberrant
+#' @param nAfull copy number major allele
+#' @param nBfull copy number minor allele
+#' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
+#' @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
+#' @param ch a list containing c vectors, where c is the number of chromosomes and every vector contains all probe numbers per chromosome
+#' @param bafsegmented B Allele Frequency, segmented, in genomic sequence (only probes heterozygous in germline), with probe IDs
+#' @param lrr (unsegmented) log R, in genomic sequence (all probes), with probe IDs
+#' @param chrs a vector containing the names for the chromosomes (e.g. c(1:22,"X"))
+#'
+#' @return plot showing the nonrounded copy number profile
+#'
+ascat.plotNonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant,nAfull,nBfull,y_limit,ch,bafsegmented,lrr,chrs, textFlag){
   par(mar = c(0.5,5,5,0.5), cex = 0.4, cex.main=3, cex.axis = 2.5)
   ticks=seq(0, y_limit, 1)
   maintitle = paste("Ploidy: ",sprintf("%1.2f",ploidy),", aberrant cell fraction: ",sprintf("%2.0f",rho*100),"%, goodness of fit: ",sprintf("%2.1f",goodnessOfFit),"%", ifelse(nonaberrant,", non-aberrant",""),sep="")
@@ -1516,7 +1552,26 @@ plot.nonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant,nAfull,nBful
    }
 }
 
-plot.ascatProfile<-function(n1all, n2all, heteroprobes, ploidy, rho, goodnessOfFit, nonaberrant, y_limit, nAfull, ch, lrr, bafsegmented, chrs, textFlag){
+#' @title ascat.plotAscatProfile
+#'
+#' @param n1all copy number major allele
+#' @param n2all copy number minor allele
+#' @param heteroprobes probes with heterozygous germline
+#' @param ploidy ploidy of the sample
+#' @param rho purity of the sample
+#' @param goodnessOfFit estimated goodness of fit
+#' @param nonaberrant
+#' @param nAfull copy number major allele
+#'
+#' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
+#' @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
+#' @param ch a list containing c vectors, where c is the number of chromosomes and every vector contains all probe numbers per chromosome
+#' @param bafsegmented B Allele Frequency, segmented, in genomic sequence (only probes heterozygous in germline), with probe IDs
+#' @param lrr (unsegmented) log R, in genomic sequence (all probes), with probe IDs
+#' @param chrs a vector containing the names for the chromosomes (e.g. c(1:22,"X"))
+#'
+#' @return plot showing the ASCAT profile of the sample
+ascat.plotAscatProfile<-function(n1all, n2all, heteroprobes, ploidy, rho, goodnessOfFit, nonaberrant, y_limit, nAfull, ch, lrr, bafsegmented, chrs, textFlag){
 
   par(mar = c(0.5,5,5,0.5), cex = 0.4, cex.main=3, cex.axis = 2.5)
   ticks=seq(0, y_limit, 1)
@@ -2003,6 +2058,30 @@ psi <- function(x,z){
 
 
 
+#' @title ascat.predictGermlineGenotypes
+#' @description predicts the germline genotypes of samples for which no matched germline sample
+#' is available
+#' @param ASCATobj an ASCAT object
+#' @param platform used array platform
+#' @details Currently possible values for platform:\cr
+#' AffySNP6 (default)\cr
+#' Custom10k\cr
+#' Illumina109k\cr
+#' IlluminaCytoSNP\cr
+#' Illumina610k\cr
+#' Illumina660k\cr
+#' Illumina700k\cr
+#' Illumina1M\cr
+#' Illumina2.5M\cr
+#' IlluminaOmni5\cr
+#' Affy10k\cr
+#' Affy100k\cr
+#' Affy250k_sty\cr
+#' Affy250k_nsp\cr
+#' AffyOncoScan\cr
+#' AffyCytoScanHD\cr
+#'
+#' @return predicted germline genotypes
 ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6") {
   Homozygous = matrix(nrow = dim(ASCATobj$Tumor_LogR)[1], ncol = dim(ASCATobj$Tumor_LogR)[2])
   colnames(Homozygous) = colnames(ASCATobj$Tumor_LogR)

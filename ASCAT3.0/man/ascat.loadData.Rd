@@ -17,11 +17,11 @@ ascat.loadData(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = NULL,
 
 \item{Germline_BAF_file}{file containing BAF of germline sample(s), NULL}
 
-\item{chrs}{}
+\item{chrs}{a vector containing the names for the chromosomes (e.g. c(1:22,"X"))}
 
 \item{gender}{a vector of gender for each cases ("XX" or "XY"). Default = all female ("XX")}
 
-\item{sexchromosomes}{}
+\item{sexchromosomes}{a vector containing the names for the sex chromosomes}
 }
 \value{
 ascat data structure containing:\cr
