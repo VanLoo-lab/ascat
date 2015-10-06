@@ -5,7 +5,7 @@
 \title{ascat.plotNonRounded}
 \usage{
 ascat.plotNonRounded(ploidy, rho, goodnessOfFit, nonaberrant, nAfull, nBfull,
-  y_limit, ch, bafsegmented, lrr, chrs, textFlag)
+  y_limit = 5, ch, bafsegmented, lrr, chrs, textFlag = FALSE)
 }
 \arguments{
 \item{ploidy}{ploidy of the sample}

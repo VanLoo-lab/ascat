@@ -8,7 +8,8 @@ runASCAT(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromosomes,
   chrnames, sexchromosomes, failedqualitycheck = F, distancepng = NA,
   copynumberprofilespng = NA, nonroundedprofilepng = NA,
   aberrationreliabilitypng = NA, gamma = 0.55, rho_manual = NA,
-  psi_manual = NA, pdfPlot = F, y_limit = 5, textFlag = F)
+  psi_manual = NA, pdfPlot = F, y_limit = 5, textFlag = F,
+  circos = NA)
 }
 \arguments{
 \item{lrr}{(unsegmented) log R, in genomic sequence (all probes), with probe IDs}
@@ -48,6 +49,8 @@ runASCAT(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromosomes,
 \item{y_limit}{Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5}
 
 \item{textFlag}{Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F}
+
+\item{circos}{Optional file to output the non-rounded values in Circos track format. Default=NA}
 
 \item{gender:}{a vector of gender for each cases ("XX" or "XY"). Default = NULL: all female ("XX")}
 }

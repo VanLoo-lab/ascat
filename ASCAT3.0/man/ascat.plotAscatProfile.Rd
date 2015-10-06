@@ -5,7 +5,8 @@
 \title{ascat.plotAscatProfile}
 \usage{
 ascat.plotAscatProfile(n1all, n2all, heteroprobes, ploidy, rho, goodnessOfFit,
-  nonaberrant, y_limit, nAfull, ch, lrr, bafsegmented, chrs, textFlag)
+  nonaberrant, y_limit = 5, nAfull, ch, lrr, bafsegmented, chrs,
+  textFlag = FALSE)
 }
 \arguments{
 \item{n1all}{copy number major allele}

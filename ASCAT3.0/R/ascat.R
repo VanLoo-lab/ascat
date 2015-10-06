@@ -128,6 +128,7 @@ ascat.plotRawData = function(ASCATobj) {
     par(mar = c(0.5,5,5,0.5), mfrow = c(2,1), cex = 0.4, cex.main=3, cex.axis = 2, pch = ifelse(dim(ASCATobj$Tumor_LogR)[1]>100000,".",20))
     plot(c(1,dim(ASCATobj$Tumor_LogR)[1]), c(-1,1), type = "n", xaxt = "n", main = paste(ASCATobj$samples[i], ", tumor data, LogR", sep = ""), xlab = "", ylab = "")
     points(ASCATobj$Tumor_LogR[,i],col="red")
+    #points(ASCATobj$Tumor_LogR[,i],col=rainbow(24)[ASCATobj$SNPpos$Chr])
     abline(v=0.5,lty=1,col="lightgrey")
     chrk_tot_len = 0
     for (j in 1:length(ASCATobj$ch)) {
@@ -590,6 +591,7 @@ ascat.plotSegmentedData = function(ASCATobj) {
 #' @param pdfPlot Optional flag if nonrounded plots and ASCAT profile in pdf format are desired. Default=F
 #' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
 #' @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
+#' @param circos Optional file to output the non-rounded values in Circos track format. Default=NA
 #' @param rho_manual optional argument to override ASCAT optimization and supply rho parameter (not recommended)
 #' @param psi_manual optional argument to override ASCAT optimization and supply psi parameter (not recommended)
 #' @details Note: for copy number only probes, nA contains the copy number value and nB = 0.
@@ -602,7 +604,7 @@ ascat.plotSegmentedData = function(ASCATobj) {
 #' 6. nonaberrantarrays: arrays on which ASCAT analysis indicates that they show virtually no aberrations\cr
 #' 7. segments: an array containing the copy number segments of each sample (not including failed arrays)\cr
 #' 8. segments_raw: an array containing the copy number segments of each sample without any rounding applied\cr
-ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, textFlag=F, rho_manual = NA, psi_manual = NA) {
+ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, textFlag=F, circos=NA, rho_manual = NA, psi_manual = NA) {
   goodarrays=NULL
   res = vector("list",dim(ASCATobj$Tumor_LogR)[2])
   for (arraynr in 1:dim(ASCATobj$Tumor_LogR)[2]) {
@@ -624,12 +626,12 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, text
       res[[arraynr]] = runASCAT(lrr,baf,lrrsegm,bafsegm,ASCATobj$gender[arraynr],ASCATobj$SNPpos,ASCATobj$ch,ASCATobj$chrs,ASCATobj$sexchromosomes, failedqualitycheck,
                                 paste(ASCATobj$samples[arraynr],".sunrise.png",sep=""),paste(ASCATobj$samples[arraynr],".ASCATprofile.", ending ,sep=""),
                                 paste(ASCATobj$samples[arraynr],".rawprofile.", ending ,sep=""),paste(ASCATobj$samples[arraynr],".aberrationreliability.png",sep=""),
-                                gamma,NA,NA,pdfPlot, y_limit, textFlag)
+                                gamma,NA,NA,pdfPlot, y_limit, textFlag, circos)
     } else {
       res[[arraynr]] = runASCAT(lrr,baf,lrrsegm,bafsegm,ASCATobj$gender[arraynr],ASCATobj$SNPpos,ASCATobj$ch,ASCATobj$chrs,ASCATobj$sexchromosomes, failedqualitycheck,
                                 paste(ASCATobj$samples[arraynr],".sunrise.png",sep=""),paste(ASCATobj$samples[arraynr],".ASCATprofile.", ending,sep=""),
                                 paste(ASCATobj$samples[arraynr],".rawprofile.", ending,sep=""),paste(ASCATobj$samples[arraynr],".aberrationreliability.png",sep=""),
-                                gamma,rho_manual[arraynr],psi_manual[arraynr], pdfPlot, y_limit, textFlag)
+                                gamma,rho_manual[arraynr],psi_manual[arraynr], pdfPlot, y_limit, textFlag, circos)
     }
     if(!is.na(res[[arraynr]]$rho)) {
       goodarrays[length(goodarrays)+1] = arraynr
@@ -941,13 +943,14 @@ create_distance_matrix = function(segments, gamma) {
 #' @param rho_manual optional argument to override ASCAT optimization and supply rho parameter (not recommended)
 #' @param psi_manual optional argument to override ASCAT optimization and supply psi parameter (not recommended)
 #' @param pdfPlot Optional flag if nonrounded plots and ASCAT profile in pdf format are desired. Default=F
+#' @param circos Optional file to output the non-rounded values in Circos track format. Default=NA
 #' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
 #' @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
 #'
 #' @return a list containing optimal purity and ploidy
 runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromosomes, chrnames, sexchromosomes, failedqualitycheck = F,
                     distancepng = NA, copynumberprofilespng = NA, nonroundedprofilepng = NA, aberrationreliabilitypng = NA, gamma = 0.55,
-		    rho_manual = NA, psi_manual = NA, pdfPlot = F, y_limit = 5, textFlag = F) {
+		    rho_manual = NA, psi_manual = NA, pdfPlot = F, y_limit = 5, textFlag = F, circos=NA) {
   ch = chromosomes
   chrs = chrnames
   b = bafsegmented
@@ -1224,6 +1227,26 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     nA = pmax(round(nAfull),0)
     nB = pmax(round(nBfull),0)
 
+    if(!is.na(circos)){
+      frame<-cbind(SNPposhet,nAfull,nBfull)
+      chrSegmA<-rle(frame$nAfull)
+      chrSegmB<-rle(frame$nBfull)
+      if(all(chrSegmA$lengths==chrSegmB$lengths)){
+        start=1
+        for(i in 1:length(chrSegmA$values)){
+          valA<-chrSegmA$values[i]
+          valB<-chrSegmB$values[i]
+          size<-chrSegmA$lengths[i]
+          write(c(paste("hs",frame[start,]$Chr,sep=""),frame[start,]$Position,frame[(start+size-1),]$Position,valA), file = paste(circos,"_major",sep=""), ncolumns = 4, append = TRUE, sep = "\t")
+          write(c(paste("hs",frame[start,]$Chr,sep=""),frame[start,]$Position,frame[(start+size-1),]$Position,valB), file = paste(circos,"_minor",sep=""), ncolumns = 4, append = TRUE, sep = "\t")
+          start=start+size
+        }
+      }
+      else{
+        print("Major and minor allele copy numbers are segmented differently.")
+      }
+    }
+
     if (is.na(nonroundedprofilepng)) {
       windows(10,5)
     }
@@ -1477,7 +1500,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
 #'
 #' @return plot showing the nonrounded copy number profile
 #'
-ascat.plotNonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant,nAfull,nBfull,y_limit,ch,bafsegmented,lrr,chrs, textFlag){
+ascat.plotNonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant,nAfull,nBfull,y_limit=5,ch,bafsegmented,lrr,chrs, textFlag=FALSE){
   par(mar = c(0.5,5,5,0.5), cex = 0.4, cex.main=3, cex.axis = 2.5)
   ticks=seq(0, y_limit, 1)
   maintitle = paste("Ploidy: ",sprintf("%1.2f",ploidy),", aberrant cell fraction: ",sprintf("%2.0f",rho*100),"%, goodness of fit: ",sprintf("%2.1f",goodnessOfFit),"%", ifelse(nonaberrant,", non-aberrant",""),sep="")
@@ -1496,7 +1519,7 @@ ascat.plotNonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant,nAfull,
     val<-A_rle$values[i]
     size<-A_rle$lengths[i]
     rect(start, (val-0.07), (start+size-1), (val+0.07), col=ifelse(val<y_limit, "purple", "violet"), border=ifelse(val<y_limit, "purple", "violet"))
-    start=start+size
+     start=start+size
   }
 
   B_rle<-rle(nBfullPlot)
@@ -1571,7 +1594,7 @@ ascat.plotNonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant,nAfull,
 #' @param chrs a vector containing the names for the chromosomes (e.g. c(1:22,"X"))
 #'
 #' @return plot showing the ASCAT profile of the sample
-ascat.plotAscatProfile<-function(n1all, n2all, heteroprobes, ploidy, rho, goodnessOfFit, nonaberrant, y_limit, nAfull, ch, lrr, bafsegmented, chrs, textFlag){
+ascat.plotAscatProfile<-function(n1all, n2all, heteroprobes, ploidy, rho, goodnessOfFit, nonaberrant, y_limit=5, nAfull, ch, lrr, bafsegmented, chrs, textFlag=FALSE){
 
   par(mar = c(0.5,5,5,0.5), cex = 0.4, cex.main=3, cex.axis = 2.5)
   ticks=seq(0, y_limit, 1)

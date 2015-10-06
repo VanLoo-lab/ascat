@@ -47,7 +47,7 @@ for (chr in c(1:22,"X")) {
 #                 ".",window3,".txt\"",sep="")
   
   torun = paste("perl make_windowed_feature_means.pl -w ",window1," -chr chr",chr,
-                " -f ",bedgraphs,"/hg19.gc5Base.chr",chr,".bg.gz | fgrep -f ",platform,".chr",chr,".txt > GCcontent.chr",chr,
+                " -f ",bedgraphs,"/hg19.gc5Base.chr",chr,".bg.gz | fgrep -f ",platform,".chr",chr,".txt > ",platform, ".GCcontent.chr",chr,
                 ".",window3,".txt",sep="")
   torunall = c(torunall,torun)
 }
