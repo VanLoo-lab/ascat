@@ -622,6 +622,9 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, text
       failedqualitycheck = T
     }
     ending = ifelse(pdfPlot, "pdf", "png")
+    if(!is.na(circos)){
+        circos=paste(circos,"_",ASCATobj$samples[arraynr],sep="")
+    }
     if(is.na(rho_manual)) {
       res[[arraynr]] = runASCAT(lrr,baf,lrrsegm,bafsegm,ASCATobj$gender[arraynr],ASCATobj$SNPpos,ASCATobj$ch,ASCATobj$chrs,ASCATobj$sexchromosomes, failedqualitycheck,
                                 paste(ASCATobj$samples[arraynr],".sunrise.png",sep=""),paste(ASCATobj$samples[arraynr],".ASCATprofile.", ending ,sep=""),
