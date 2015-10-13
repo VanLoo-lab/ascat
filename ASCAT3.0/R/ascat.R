@@ -623,18 +623,18 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, text
     }
     ending = ifelse(pdfPlot, "pdf", "png")
     if(!is.na(circos)){
-        circos=paste(circos,"_",ASCATobj$samples[arraynr],sep="")
+        circosName=paste(circos,"_",ASCATobj$samples[arraynr],sep="")
     }
     if(is.na(rho_manual)) {
       res[[arraynr]] = runASCAT(lrr,baf,lrrsegm,bafsegm,ASCATobj$gender[arraynr],ASCATobj$SNPpos,ASCATobj$ch,ASCATobj$chrs,ASCATobj$sexchromosomes, failedqualitycheck,
                                 paste(ASCATobj$samples[arraynr],".sunrise.png",sep=""),paste(ASCATobj$samples[arraynr],".ASCATprofile.", ending ,sep=""),
                                 paste(ASCATobj$samples[arraynr],".rawprofile.", ending ,sep=""),paste(ASCATobj$samples[arraynr],".aberrationreliability.png",sep=""),
-                                gamma,NA,NA,pdfPlot, y_limit, textFlag, circos)
+                                gamma,NA,NA,pdfPlot, y_limit, textFlag, circosName)
     } else {
       res[[arraynr]] = runASCAT(lrr,baf,lrrsegm,bafsegm,ASCATobj$gender[arraynr],ASCATobj$SNPpos,ASCATobj$ch,ASCATobj$chrs,ASCATobj$sexchromosomes, failedqualitycheck,
                                 paste(ASCATobj$samples[arraynr],".sunrise.png",sep=""),paste(ASCATobj$samples[arraynr],".ASCATprofile.", ending,sep=""),
                                 paste(ASCATobj$samples[arraynr],".rawprofile.", ending,sep=""),paste(ASCATobj$samples[arraynr],".aberrationreliability.png",sep=""),
-                                gamma,rho_manual[arraynr],psi_manual[arraynr], pdfPlot, y_limit, textFlag, circos)
+                                gamma,rho_manual[arraynr],psi_manual[arraynr], pdfPlot, y_limit, textFlag, circosName)
     }
     if(!is.na(res[[arraynr]]$rho)) {
       goodarrays[length(goodarrays)+1] = arraynr
