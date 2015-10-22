@@ -2396,7 +2396,7 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6") {
 
     png(filename = paste("tumorSep",colnames(ASCATobj$Tumor_LogR)[i],".png",sep=""), width = 2000, height = 500, res = 200)
     title = paste(paste(colnames(ASCATobj$Tumor_BAF)[i], Hetero), Homo)
-    ascat.plotGenotypes(ASCATobj,Tumor_BAF_noNA, Hom, ch_noNA)
+    ascat.plotGenotypes(ASCATobj,title,Tumor_BAF_noNA, Hom, ch_noNA)
     dev.off()
 
     Homozygous[names(Hom),i] = Hom
