@@ -21,7 +21,7 @@ ascat.plotAscatProfile(n1all, n2all, heteroprobes, ploidy, rho, goodnessOfFit,
 
 \item{goodnessOfFit}{estimated goodness of fit}
 
-\item{nonaberrant}{}
+\item{nonaberrant}{boolean flag denoting non-aberrated samples}
 
 \item{y_limit}{Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5}
 

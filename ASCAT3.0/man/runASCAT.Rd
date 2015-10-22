@@ -20,6 +20,8 @@ runASCAT(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromosomes,
 
 \item{bafsegmented}{B Allele Frequency, segmented, in genomic sequence (only probes heterozygous in germline), with probe IDs}
 
+\item{gender}{a vector of gender for each cases ("XX" or "XY"). Default = NULL: all female ("XX")}
+
 \item{SNPpos}{position of all SNPs}
 
 \item{chromosomes}{a list containing c vectors, where c is the number of chromosomes and every vector contains all probe numbers per chromosome}
@@ -51,8 +53,6 @@ runASCAT(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromosomes,
 \item{textFlag}{Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F}
 
 \item{circos}{Optional file to output the non-rounded values in Circos track format. Default=NA}
-
-\item{gender:}{a vector of gender for each cases ("XX" or "XY"). Default = NULL: all female ("XX")}
 }
 \value{
 a list containing optimal purity and ploidy

@@ -932,7 +932,7 @@ create_distance_matrix = function(segments, gamma) {
 #' @param baf (unsegmented) B Allele Frequency, in genomic sequence (all probes), with probe IDs
 #' @param lrrsegmented log R, segmented, in genomic sequence (all probes), with probe IDs
 #' @param bafsegmented B Allele Frequency, segmented, in genomic sequence (only probes heterozygous in germline), with probe IDs
-#' @param gender: a vector of gender for each cases ("XX" or "XY"). Default = NULL: all female ("XX")
+#' @param gender a vector of gender for each cases ("XX" or "XY"). Default = NULL: all female ("XX")
 #' @param SNPpos position of all SNPs
 #' @param chromosomes a list containing c vectors, where c is the number of chromosomes and every vector contains all probe numbers per chromosome
 #' @param chrnames a vector containing the names for the chromosomes (e.g. c(1:22,"X"))
@@ -951,6 +951,8 @@ create_distance_matrix = function(segments, gamma) {
 #' @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
 #'
 #' @return a list containing optimal purity and ploidy
+#'
+#' @import RColorBrewer
 runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromosomes, chrnames, sexchromosomes, failedqualitycheck = F,
                     distancepng = NA, copynumberprofilespng = NA, nonroundedprofilepng = NA, aberrationreliabilitypng = NA, gamma = 0.55,
 		    rho_manual = NA, psi_manual = NA, pdfPlot = F, y_limit = 5, textFlag = F, circos=NA) {
@@ -958,8 +960,6 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
   chrs = chrnames
   b = bafsegmented
   r = lrrsegmented[names(bafsegmented)]
-
-  library(RColorBrewer)
 
   SNPposhet = SNPpos[names(bafsegmented),]
   autoprobes = !(SNPposhet[,1]%in%sexchromosomes)
@@ -979,8 +979,8 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
   hmcol = rev(colorRampPalette(brewer.pal(10, "RdBu"))(256))
   image(log(d), col = hmcol, axes = F, xlab = "Ploidy", ylab = "Aberrant cell fraction")
 
-  axis(1, at = seq(0, 1, by = 1/5), label = seq(1, 6, by = 1))
-  axis(2, at = seq(0, 1/1.05, by = 1/3/1.05), label = seq(0.1, 1, by = 3/10))
+  axis(1, at = seq(0, 1, by = 1/5), labels = seq(1, 6, by = 1))
+  axis(2, at = seq(0, 1/1.05, by = 1/3/1.05), labels = seq(0.1, 1, by = 3/10))
 
   TheoretMaxdist = sum(rep(0.25,dim(s)[1]) * s[,"length"] * ifelse(s[,"b"]==0.5,0.05,1),na.rm=T)
 
@@ -1251,7 +1251,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     }
 
     if (is.na(nonroundedprofilepng)) {
-      windows(10,5)
+      dev.new(10,5)
     }
     else {
       if(pdfPlot){
@@ -1412,7 +1412,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
 
     # plot ASCAT profile
     if (is.na(copynumberprofilespng)) {
-      windows(10,2.5)
+      dev.new(10,2.5)
     }
     else {
       if(pdfPlot){
@@ -1434,7 +1434,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
       png(filename = aberrationreliabilitypng, width = 2000, height = 500, res = 200)
     }
     else {
-      windows(10,2.5)
+      dev.new(10,2.5)
     }
 
     par(mar = c(0.5,5,5,0.5), cex = 0.4, cex.main=3, cex.axis = 2.5)
@@ -1491,7 +1491,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
 #' @param ploidy ploidy of the sample
 #' @param rho purity of the sample
 #' @param goodnessOfFit estimated goodness of fit
-#' @param nonaberrant
+#' @param nonaberrant boolean flag denoting non-aberrated samples
 #' @param nAfull copy number major allele
 #' @param nBfull copy number minor allele
 #' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
@@ -1586,7 +1586,7 @@ ascat.plotNonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant,nAfull,
 #' @param ploidy ploidy of the sample
 #' @param rho purity of the sample
 #' @param goodnessOfFit estimated goodness of fit
-#' @param nonaberrant
+#' @param nonaberrant boolean flag denoting non-aberrated samples
 #' @param nAfull copy number major allele
 #'
 #' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5

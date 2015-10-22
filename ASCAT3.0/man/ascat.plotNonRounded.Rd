@@ -14,7 +14,7 @@ ascat.plotNonRounded(ploidy, rho, goodnessOfFit, nonaberrant, nAfull, nBfull,
 
 \item{goodnessOfFit}{estimated goodness of fit}
 
-\item{nonaberrant}{}
+\item{nonaberrant}{boolean flag denoting non-aberrated samples}
 
 \item{nAfull}{copy number major allele}
 
