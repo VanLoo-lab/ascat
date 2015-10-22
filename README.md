@@ -1,12 +1,9 @@
-Allele-Specific Copy number Analysis of Tumors - R package
+Allele-Specific Copy number Analysis of Tumors
 ======
 
 Description
 --------
-This R package contains the R code of ASCAT, described in [this](http://www.ncbi.nlm.nih.gov/pubmed/20837533) publication. More information is to follow.
+This contains v1.0 of the ASCAT, described in [this](http://www.ncbi.nlm.nih.gov/pubmed/20837533) publication.
 
-Installation
---------
-Use the devtools R package to install ASCAT:
+It consists of two parts, Segmentation in writtin in MATLAB and ASCAT code in R.
 
-    > library(devtools); install_github("FCI-CancerGenomics/ASCAT")
