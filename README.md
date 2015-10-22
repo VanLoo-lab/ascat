@@ -1,4 +1,4 @@
-Allele-Specific Copy number Analysis of Tumors - R package
+Allele-Specific Copy number Analysis of Tumors
 ======
 
 Description
