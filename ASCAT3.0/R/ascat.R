@@ -26,6 +26,8 @@
 #' 9. chr: a list containing vectors with the indices for each distinct part that can be segmented separately (e.g. chromosome arm, stretch of DNA between gaps in the array design)\cr
 #' 10. gender: a vector of gender for each cases ("XX" or "XY"). Default = NULL: all female ("XX")\cr
 #'
+#' @export
+#'
 ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = NULL, Germline_BAF_file = NULL, chrs = c(1:22,"X","Y"), gender = NULL, sexchromosomes = c("X","Y")) {
 
   # read in SNP array data files
@@ -121,6 +123,8 @@ ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = 
 #' @param ASCATobj an ASCAT object (e.g. data structure from ascat.loadData)
 #'
 #' @return Produces png files showing the logR and BAF values for tumour and germline samples
+#'
+#' @export
 ascat.plotRawData = function(ASCATobj) {
   print.noquote("Plotting tumor data")
   for (i in 1:dim(ASCATobj$Tumor_LogR)[2]) {
@@ -199,6 +203,8 @@ ascat.plotRawData = function(ASCATobj) {
 #' @param GCcontentfile File containing the GC content around every SNP for increasing window sizes
 #' @details Note that probes not present in the GCcontentfile will be lost from the results
 #' @return ASCAT object with corrected tumour logR
+#'
+#' @export
 ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
   if(is.null(GCcontentfile)) {
     print.noquote("Error: no GC content file given!")
@@ -301,6 +307,8 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
 #' 7. SNPpos: position of all SNPs\cr
 #' 8. ch: a list containing vectors with the indices for each chromosome (e.g. Tumor_LogR[ch[[13]],] will output the Tumor_LogR data of chromosome 13\cr
 #' 9. chr: a list containing vectors with the indices for each distinct part that can be segmented separately (e.g. chromosome arm, stretch of DNA between gaps in the array design)\cr
+#'
+#' @export
 #'
 ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), ascat.gg = NULL, penalty = 25) {
   #first, set germline genotypes
@@ -539,6 +547,9 @@ ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), asc
 #' @param ASCATobj an ASCAT object (e.g. from ascat.aspcf)
 #'
 #' @return png files showing raw and segmented tumour logR and BAF
+#'
+#' @export
+#'
 ascat.plotSegmentedData = function(ASCATobj) {
   for (arraynr in 1:dim(ASCATobj$Tumor_LogR)[2]) {
     Select_nonNAs = rownames(ASCATobj$Tumor_BAF_segmented[[arraynr]])
@@ -604,6 +615,9 @@ ascat.plotSegmentedData = function(ASCATobj) {
 #' 6. nonaberrantarrays: arrays on which ASCAT analysis indicates that they show virtually no aberrations\cr
 #' 7. segments: an array containing the copy number segments of each sample (not including failed arrays)\cr
 #' 8. segments_raw: an array containing the copy number segments of each sample without any rounding applied\cr
+#'
+#' @export
+#'
 ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, textFlag=F, circos=NA, rho_manual = NA, psi_manual = NA) {
   goodarrays=NULL
   res = vector("list",dim(ASCATobj$Tumor_LogR)[2])
@@ -622,6 +636,7 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, text
       failedqualitycheck = T
     }
     ending = ifelse(pdfPlot, "pdf", "png")
+    circosName=NA
     if(!is.na(circos)){
         circosName=paste(circos,"_",ASCATobj$samples[arraynr],sep="")
     }
@@ -953,6 +968,8 @@ create_distance_matrix = function(segments, gamma) {
 #' @return a list containing optimal purity and ploidy
 #'
 #' @import RColorBrewer
+#'
+#' @export
 runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromosomes, chrnames, sexchromosomes, failedqualitycheck = F,
                     distancepng = NA, copynumberprofilespng = NA, nonroundedprofilepng = NA, aberrationreliabilitypng = NA, gamma = 0.55,
 		    rho_manual = NA, psi_manual = NA, pdfPlot = F, y_limit = 5, textFlag = F, circos=NA) {
@@ -969,18 +986,6 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
 
   s = make_segments(r2,b2)
   d = create_distance_matrix(s, gamma)
-
-  if (!is.na(distancepng)) {
-    png(filename = distancepng, width = 1000, height = 1000, res = 1000/7)
-  }
-
-  par(mar = c(5,5,0.5,0.5), cex=0.75, cex.lab=2, cex.axis=2)
-
-  hmcol = rev(colorRampPalette(brewer.pal(10, "RdBu"))(256))
-  image(log(d), col = hmcol, axes = F, xlab = "Ploidy", ylab = "Aberrant cell fraction")
-
-  axis(1, at = seq(0, 1, by = 1/5), labels = seq(1, 6, by = 1))
-  axis(2, at = seq(0, 1/1.05, by = 1/3/1.05), labels = seq(0.1, 1, by = 3/10))
 
   TheoretMaxdist = sum(rep(0.25,dim(s)[1]) * s[,"length"] * ifelse(s[,"b"]==0.5,0.05,1),na.rm=T)
 
@@ -1189,7 +1194,6 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
           }
           ploidy_opt1 = optima[[i]][4]
           goodnessOfFit_opt1 = optima[[i]][5]
-          points((psi_opt1-1)/5,(rho_opt1-0.1)/0.95,col="green",pch="X", cex = 2)
         }
       }
     } else {
@@ -1197,14 +1201,17 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
       psi_opt1 = optima[[1]][3]
       ploidy_opt1 = optima[[1]][4]
       goodnessOfFit_opt1 = optima[[1]][5]
-      points((psi_opt1-1)/5,(rho_opt1-0.1)/0.95,col="green",pch="X", cex = 2)
     }
   }
 
+  #plot Sunrise
+  if (!is.na(distancepng)) {
+    png(filename = distancepng, width = 1000, height = 1000, res = 1000/7)
+  }
+  ascat.plotSunrise(d,psi_opt1,rho_opt1)
   if (!is.na(distancepng)) {
     dev.off()
   }
-
 
   if(nropt>0) {
 
@@ -1485,6 +1492,27 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
 
 }
 
+#' ascat.plotSunrise
+#'
+#' @param d distance matrix for a range of ploidy and tumour percentage values
+#' @param psi_opt1 optimal ploidy
+#' @param rho_opt1 optimal aberrant cell fraction
+#'
+#' @return plot visualising range of ploidy and tumour percentage values
+#' @export
+ascat.plotSunrise<-function(d, psi_opt1, rho_opt1){
+
+  par(mar = c(5,5,0.5,0.5), cex=0.75, cex.lab=2, cex.axis=2)
+
+  hmcol = rev(colorRampPalette(brewer.pal(10, "RdBu"))(256))
+  image(log(d), col = hmcol, axes = F, xlab = "Ploidy", ylab = "Aberrant cell fraction")
+
+  axis(1, at = seq(0, 1, by = 1/5), labels = seq(1, 6, by = 1))
+  axis(2, at = seq(0, 1/1.05, by = 1/3/1.05), labels = seq(0.1, 1, by = 3/10))
+
+  points((psi_opt1-1)/5,(rho_opt1-0.1)/0.95,col="green",pch="X", cex = 2)
+}
+
 
 #' @title ascat.plotNonRounded
 #'
@@ -1503,6 +1531,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
 #'
 #' @return plot showing the nonrounded copy number profile
 #'
+#' @export
 ascat.plotNonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant,nAfull,nBfull,y_limit=5,ch,bafsegmented,lrr,chrs, textFlag=FALSE){
   par(mar = c(0.5,5,5,0.5), cex = 0.4, cex.main=3, cex.axis = 2.5)
   ticks=seq(0, y_limit, 1)
@@ -1597,6 +1626,9 @@ ascat.plotNonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant,nAfull,
 #' @param chrs a vector containing the names for the chromosomes (e.g. c(1:22,"X"))
 #'
 #' @return plot showing the ASCAT profile of the sample
+#'
+#' @export
+#'
 ascat.plotAscatProfile<-function(n1all, n2all, heteroprobes, ploidy, rho, goodnessOfFit, nonaberrant, y_limit=5, nAfull, ch, lrr, bafsegmented, chrs, textFlag=FALSE){
 
   par(mar = c(0.5,5,5,0.5), cex = 0.4, cex.main=3, cex.axis = 2.5)
@@ -2108,6 +2140,8 @@ psi <- function(x,z){
 #' AffyCytoScanHD\cr
 #'
 #' @return predicted germline genotypes
+#'
+#' @export
 ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6") {
   Homozygous = matrix(nrow = dim(ASCATobj$Tumor_LogR)[1], ncol = dim(ASCATobj$Tumor_LogR)[2])
   colnames(Homozygous) = colnames(ASCATobj$Tumor_LogR)
@@ -2236,8 +2270,6 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6") {
   failedarrays = NULL
 
   for (i in 1:dim(ASCATobj$Tumor_LogR)[2]) {
-    png(filename = paste("tumorSep",colnames(ASCATobj$Tumor_LogR)[i],".png",sep=""), width = 2000, height = 500, res = 200)
-    par(mar = c(0.5,5,5,0.5), cex = 0.4, cex.main=3, cex.axis = 2, pch = ifelse(dim(ASCATobj$Tumor_LogR)[1]>100000,".",20))
 
     Tumor_BAF_noNA = ASCATobj$Tumor_BAF[!is.na(ASCATobj$Tumor_BAF[,i]),i]
     names(Tumor_BAF_noNA) = rownames(ASCATobj$Tumor_BAF)[!is.na(ASCATobj$Tumor_BAF[,i])]
@@ -2274,11 +2306,10 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6") {
 
     Hom = ifelse(bsm<homoLimit,T,NA)
 
-    Hetero = sum(Hom==F, na.rm=T)
     Homo = sum(Hom==T, na.rm=T)
     Undecided = sum(is.na(Hom))
 
-    extraHetero = round(min(proportionHetero * length(Tumor_BAF_noNA) - Hetero,Undecided-proportionOpen*length(Tumor_BAF_noNA)))
+    extraHetero = round(min(proportionHetero * length(Tumor_BAF_noNA),Undecided-proportionOpen*length(Tumor_BAF_noNA)))
 
     if(extraHetero>0) {
 
@@ -2360,26 +2391,12 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6") {
       Undecided = sum(is.na(Hom))
 
     }
-
-    title = paste(paste(colnames(ASCATobj$Tumor_BAF)[i], Hetero), Homo)
-    plot(c(1,length(Tumor_BAF_noNA)), c(0,1), type = "n", xaxt = "n", main = title, xlab = "", ylab = "")
-    points(Tumor_BAF_noNA,col=ifelse(is.na(Hom),"green",ifelse(Hom,"blue","red")))
-
-    abline(v=0.5,lty=1,col="lightgrey")
-    chrk_tot_len = 0
-    for (j in 1:length(ch_noNA)) {
-      chrk = ch_noNA[[j]];
-      chrk_tot_len_prev = chrk_tot_len
-      chrk_tot_len = chrk_tot_len + length(chrk)
-      vpos = chrk_tot_len;
-      tpos = (chrk_tot_len+chrk_tot_len_prev)/2;
-      text(tpos,1,ASCATobj$chrs[j], pos = 1, cex = 2)
-      abline(v=vpos+0.5,lty=1,col="lightgrey")
-    }
-
     # set all Undecided to homozygous
     Hom[is.na(Hom)] = T
 
+    png(filename = paste("tumorSep",colnames(ASCATobj$Tumor_LogR)[i],".png",sep=""), width = 2000, height = 500, res = 200)
+    title = paste(paste(colnames(ASCATobj$Tumor_BAF)[i], Hetero), Homo)
+    ascat.plotGenotypes(ASCATobj,Tumor_BAF_noNA, Hom, ch_noNA)
     dev.off()
 
     Homozygous[names(Hom),i] = Hom
@@ -2389,3 +2406,32 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6") {
 
 }
 
+
+#' ascat.plotGenotypes
+#'
+#' @param ASCATobj an ASCAT object
+#' @param title main title of the plot
+#' @param Tumor_BAF_noNA B-allele frequencies of the tumour sample with removed NA values
+#' @param Hom Boolean vector denoting homozygous SNPs
+#' @param ch_noNA vector of probes per chromosome (NA values excluded)
+#'
+#' @return plot showing classified BAF per sample, with unused SNPs in green, germline homozygous SNPs in blue and all others in red
+#' @export
+#'
+ascat.plotGenotypes<-function(ASCATobj, title, Tumor_BAF_noNA, Hom, ch_noNA){
+  par(mar = c(0.5,5,5,0.5), cex = 0.4, cex.main=3, cex.axis = 2, pch = ifelse(dim(ASCATobj$Tumor_LogR)[1]>100000,".",20))
+  plot(c(1,length(Tumor_BAF_noNA)), c(0,1), type = "n", xaxt = "n", main = title, xlab = "", ylab = "")
+  points(Tumor_BAF_noNA,col=ifelse(is.na(Hom),"green",ifelse(Hom,"blue","red")))
+
+  abline(v=0.5,lty=1,col="lightgrey")
+  chrk_tot_len = 0
+  for (j in 1:length(ch_noNA)) {
+    chrk = ch_noNA[[j]];
+    chrk_tot_len_prev = chrk_tot_len
+    chrk_tot_len = chrk_tot_len + length(chrk)
+    vpos = chrk_tot_len;
+    tpos = (chrk_tot_len+chrk_tot_len_prev)/2;
+    text(tpos,1,ASCATobj$chrs[j], pos = 1, cex = 2)
+    abline(v=vpos+0.5,lty=1,col="lightgrey")
+  }
+}
