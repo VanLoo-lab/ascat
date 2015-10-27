@@ -1501,81 +1501,127 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
 #' @param lrr (unsegmented) log R, in genomic sequence (all probes), with probe IDs
 #' @param chrs a vector containing the names for the chromosomes (e.g. c(1:22,"X"))
 #'
-#' @return plot showing the nonrounded copy number profile
+#' @return plot showing the nonrounded copy number profile, using base plotting function 
 #'
 ascat.plotNonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant,nAfull,nBfull,y_limit=5,ch,bafsegmented,lrr,chrs, textFlag=FALSE){
-  par(mar = c(0.5,5,5,0.5), cex = 0.4, cex.main=3, cex.axis = 2.5)
-  ticks=seq(0, y_limit, 1)
   maintitle = paste("Ploidy: ",sprintf("%1.2f",ploidy),", aberrant cell fraction: ",sprintf("%2.0f",rho*100),"%, goodness of fit: ",sprintf("%2.1f",goodnessOfFit),"%", ifelse(nonaberrant,", non-aberrant",""),sep="")
-  plot(c(1,length(nAfull)), c(0,y_limit), type = "n", xaxt = "n", yaxt="n", main = maintitle, xlab = "", ylab = "")
-  axis(side = 2, at = ticks)
-
   nBfullPlot<-ifelse(nBfull<y_limit, nBfull, y_limit+0.1)
   nAfullPlot<-ifelse((nAfull+nBfull)<y_limit, nAfull+nBfull, y_limit+0.1)
+  colourTotal = "purple"
+  colourMinor = "blue"
+  base.gw.plot(bafsegmented,nAfullPlot,nBfullPlot,colourTotal,colourMinor,maintitle,chrs,y_limit,textFlag,twoColours=TRUE)
+}
 
+
+#' @title create.bb.plot.average
+#' 
+#' @param BAFvals B Allele Frequency for every probe with position 
+#' @param subclones Segments with chromosomal locations
+#' @param bafsegmented B Allele Frequency, segmented, in genomic sequence (only probes heterozygous in germline), with probe IDs 
+#' @param ploidy ploidy of the sample
+#' @param rho purity of the sample
+#' @param goodnessOfFit estimated goodness of fit
+#' @param pos_min
+#' @param pos_max
+#' @param segment_states_min Vector containing copy number per segment minor allele 
+#' @param segment_states_tot Vector containing copy number per segment total copy number 
+#' @param chr.segs Vector containing chromosome segments 
+#' 
+#' @return plot showing Battenberg average copy number profile using base plotting function
+#' 
+create.bb.plot.average = function(BAFvals, subclones, bafsegmented, ploidy, rho, goodnessOfFit, pos_min, pos_max, segment_states_min, segment_states_tot, chr.segs){
+  maintitle = paste("Ploidy: ",sprintf("%1.2f",ploidy),", aberrant cell fraction: ",sprintf("%2.0f",rho*100),"%, goodness of fit: ",sprintf("%2.1f",goodnessOfFit*100),"%",sep="")
+  nTotal = array(NA, nrow(BAFvals))
+  nMinor = array(NA, nrow(BAFvals))
+  for (i in 1:nrow(subclones)) {
+    segm_chr = subclones$chr[i] == BAFvals$Chromosome & subclones$startpos[i] < BAFvals$Position & subclones$endpos[i] >= BAFvals$Position
+    pos_min = min(which(segm_chr))
+    pos_max = max(which(segm_chr))
+    nTotal = c(nTotal, segment_states_tot[pos_min[i]:pos_max[i]]) 
+    nMinor = c(nMinor, segment_states_min[pos_min[i]:pos_max[i]])    
+  }
+  colourTotal = "#E69F00"
+  colourMinor = "#2f4f4f"   
+  base.gw.plot(bafsegmented,nTotal,nMinor,colourTotal,colourMinor,maintitle,chr.segs,y_limit,textFlag)
+}
+
+#' @title base.gw.plot
+#' 
+#' @param bafsegmented B Allele Frequency, segmented, in genomic sequence (only probes heterozygous in germline), with probe IDs
+#' @param nAfullPlot Total segment copy number
+#' @param nBfullPlot Segment copy number minor allele
+#' @param colourTotal Colour to plot total copy number
+#' @param colourMinor Colour to plot minor allele
+#' @param maintitle Title comprising ploidy, rho, goodness of fit 
+#' @param chr.segs Vector comprising chromosome segments
+#' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
+#' @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F  
+#' @param twoColours Optional flag to specify colours, for ASCAT nonRounded colour is paler if CN > y_limit 
+#' 
+#' @return basic plot containing chromosome positions and names, plots copy number for either ASCAT non rounded or BB average 
+
+base.gw.plot = function(bafsegmented,nAfullPlot,nBfullPlot,colourTotal,colourMinor,maintitle,chr.segs,y_limit,textFlag=FALSE,twoColours=FALSE){
+  par(mar = c(0.5,5,5,0.5), cex = 0.4, cex.main=3, cex.axis = 2.5)
+  ticks=seq(0, y_limit, 1)
+  plot(c(1,length(nAfullPlot)), c(0,y_limit), type = "n", xaxt = "n", yaxt="n", main = maintitle, xlab = "", ylab = "")
+  axis(side = 2, at = ticks)
   abline(h=ticks, col="lightgrey", lty=1)
-
+  
   A_rle<-rle(nAfullPlot)
   start=0
-  #plot purple rectangles
+  #plot total copy number
   for(i in 1:length(A_rle$values)){
     val<-A_rle$values[i]
     size<-A_rle$lengths[i]
-    rect(start, (val-0.07), (start+size-1), (val+0.07), col=ifelse(val<y_limit, "purple", "violet"), border=ifelse(val<y_limit, "purple", "violet"))
-     start=start+size
+    rect(start, (val-0.07), (start+size-1), (val+0.07), col=ifelse((twoColours & val>=y_limit), adjustcolor(colourTotal,alpha.f=0.5), colourTotal), border=ifelse((twoColours & val>=y_limit), "violet", colourTotal))
+    start=start+size
   }
-
+  
   B_rle<-rle(nBfullPlot)
   start=0
-  #plot blue rectangles
+  #plot minor allele copy number
   for(i in 1:length(B_rle$values)){
     val<-B_rle$values[i]
     size<-B_rle$lengths[i]
-    rect(start, (val-0.07), (start+size-1), (val+0.07), col=ifelse(val<y_limit, "blue", "dodgerblue"), border=ifelse(val<y_limit, "blue", "dodgerblue"))
+    rect(start, (val-0.07), (start+size-1), (val+0.07), col=ifelse((twoColours & val>=y_limit), adjustcolor(colourMinor, alpha.f=0.5), colourMinor), border=ifelse((twoColours & val>=y_limit), "dodgerblue", colourMinor))
     start=start+size
   }
-
-
-  #points(nAfullPlot,pch = "|", col=ifelse(nAfullPlot<y_limit, "purple", "violet"))
-  #points(nBfullPlot,pch = "|", col=ifelse(nBfullPlot<y_limit, "blue", "dodgerblue"))
-
-  # don't ask me why, but the "|" sign is not centered, so the lines may need to be shifted..
-
-   abline(v=0,lty=1,col="lightgrey")
-   chrk_tot_len = 0
-   for (i in 1:length(ch)) {
-     chrk = ch[[i]]
-     chrk_hetero = intersect(names(lrr)[chrk],names(bafsegmented))
+  
+  chrk_tot_len = 0
+  for (i in 1:length(chr.segs)) {
+    chrk = chr.segs[[i]];
+    chrk_hetero = names(bafsegmented)[chrk]
     chrk_tot_len_prev = chrk_tot_len
     chrk_tot_len = chrk_tot_len + length(chrk_hetero)
-   vpos = chrk_tot_len
-   tpos = (chrk_tot_len+chrk_tot_len_prev)/2
-   text(tpos,y_limit,chrs[i], pos = 1, cex = 2)
-   abline(v=vpos,lty=1,col="lightgrey")
-   }
-
-   #add text to too high fragments
-   if(textFlag){
-#      rleB<-rle(nBfullPlot>y_limit)
-#      pos<-0
-#      for(i in 1:length(rleB$values)){
-#        if(rleB$values[i]){
-#          xpos=pos+(rleB$lengths[i]/2)
-#          text(xpos,y_limit+0.1,sprintf("%1.2f",nBfull[pos+1]), pos = 1, cex = 0.7)
-#        }
-#        pos=pos+rleB$lengths[i]
-#      }
-
-     rleA<-rle(nAfullPlot>y_limit)
-     pos<-0
-     for(i in 1:length(rleA$values)){
-       if(rleA$values[i]){
-         xpos=pos+(rleA$lengths[i]/2)
-         text(xpos,y_limit+0.1,sprintf("%1.2f",(nAfull[pos+1]+nBfull[pos+1])), pos = 1, cex = 0.7)
-       }
-       pos=pos+rleA$lengths[i]
-     }
-   }
+    vpos = chrk_tot_len;
+    tpos = (chrk_tot_len+chrk_tot_len_prev)/2;
+    text(tpos,5,ifelse(i<23,sprintf("%d",i),"X"), pos = 1, cex = 2)
+    abline(v=vpos,lty=1,col="lightgrey")
+  }
+  
+  #add text to too high fragments
+  if(textFlag){
+    #      rleB<-rle(nBfullPlot>y_limit)
+    #      pos<-0
+    #      for(i in 1:length(rleB$values)){
+    #        if(rleB$values[i]){
+    #          xpos=pos+(rleB$lengths[i]/2)
+    #          text(xpos,y_limit+0.1,sprintf("%1.2f",nBfull[pos+1]), pos = 1, cex = 0.7)
+    #        }
+    #        pos=pos+rleB$lengths[i]
+    #      }
+    
+    rleA<-rle(nAfullPlot>y_limit)
+    pos<-0
+    for(i in 1:length(rleA$values)){
+      if(rleA$values[i]){
+        xpos=pos+(rleA$lengths[i]/2)
+        text(xpos,y_limit+0.1,sprintf("%1.2f",(nAfull[pos+1]+nBfull[pos+1])), pos = 1, cex = 0.7)
+      }
+      pos=pos+rleA$lengths[i]
+    }
+  }
+}
 }
 
 #' @title ascat.plotAscatProfile
