@@ -55,7 +55,7 @@ runASCAT(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromosomes,
 \item{circos}{Optional file to output the non-rounded values in Circos track format. Default=NA}
 }
 \value{
-a list containing optimal purity and ploidy
+list containing optimal purity and ploidy
 }
 \description{
 the ASCAT main function
