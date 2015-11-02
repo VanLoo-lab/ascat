@@ -601,7 +601,7 @@ ascat.plotSegmentedData = function(ASCATobj) {
 #' @param gamma technology parameter, compaction of Log R profiles (expected decrease in case of deletion in diploid sample, 100\% aberrant cells; 1 in ideal case, 0.55 of Illumina 109K arrays)
 #' @param pdfPlot Optional flag if nonrounded plots and ASCAT profile in pdf format are desired. Default=F
 #' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
-#' @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
+#  @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
 #' @param circos Optional file to output the non-rounded values in Circos track format. Default=NA
 #' @param rho_manual optional argument to override ASCAT optimization and supply rho parameter (not recommended)
 #' @param psi_manual optional argument to override ASCAT optimization and supply psi parameter (not recommended)
@@ -618,7 +618,7 @@ ascat.plotSegmentedData = function(ASCATobj) {
 #'
 #' @export
 #'
-ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, textFlag=F, circos=NA, rho_manual = NA, psi_manual = NA) {
+ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circos=NA, rho_manual = NA, psi_manual = NA) {
   goodarrays=NULL
   res = vector("list",dim(ASCATobj$Tumor_LogR)[2])
   for (arraynr in 1:dim(ASCATobj$Tumor_LogR)[2]) {
@@ -644,12 +644,12 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, text
       res[[arraynr]] = runASCAT(lrr,baf,lrrsegm,bafsegm,ASCATobj$gender[arraynr],ASCATobj$SNPpos,ASCATobj$ch,ASCATobj$chrs,ASCATobj$sexchromosomes, failedqualitycheck,
                                 paste(ASCATobj$samples[arraynr],".sunrise.png",sep=""),paste(ASCATobj$samples[arraynr],".ASCATprofile.", ending ,sep=""),
                                 paste(ASCATobj$samples[arraynr],".rawprofile.", ending ,sep=""),paste(ASCATobj$samples[arraynr],".aberrationreliability.png",sep=""),
-                                gamma,NA,NA,pdfPlot, y_limit, textFlag, circosName)
+                                gamma,NA,NA,pdfPlot, y_limit, circosName)
     } else {
       res[[arraynr]] = runASCAT(lrr,baf,lrrsegm,bafsegm,ASCATobj$gender[arraynr],ASCATobj$SNPpos,ASCATobj$ch,ASCATobj$chrs,ASCATobj$sexchromosomes, failedqualitycheck,
                                 paste(ASCATobj$samples[arraynr],".sunrise.png",sep=""),paste(ASCATobj$samples[arraynr],".ASCATprofile.", ending,sep=""),
                                 paste(ASCATobj$samples[arraynr],".rawprofile.", ending,sep=""),paste(ASCATobj$samples[arraynr],".aberrationreliability.png",sep=""),
-                                gamma,rho_manual[arraynr],psi_manual[arraynr], pdfPlot, y_limit, textFlag, circosName)
+                                gamma,rho_manual[arraynr],psi_manual[arraynr], pdfPlot, y_limit, circosName)
     }
     if(!is.na(res[[arraynr]]$rho)) {
       goodarrays[length(goodarrays)+1] = arraynr
@@ -963,7 +963,7 @@ create_distance_matrix = function(segments, gamma) {
 #' @param pdfPlot Optional flag if nonrounded plots and ASCAT profile in pdf format are desired. Default=F
 #' @param circos Optional file to output the non-rounded values in Circos track format. Default=NA
 #' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
-#' @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
+#  @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
 #'
 #' @return list containing optimal purity and ploidy
 #'
@@ -972,7 +972,7 @@ create_distance_matrix = function(segments, gamma) {
 #' @export
 runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromosomes, chrnames, sexchromosomes, failedqualitycheck = F,
                     distancepng = NA, copynumberprofilespng = NA, nonroundedprofilepng = NA, aberrationreliabilitypng = NA, gamma = 0.55,
-		    rho_manual = NA, psi_manual = NA, pdfPlot = F, y_limit = 5, textFlag = F, circos=NA) {
+		    rho_manual = NA, psi_manual = NA, pdfPlot = F, y_limit = 5, circos=NA) {
   ch = chromosomes
   chrs = chrnames
   b = bafsegmented
@@ -1268,7 +1268,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
       }
     }
 
-    ascat.plotNonRounded(ploidy_opt1, rho_opt1, goodnessOfFit_opt1, nonaberrant, nAfull, nBfull, y_limit, bafsegmented, ch,lrr, textFlag)
+    ascat.plotNonRounded(ploidy_opt1, rho_opt1, goodnessOfFit_opt1, nonaberrant, nAfull, nBfull, y_limit, bafsegmented, ch,lrr)
 
     if (!is.na(nonroundedprofilepng)) {
       dev.off()
@@ -1429,7 +1429,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
       }
     }
     #plot ascat profile
-    ascat.plotAscatProfile(n1all, n2all, heteroprobes, ploidy_opt1, rho_opt1, goodnessOfFit_opt1, nonaberrant,y_limit, nAfull, ch, lrr, bafsegmented, chrs, textFlag)
+    ascat.plotAscatProfile(n1all, n2all, heteroprobes, ploidy_opt1, rho_opt1, goodnessOfFit_opt1, nonaberrant,y_limit, nAfull, ch, lrr, bafsegmented, chrs)
 
     if (!is.na(copynumberprofilespng)) {
       dev.off()
@@ -1522,7 +1522,7 @@ ascat.plotSunrise<-function(d, psi_opt1, rho_opt1){
 #' @param nAfull copy number major allele
 #' @param nBfull copy number minor allele
 #' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
-#' @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
+#  @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
 #' @param bafsegmented B Allele Frequency, segmented, in genomic sequence (only probes heterozygous in germline), with probe IDs
 #' @param lrr (unsegmented) log R, in genomic sequence (all probes), with probe IDs
 #' @param ch a list containing c vectors, where c is the number of chromosomes and every vector contains all probe numbers per chromosome
@@ -1530,47 +1530,47 @@ ascat.plotSunrise<-function(d, psi_opt1, rho_opt1){
 #' @return plot showing the nonrounded copy number profile, using base plotting function
 #'
 #' @export
-ascat.plotNonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant, nAfull, nBfull,y_limit=5,bafsegmented,ch,lrr, textFlag=FALSE){
+ascat.plotNonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant, nAfull, nBfull,y_limit=5,bafsegmented,ch,lrr){
   maintitle = paste("Ploidy: ",sprintf("%1.2f",ploidy),", aberrant cell fraction: ",sprintf("%2.0f",rho*100),"%, goodness of fit: ",sprintf("%2.1f",goodnessOfFit),"%", ifelse(nonaberrant,", non-aberrant",""),sep="")
   nBfullPlot<-ifelse(nBfull<y_limit, nBfull, y_limit+0.1)
   nAfullPlot<-ifelse((nAfull+nBfull)<y_limit, nAfull+nBfull, y_limit+0.1)
   colourTotal = "purple"
   colourMinor = "blue"
-  base.gw.plot(bafsegmented,nAfullPlot,nBfullPlot,colourTotal,colourMinor,maintitle,ch,lrr,y_limit,textFlag,twoColours=TRUE)
+  base.gw.plot(bafsegmented,nAfullPlot,nBfullPlot,colourTotal,colourMinor,maintitle,ch,lrr,y_limit,twoColours=TRUE)
 }
 
 
-#' @title create.bb.plot.average
-#'
-#' @param BAFvals B Allele Frequency for every probe with position
-#' @param subclones Segments with chromosomal locations
-#' @param bafsegmented B Allele Frequency, segmented, in genomic sequence (only probes heterozygous in germline), with probe IDs
-#' @param ploidy ploidy of the sample
-#' @param rho purity of the sample
-#' @param goodnessOfFit estimated goodness of fit
-#' @param pos_min
-#' @param pos_max
-#' @param segment_states_min Vector containing copy number per segment minor allele
-#' @param segment_states_tot Vector containing copy number per segment total copy number
-#' @param chr.segs Vector containing chromosome segments
-#'
-#' @return plot showing Battenberg average copy number profile using base plotting function
-#'
-create.bb.plot.average = function(BAFvals, subclones, bafsegmented, ploidy, rho, goodnessOfFit, pos_min, pos_max, segment_states_min, segment_states_tot, chr.segs){
-  maintitle = paste("Ploidy: ",sprintf("%1.2f",ploidy),", aberrant cell fraction: ",sprintf("%2.0f",rho*100),"%, goodness of fit: ",sprintf("%2.1f",goodnessOfFit*100),"%",sep="")
-  nTotal = array(NA, nrow(BAFvals))
-  nMinor = array(NA, nrow(BAFvals))
-  for (i in 1:nrow(subclones)) {
-    segm_chr = subclones$chr[i] == BAFvals$Chromosome & subclones$startpos[i] < BAFvals$Position & subclones$endpos[i] >= BAFvals$Position
-    pos_min = min(which(segm_chr))
-    pos_max = max(which(segm_chr))
-    nTotal = c(nTotal, segment_states_tot[pos_min[i]:pos_max[i]])
-    nMinor = c(nMinor, segment_states_min[pos_min[i]:pos_max[i]])
-  }
-  colourTotal = "#E69F00"
-  colourMinor = "#2f4f4f"
-  base.gw.plot(bafsegmented,nTotal,nMinor,colourTotal,colourMinor,maintitle,chr.segs,y_limit,textFlag)
-}
+#  @title create.bb.plot.average
+#
+#  @param BAFvals B Allele Frequency for every probe with position
+#  @param subclones Segments with chromosomal locations
+#  @param bafsegmented B Allele Frequency, segmented, in genomic sequence (only probes heterozygous in germline), with probe IDs
+#  @param ploidy ploidy of the sample
+#  @param rho purity of the sample
+#  @param goodnessOfFit estimated goodness of fit
+#  @param pos_min
+#  @param pos_max
+#  @param segment_states_min Vector containing copy number per segment minor allele
+#  @param segment_states_tot Vector containing copy number per segment total copy number
+#  @param chr.segs Vector containing chromosome segments
+#
+#  @return plot showing Battenberg average copy number profile using base plotting function
+#
+# create.bb.plot.average = function(BAFvals, subclones, bafsegmented, ploidy, rho, goodnessOfFit, pos_min, pos_max, segment_states_min, segment_states_tot, chr.segs){
+#   maintitle = paste("Ploidy: ",sprintf("%1.2f",ploidy),", aberrant cell fraction: ",sprintf("%2.0f",rho*100),"%, goodness of fit: ",sprintf("%2.1f",goodnessOfFit*100),"%",sep="")
+#   nTotal = array(NA, nrow(BAFvals))
+#   nMinor = array(NA, nrow(BAFvals))
+#   for (i in 1:nrow(subclones)) {
+#     segm_chr = subclones$chr[i] == BAFvals$Chromosome & subclones$startpos[i] < BAFvals$Position & subclones$endpos[i] >= BAFvals$Position
+#     pos_min = min(which(segm_chr))
+#     pos_max = max(which(segm_chr))
+#     nTotal = c(nTotal, segment_states_tot[pos_min[i]:pos_max[i]])
+#     nMinor = c(nMinor, segment_states_min[pos_min[i]:pos_max[i]])
+#   }
+#   colourTotal = "#E69F00"
+#   colourMinor = "#2f4f4f"
+#   base.gw.plot(bafsegmented,nTotal,nMinor,colourTotal,colourMinor,maintitle,chr.segs,y_limit,textFlag)
+# }
 
 #' @title base.gw.plot
 #'
@@ -1583,12 +1583,11 @@ create.bb.plot.average = function(BAFvals, subclones, bafsegmented, ploidy, rho,
 #' @param chr.segs Vector comprising chromosome segments
 #' @param lrr (unsegmented) log R, in genomic sequence (all probes), with probe IDs
 #' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
-#' @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
 #' @param twoColours Optional flag to specify colours, if TRUE colour is paler for CN values > y_limit
 #'
 #' @return basic plot containing chromosome positions and names, plots copy number for either ASCAT non rounded or BB average
 
-base.gw.plot = function(bafsegmented,nAfullPlot,nBfullPlot,colourTotal,colourMinor,maintitle,chr.segs,lrr,y_limit,textFlag=FALSE,twoColours=FALSE){
+base.gw.plot = function(bafsegmented,nAfullPlot,nBfullPlot,colourTotal,colourMinor,maintitle,chr.segs,lrr,y_limit,twoColours=FALSE){
   par(mar = c(0.5,5,5,0.5), cex = 0.4, cex.main=3, cex.axis = 2.5)
   ticks=seq(0, y_limit, 1)
   plot(c(1,length(nAfullPlot)), c(0,y_limit), type = "n", xaxt = "n", yaxt="n", main = maintitle, xlab = "", ylab = "")
@@ -1628,28 +1627,28 @@ base.gw.plot = function(bafsegmented,nAfullPlot,nBfullPlot,colourTotal,colourMin
     abline(v=vpos,lty=1,col="lightgrey")
   }
 
-  #add text to too high fragments
-  if(textFlag){
-    #      rleB<-rle(nBfullPlot>y_limit)
-    #      pos<-0
-    #      for(i in 1:length(rleB$values)){
-    #        if(rleB$values[i]){
-    #          xpos=pos+(rleB$lengths[i]/2)
-    #          text(xpos,y_limit+0.1,sprintf("%1.2f",nBfull[pos+1]), pos = 1, cex = 0.7)
-    #        }
-    #        pos=pos+rleB$lengths[i]
-    #      }
-
-    rleA<-rle(nAfullPlot>y_limit)
-    pos<-0
-    for(i in 1:length(rleA$values)){
-      if(rleA$values[i]){
-        xpos=pos+(rleA$lengths[i]/2)
-        text(xpos,y_limit+0.1,sprintf("%1.2f",(nAfull[pos+1]+nBfull[pos+1])), pos = 1, cex = 0.7)
-      }
-      pos=pos+rleA$lengths[i]
-    }
-  }
+#   #add text to too high fragments
+#   if(textFlag){
+#     #      rleB<-rle(nBfullPlot>y_limit)
+#     #      pos<-0
+#     #      for(i in 1:length(rleB$values)){
+#     #        if(rleB$values[i]){
+#     #          xpos=pos+(rleB$lengths[i]/2)
+#     #          text(xpos,y_limit+0.1,sprintf("%1.2f",nBfull[pos+1]), pos = 1, cex = 0.7)
+#     #        }
+#     #        pos=pos+rleB$lengths[i]
+#     #      }
+#
+#     rleA<-rle(nAfullPlot>y_limit)
+#     pos<-0
+#     for(i in 1:length(rleA$values)){
+#       if(rleA$values[i]){
+#         xpos=pos+(rleA$lengths[i]/2)
+#         text(xpos,y_limit+0.1,sprintf("%1.2f",(nAfull[pos+1]+nBfull[pos+1])), pos = 1, cex = 0.7)
+#       }
+#       pos=pos+rleA$lengths[i]
+#     }
+#   }
 }
 
 #' @title ascat.plotAscatProfile
@@ -1664,7 +1663,7 @@ base.gw.plot = function(bafsegmented,nAfullPlot,nBfullPlot,colourTotal,colourMin
 #' @param nAfull copy number major allele
 #'
 #' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
-#' @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
+#  @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
 #' @param ch a list containing c vectors, where c is the number of chromosomes and every vector contains all probe numbers per chromosome
 #' @param bafsegmented B Allele Frequency, segmented, in genomic sequence (only probes heterozygous in germline), with probe IDs
 #' @param lrr (unsegmented) log R, in genomic sequence (all probes), with probe IDs
@@ -1674,7 +1673,7 @@ base.gw.plot = function(bafsegmented,nAfullPlot,nBfullPlot,colourTotal,colourMin
 #'
 #' @export
 #'
-ascat.plotAscatProfile<-function(n1all, n2all, heteroprobes, ploidy, rho, goodnessOfFit, nonaberrant, y_limit=5, nAfull, ch, lrr, bafsegmented, chrs, textFlag=FALSE){
+ascat.plotAscatProfile<-function(n1all, n2all, heteroprobes, ploidy, rho, goodnessOfFit, nonaberrant, y_limit=5, nAfull, ch, lrr, bafsegmented, chrs){
   nA2 = n1all[heteroprobes]
   nB2 = n2all[heteroprobes]
   nA = ifelse(nA2>nB2,nA2,nB2)
@@ -1687,7 +1686,7 @@ ascat.plotAscatProfile<-function(n1all, n2all, heteroprobes, ploidy, rho, goodne
   colourMinor="green"
 
   maintitle = paste("Ploidy: ",sprintf("%1.2f",ploidy),", aberrant cell fraction: ",sprintf("%2.0f",rho*100),"%, goodness of fit: ",sprintf("%2.1f",goodnessOfFit),"%", ifelse(nonaberrant,", non-aberrant",""),sep="")
-  base.gw.plot(bafsegmented,nAPlot,nBPlot,colourTotal,colourMinor,maintitle,ch,lrr,y_limit,textFlag,twoColours=TRUE)
+  base.gw.plot(bafsegmented,nAPlot,nBPlot,colourTotal,colourMinor,maintitle,ch,lrr,y_limit,twoColours=TRUE)
 }
 
 

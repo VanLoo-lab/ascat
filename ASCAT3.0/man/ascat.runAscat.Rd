@@ -5,7 +5,7 @@
 \title{ascat.runAscat}
 \usage{
 ascat.runAscat(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5,
-  textFlag = F, circos = NA, rho_manual = NA, psi_manual = NA)
+  circos = NA, rho_manual = NA, psi_manual = NA)
 }
 \arguments{
 \item{ASCATobj}{an ASCAT object from ascat.aspcf}
@@ -15,8 +15,6 @@ ascat.runAscat(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5,
 \item{pdfPlot}{Optional flag if nonrounded plots and ASCAT profile in pdf format are desired. Default=F}
 
 \item{y_limit}{Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5}
-
-\item{textFlag}{Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F}
 
 \item{circos}{Optional file to output the non-rounded values in Circos track format. Default=NA}
 

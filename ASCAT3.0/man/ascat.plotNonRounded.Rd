@@ -5,7 +5,7 @@
 \title{ascat.plotNonRounded}
 \usage{
 ascat.plotNonRounded(ploidy, rho, goodnessOfFit, nonaberrant, nAfull, nBfull,
-  y_limit = 5, bafsegmented, ch, lrr, textFlag = FALSE)
+  y_limit = 5, bafsegmented, ch, lrr)
 }
 \arguments{
 \item{ploidy}{ploidy of the sample}
@@ -27,8 +27,6 @@ ascat.plotNonRounded(ploidy, rho, goodnessOfFit, nonaberrant, nAfull, nBfull,
 \item{ch}{a list containing c vectors, where c is the number of chromosomes and every vector contains all probe numbers per chromosome}
 
 \item{lrr}{(unsegmented) log R, in genomic sequence (all probes), with probe IDs}
-
-\item{textFlag}{Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F}
 }
 \value{
 plot showing the nonrounded copy number profile, using base plotting function
