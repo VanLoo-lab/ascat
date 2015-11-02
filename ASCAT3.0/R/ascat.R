@@ -1204,16 +1204,15 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     }
   }
 
-  #plot Sunrise
-  if (!is.na(distancepng)) {
-    png(filename = distancepng, width = 1000, height = 1000, res = 1000/7)
-  }
-  ascat.plotSunrise(d,psi_opt1,rho_opt1)
-  if (!is.na(distancepng)) {
-    dev.off()
-  }
-
   if(nropt>0) {
+    #plot Sunrise
+    if (!is.na(distancepng)) {
+      png(filename = distancepng, width = 1000, height = 1000, res = 1000/7)
+    }
+    ascat.plotSunrise(d,psi_opt1,rho_opt1)
+    if (!is.na(distancepng)) {
+      dev.off()
+    }
 
     rho = rho_opt1
     psi = psi_opt1

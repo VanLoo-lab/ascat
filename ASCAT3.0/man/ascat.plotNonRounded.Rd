@@ -5,7 +5,7 @@
 \title{ascat.plotNonRounded}
 \usage{
 ascat.plotNonRounded(ploidy, rho, goodnessOfFit, nonaberrant, nAfull, nBfull,
-  y_limit = 5, bafsegmented, chrs, textFlag = FALSE)
+  y_limit = 5, bafsegmented, ch, lrr, textFlag = FALSE)
 }
 \arguments{
 \item{ploidy}{ploidy of the sample}
@@ -24,7 +24,9 @@ ascat.plotNonRounded(ploidy, rho, goodnessOfFit, nonaberrant, nAfull, nBfull,
 
 \item{bafsegmented}{B Allele Frequency, segmented, in genomic sequence (only probes heterozygous in germline), with probe IDs}
 
-\item{chrs}{a vector containing the names for the chromosomes (e.g. c(1:22,"X"))}
+\item{ch}{a list containing c vectors, where c is the number of chromosomes and every vector contains all probe numbers per chromosome}
+
+\item{lrr}{(unsegmented) log R, in genomic sequence (all probes), with probe IDs}
 
 \item{textFlag}{Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F}
 }
