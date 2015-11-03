@@ -1486,6 +1486,9 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
   }
 
   else {
+
+    name=gsub(".sunrise.png","",basename(distancepng))
+    warning(paste("ASCAT could not find an optimal ploidy and callularity value for sample ", name, ".\n", sep=""))
     return(list(rho = NA, psi = NA, goodnessOfFit = NA, nonaberrant = F, nA = NA, nB = NA, seg = NA, seg_raw = NA))
   }
 
