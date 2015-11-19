@@ -1,4 +1,4 @@
-# ASCAT 3.0
+# ASCAT 2.4
 # author: Peter Van Loo
 # PCF and ASPCF: Gro Nilsen
 # GC correction: Jiqiu Cheng
