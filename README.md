@@ -1,4 +1,4 @@
-## Allele-Specific Copy number Analysis of Tumors
+## Allele-Specific Copy Number Analysis of Tumors
 
 ### Description
 
