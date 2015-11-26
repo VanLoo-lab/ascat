@@ -5,7 +5,7 @@
 # step 1.2:
 # apt-probeset-summarize --cdf-file GenomeWideSNP_6.cdf --analysis quant-norm.sketch=50000,pm-only,med-polish,expr.genotype=true --target-sketch hapmap.quant-norm.normalization-target.txt --out-dir apt --cel-files CELfiles.txt
 # step 1.4:
-# normalize_affy_geno_cluster.pl apt/gw6.genocluster quant-norm.pm-only.med-polish.expr.summary.txt -locfile affygw6.hg19.pfb -out lrr_baf.txt
+# normalize_affy_geno_cluster.pl gw6.genocluster quant-norm.pm-only.med-polish.expr.summary.txt -locfile affygw6.hg19.pfb -out lrr_baf.txt
 #############################################
 
 lrrbaf = read.table("lrr_baf.txt", header = T, sep = "\t", row.names=1)
