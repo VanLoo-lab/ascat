@@ -1666,20 +1666,18 @@ base.gw.plot = function(bafsegmented,nAfullPlot,nBfullPlot,colourTotal,colourMin
 #' @param rho purity of the sample
 #' @param goodnessOfFit estimated goodness of fit
 #' @param nonaberrant boolean flag denoting non-aberrated samples
-#' @param nAfull copy number major allele
 #'
 #' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
 #  @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
 #' @param ch a list containing c vectors, where c is the number of chromosomes and every vector contains all probe numbers per chromosome
 #' @param bafsegmented B Allele Frequency, segmented, in genomic sequence (only probes heterozygous in germline), with probe IDs
 #' @param lrr (unsegmented) log R, in genomic sequence (all probes), with probe IDs
-#' @param chrs a vector containing the names for the chromosomes (e.g. c(1:22,"X"))
 #'
 #' @return plot showing the ASCAT profile of the sample
 #'
 #' @export
 #'
-ascat.plotAscatProfile<-function(n1all, n2all, heteroprobes, ploidy, rho, goodnessOfFit, nonaberrant, y_limit=5, nAfull, ch, lrr, bafsegmented, chrs){
+ascat.plotAscatProfile<-function(n1all, n2all, heteroprobes, ploidy, rho, goodnessOfFit, nonaberrant, y_limit=5, ch, lrr, bafsegmented){
   nA2 = n1all[heteroprobes]
   nB2 = n2all[heteroprobes]
   nA = ifelse(nA2>nB2,nA2,nB2)
