@@ -1499,14 +1499,19 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
 #' @param d distance matrix for a range of ploidy and tumour percentage values
 #' @param psi_opt1 optimal ploidy
 #' @param rho_opt1 optimal aberrant cell fraction
+#' @param minim when set to true, optimal regions in the sunrise plot are depicted in blue; if set to false, colours are inverted and red corresponds to optimal values (default: TRUE)
 #'
 #' @return plot visualising range of ploidy and tumour percentage values
 #' @export
-ascat.plotSunrise<-function(d, psi_opt1, rho_opt1, ){
+ascat.plotSunrise<-function(d, psi_opt1, rho_opt1, minim=T){
  
   par(mar = c(5,5,0.5,0.5), cex=0.75, cex.lab=2, cex.axis=2)
 
-  hmcol = rev(colorRampPalette(brewer.pal(10, "RdBu"))(256))
+  if(minim){
+    hmcol = rev(colorRampPalette(RColorBrewer::brewer.pal(10, "RdBu"))(256))
+  } else {
+    hmcol = colorRampPalette(RColorBrewer::brewer.pal(10, "RdBu"))(256)
+  } 
   image(log(d), col = hmcol, axes = F, xlab = "Ploidy", ylab = "Aberrant cell fraction")
   
   ploidy_min<-as.numeric(rownames(d)[1])
