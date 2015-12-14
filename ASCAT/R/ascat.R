@@ -418,7 +418,7 @@ ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), asc
             }
             #2nd step: adapt levels!
             logRd = numeric(0)
-            seg = make_seg_lr(logRc)
+            seg = rle(logRc)$lengths
             startprobe = 1
             endprobe = 0
             for (i in 1:length(seg)) {
@@ -485,7 +485,7 @@ ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), asc
           }
         }
         #adapt levels again
-        seg = make_seg_lr(logRPCFed)
+        seg = rle(logRPCFed)$lengths
         logRPCFed = numeric(0)
         startprobe = 1
         endprobe = 0
@@ -738,32 +738,6 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
               failedarrays = fa, nonaberrantarrays = naarrays, segments = seg, segments_raw = seg_raw))
 }
 
-
-
-
-
-# helping function to read segments:
-#' @export 
-make_seg_lr = function(r) {
-  pcf_segments = numeric(0);
-  index = 0;
-  previousr = 1E10;
-  for (i in 1:length(r)) {
-    if (r[i] != previousr) {
-      index=index+1;
-      count=1;
-    }
-    else {
-      count = count + 1;
-    }
-    pcf_segments[index] = count;
-    previousr = r[i];
-  }
-  return(pcf_segments);
-}
-
-
-
 # helper function to split the genome into parts
 split_genome = function(SNPpos) {
 
@@ -824,8 +798,14 @@ split_genome = function(SNPpos) {
 
 
 
-# helper function to predict germline homozygous segments for later resegmentation
+#' @title predictGermlineHomozygousStretches
+#' @description helper function to predict germline homozyguous segments for later re-segmentation
+#' @param chr a list containing vectors with the indices for each distinct part that can be segmented separately
+#' @param hom germline genotypes
+#' @return germline homozyguous segments
+#'
 #' @export
+#' 
 predictGermlineHomozygousStretches = function(chr, hom) {
 
   # contains the result: a list of vectors of probe numbers in homozygous stretches for each sample
@@ -874,12 +854,13 @@ predictGermlineHomozygousStretches = function(chr, hom) {
 }
 
 
-
-
-
-# function to make segments of constant LRR and BAF
-# this function is more general and does not depend on specifically ASPCF output
-# it can also handle segmention performed on LRR and BAF separately
+#' @title make_segments
+#' @description Function to make segments of constant LRR and BAF.\cr
+#' This function is more general and does not depend on specific ASPCF output, it can also handle segmention performed on LRR and BAF separately
+#' @param r segmented logR
+#' @param b segmented BAF
+#' @return segments of constant logR and BAF including their lengths
+#'
 #' @export
 make_segments = function(r,b) {
   m = matrix(ncol = 2, nrow = length(b))
