@@ -1502,17 +1502,22 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
 #'
 #' @return plot visualising range of ploidy and tumour percentage values
 #' @export
-ascat.plotSunrise<-function(d, psi_opt1, rho_opt1){
-
+ascat.plotSunrise<-function(d, psi_opt1, rho_opt1, ){
+ 
   par(mar = c(5,5,0.5,0.5), cex=0.75, cex.lab=2, cex.axis=2)
 
   hmcol = rev(colorRampPalette(brewer.pal(10, "RdBu"))(256))
   image(log(d), col = hmcol, axes = F, xlab = "Ploidy", ylab = "Aberrant cell fraction")
+  
+  ploidy_min<-as.numeric(rownames(d)[1])
+  ploidy_max<-as.numeric(rownames(d)[nrow(d)])
+  purity_min<-as.numeric(colnames(d)[1])
+  purity_max<-as.numeric(colnames(d)[ncol(d)])
 
-  axis(1, at = seq(0, 1, by = 1/5), labels = seq(1, 6, by = 1))
-  axis(2, at = seq(0, 1/1.05, by = 1/3/1.05), labels = seq(0.1, 1, by = 3/10))
+  axis(1, at = seq(0, 1, by = 1/(ploidy_max-1)), labels = seq(ploidy_min, ploidy_max, by = 1))
+  axis(2, at = seq(0, 1/purity_max, by = 1/3/purity_max), labels = seq(purity_min, purity_max, by = 3/10))
 
-  points((psi_opt1-1)/5,(rho_opt1-0.1)/0.95,col="green",pch="X", cex = 2)
+  points((psi_opt1-ploidy_min)/(ploidy_max-1),(rho_opt1-purity_min)/(1/purity_max),col="green",pch="X", cex = 2)
 }
 
 
