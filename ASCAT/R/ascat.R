@@ -743,6 +743,7 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
 
 
 # helping function to read segments:
+#' @export 
 make_seg_lr = function(r) {
   pcf_segments = numeric(0);
   index = 0;
@@ -824,6 +825,7 @@ split_genome = function(SNPpos) {
 
 
 # helper function to predict germline homozygous segments for later resegmentation
+#' @export
 predictGermlineHomozygousStretches = function(chr, hom) {
 
   # contains the result: a list of vectors of probe numbers in homozygous stretches for each sample
@@ -878,6 +880,7 @@ predictGermlineHomozygousStretches = function(chr, hom) {
 # function to make segments of constant LRR and BAF
 # this function is more general and does not depend on specifically ASPCF output
 # it can also handle segmention performed on LRR and BAF separately
+#' @export
 make_segments = function(r,b) {
   m = matrix(ncol = 2, nrow = length(b))
   m[,1] = r
