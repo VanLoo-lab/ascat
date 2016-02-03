@@ -1407,7 +1407,8 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
       }
     }
     #plot ascat profile
-    ascat.plotAscatProfile(n1all, n2all, heteroprobes, ploidy_opt1, rho_opt1, goodnessOfFit_opt1, nonaberrant,y_limit, nAfull, ch, lrr, bafsegmented, chrs)
+    ascat.plotAscatProfile(n1all, n2all, heteroprobes, ploidy_opt1, rho_opt1, goodnessOfFit_opt1, nonaberrant,y_limit, ch, lrr, bafsegmented)
+
     
     if (!is.na(copynumberprofilespng)) {
       dev.off()
