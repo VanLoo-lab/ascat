@@ -1,4 +1,4 @@
-# ASCAT 2.4
+# ASCAT 2.4.1
 # author: Peter Van Loo
 # PCF and ASPCF: Gro Nilsen
 # GC correction: Jiqiu Cheng
@@ -797,7 +797,7 @@ split_genome = function(SNPpos) {
 #' @param chr a list containing vectors with the indices for each distinct part that can be segmented separately
 #' @param hom germline genotypes
 #' @return germline homozyguous segments
-#'
+#' 
 #' @export
 #' 
 predictGermlineHomozygousStretches = function(chr, hom) {
@@ -854,7 +854,7 @@ predictGermlineHomozygousStretches = function(chr, hom) {
 #' @param r segmented logR
 #' @param b segmented BAF
 #' @return segments of constant logR and BAF including their lengths
-#'
+#' @keywords internal
 #' @export
 make_segments = function(r,b) {
   m = matrix(ncol = 2, nrow = length(b))
@@ -1507,6 +1507,7 @@ ascat.plotSunrise<-function(d, psi_opt1, rho_opt1, minim=T){
 
 #' @title ascat.plotNonRounded
 #'
+#' @description Function plotting the unrounded ASCAT copy number over all chromosomes
 #' @param ploidy ploidy of the sample
 #' @param rho purity of the sample
 #' @param goodnessOfFit estimated goodness of fit
@@ -1565,7 +1566,7 @@ ascat.plotNonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant, nAfull
 # }
 
 #' @title base.gw.plot
-#'
+#' @description Basis for the genome-wide plots
 #' @param bafsegmented B Allele Frequency, segmented, in genomic sequence (only probes heterozygous in germline), with probe IDs
 #' @param nAfullPlot Total segment copy number
 #' @param nBfullPlot Segment copy number minor allele
@@ -1576,8 +1577,9 @@ ascat.plotNonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant, nAfull
 #' @param lrr (unsegmented) log R, in genomic sequence (all probes), with probe IDs
 #' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
 #' @param twoColours Optional flag to specify colours, if TRUE colour is paler for CN values > y_limit
-#'
+#' @keywords internal
 #' @return basic plot containing chromosome positions and names, plots copy number for either ASCAT non rounded or BB average
+#' @export
 
 base.gw.plot = function(bafsegmented,nAfullPlot,nBfullPlot,colourTotal,colourMinor,maintitle,chr.segs,lrr,y_limit,twoColours=FALSE){
   par(mar = c(0.5,5,5,0.5), cex = 0.4, cex.main=3, cex.axis = 2.5)
@@ -1645,6 +1647,7 @@ base.gw.plot = function(bafsegmented,nAfullPlot,nBfullPlot,colourTotal,colourMin
 
 #' @title ascat.plotAscatProfile
 #'
+#' @description Function plotting the rounded ASCAT profiles over all chromosomes
 #' @param n1all copy number major allele
 #' @param n2all copy number minor allele
 #' @param heteroprobes probes with heterozygous germline
@@ -1652,12 +1655,10 @@ base.gw.plot = function(bafsegmented,nAfullPlot,nBfullPlot,colourTotal,colourMin
 #' @param rho purity of the sample
 #' @param goodnessOfFit estimated goodness of fit
 #' @param nonaberrant boolean flag denoting non-aberrated samples
-#'
 #' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
-#  @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
 #' @param ch a list containing c vectors, where c is the number of chromosomes and every vector contains all probe numbers per chromosome
-#' @param bafsegmented B Allele Frequency, segmented, in genomic sequence (only probes heterozygous in germline), with probe IDs
 #' @param lrr (unsegmented) log R, in genomic sequence (all probes), with probe IDs
+#' @param bafsegmented B Allele Frequency, segmented, in genomic sequence (only probes heterozygous in germline), with probe IDs
 #'
 #' @return plot showing the ASCAT profile of the sample
 #'
@@ -2106,6 +2107,12 @@ psi <- function(x,z){
 #' Affy250k_nsp\cr
 #' AffyOncoScan\cr
 #' AffyCytoScanHD\cr
+#' HumanCNV370quad\cr
+#' HumanCore12\cr
+#' HumanCoreExome24\cr
+#' HumanOmniExpress12v11\cr
+#' HumanOmniExpress12v1h\cr
+#' HumanOmniExpress12v1j\cr
 #'
 #' @return predicted germline genotypes
 #'
