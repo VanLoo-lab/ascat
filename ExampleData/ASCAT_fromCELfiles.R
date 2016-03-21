@@ -61,7 +61,7 @@ gender <- read.table("birdseed.report.txt", sep="\t", skip=66, header=T)
 sex <- as.vector(gender[,"computed_gender"])
 sex[sex == "female"] <- "XX"
 sex[sex == "male"] <- "XY"
-sex[sex == "unknown"] <- NA
+sex[sex == "unknown"] <- "XX"
 
 samplename <- sub(".tumor.LogR.txt", "", file.tumor.LogR)
 
