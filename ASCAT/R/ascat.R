@@ -2110,9 +2110,7 @@ psi <- function(x,z){
 #' HumanCNV370quad\cr
 #' HumanCore12\cr
 #' HumanCoreExome24\cr
-#' HumanOmniExpress12v11\cr
-#' HumanOmniExpress12v1h\cr
-#' HumanOmniExpress12v1j\cr
+#' HumanOmniExpress12\cr
 #'
 #' @return predicted germline genotypes
 #'
@@ -2253,27 +2251,13 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6") {
     segmentLength = 20
   }
   else if (platform=="HumanCoreExome24") {
-    maxHomozygous = 0.1
-    proportionHetero = 0.295
-    proportionHomo = 0.67
-    proportionOpen = 0.015
-    segmentLength = 100
-  }
-  else if (platform=="HumanOmniExpress12v11") {
     maxHomozygous = 0.05
-    proportionHetero = 0.295
-    proportionHomo = 0.67
-    proportionOpen = 0.015
+    proportionHetero = 0.175
+    proportionHomo = 0.79
+    proportionOpen = 0.02
     segmentLength = 100
   }
-  else if (platform=="HumanOmniExpress12v1h") {
-    maxHomozygous = 0.05
-    proportionHetero = 0.295
-    proportionHomo = 0.67
-    proportionOpen = 0.015
-    segmentLength = 100
-  }
-  else if (platform=="HumanOmniExpress12v1j") {
+  else if (platform=="HumanOmniExpress12") {
     maxHomozygous = 0.05
     proportionHetero = 0.295
     proportionHomo = 0.67

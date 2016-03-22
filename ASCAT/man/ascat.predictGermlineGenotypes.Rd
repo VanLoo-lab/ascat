@@ -39,8 +39,6 @@ AffyCytoScanHD\cr
 HumanCNV370quad\cr
 HumanCore12\cr
 HumanCoreExome24\cr
-HumanOmniExpress12v11\cr
-HumanOmniExpress12v1h\cr
-HumanOmniExpress12v1j\cr
+HumanOmniExpress12\cr
 }
 
