@@ -1,18 +1,21 @@
 Package: ASCAT
 Type: Package
 Title: Allele-Specific Copy Number Analysis of Tumours
-Version: 2.4
+Version: 2.4.1
 Date: 2015-09-22
 Authors@R: c(person("Peter", "Van Loo", role=c("aut","cre"), email="Peter.VanLoo@crick.ac.uk"),
     person("Gro", "Nielsen", role="ctb"),
     person("Jiqiu","Cheng", role="ctb"),
     person("Stefan","Dentro", role="ctb"),
     person("Kerstin","Haase", role="ctb"))
-Author: Peter Van Loo [aut, cre], Gro Nielsen [ctb], Jiqiu Cheng [ctb], Stefan Dentro [ctb], Kerstin Haase [ctb]
+Author: Peter Van Loo [aut, cre], Gro Nielsen [ctb], Jiqiu Cheng [ctb], Stefan
+    Dentro [ctb], Kerstin Haase [ctb]
 Maintainer: Kerstin Haase <Kerstin.Haase@crick.ac.uk>
-Description: R package of ASCAT as published in http://www.ncbi.nlm.nih.gov/pubmed/20837533
-Depends: 
-  R (>= 2.13.0),
-  RColorBrewer
+Description: R package of ASCAT as published in http://www.ncbi.nlm.nih.gov/
+    pubmed/20837533
+Depends:
+    R (>= 2.13.0),
+    RColorBrewer
 License: GPL-3
 LazyLoad: yes
+RoxygenNote: 5.0.1
