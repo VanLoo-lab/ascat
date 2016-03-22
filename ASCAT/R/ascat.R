@@ -796,9 +796,11 @@ split_genome = function(SNPpos) {
 #' @description helper function to predict germline homozyguous segments for later re-segmentation
 #' @param chr a list containing vectors with the indices for each distinct part that can be segmented separately
 #' @param hom germline genotypes
+#' 
+#' @keywords internal
+#' 
 #' @return germline homozyguous segments
 #' 
-#' @export
 #' 
 predictGermlineHomozygousStretches = function(chr, hom) {
   
@@ -941,7 +943,8 @@ create_distance_matrix = function(segments, gamma) {
 #' @param pdfPlot Optional flag if nonrounded plots and ASCAT profile in pdf format are desired. Default=F
 #' @param circos Optional file to output the non-rounded values in Circos track format. Default=NA
 #' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
-#  @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
+#'
+#' @keywords internal
 #'
 #' @return list containing optimal purity and ploidy
 #'
