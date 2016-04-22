@@ -223,11 +223,24 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
     Tumor_LogR = ASCATobj$Tumor_LogR[ovl,,drop=F]
     Tumor_BAF = ASCATobj$Tumor_BAF[ovl,,drop=F]
     
+    chrs = intersect(ASCATobj$chrs,unique(SNPpos[,1]))
+    
     Germline_LogR = NULL
     Germline_BAF = NULL
     if(!is.null(ASCATobj$Germline_LogR)) {
       Germline_LogR = ASCATobj$Germline_LogR[ovl,,drop=F]
       Germline_BAF = ASCATobj$Germline_BAF[ovl,,drop=F]
+    }
+    
+    last = 0;
+    ch = list();
+    for (i in 1:length(ASCATobj$chrs)) {
+      chrke = SNPpos[SNPpos[,1]==ASCATobj$chrs[i],]
+      chrpos = chrke[,2]
+      names(chrpos) = rownames(chrke)
+      chrpos = sort(chrpos)
+      ch[[i]] = (last+1):(last+length(chrpos))
+      last = last+length(chrpos)
     }
     
     for (s in 1:length(ASCATobj$samples)) {
@@ -272,6 +285,8 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
       GCcorrected[!flag_NA] <- model$residuals
       
       Tumor_LogR[,s] = GCcorrected
+      
+      chr = split_genome(SNPpos)
     }
     
     # add some plotting code for each sample while it is generated!!!!
@@ -279,7 +294,7 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
     return(list(Tumor_LogR = Tumor_LogR, Tumor_BAF = Tumor_BAF,
                 Tumor_LogR_segmented = NULL, Tumor_BAF_segmented = NULL,
                 Germline_LogR = Germline_LogR, Germline_BAF = Germline_BAF,
-                SNPpos = SNPpos, ch = ASCATobj$ch, chr = ASCATobj$chr, chrs = ASCATobj$chrs,
+                SNPpos = SNPpos, ch = ch, chr = chr, chrs = chrs,
                 samples = colnames(Tumor_LogR), gender = ASCATobj$gender,
                 sexchromosomes = ASCATobj$sexchromosomes))
   }
