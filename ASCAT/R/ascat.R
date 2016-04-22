@@ -1,4 +1,4 @@
-# ASCAT 2.4.1
+# ASCAT 2.4.2
 # author: Peter Van Loo
 # PCF and ASPCF: Gro Nilsen
 # GC correction: Jiqiu Cheng
@@ -223,11 +223,24 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
     Tumor_LogR = ASCATobj$Tumor_LogR[ovl,,drop=F]
     Tumor_BAF = ASCATobj$Tumor_BAF[ovl,,drop=F]
     
+    chrs = intersect(ASCATobj$chrs,unique(SNPpos[,1]))
+    
     Germline_LogR = NULL
     Germline_BAF = NULL
     if(!is.null(ASCATobj$Germline_LogR)) {
       Germline_LogR = ASCATobj$Germline_LogR[ovl,,drop=F]
       Germline_BAF = ASCATobj$Germline_BAF[ovl,,drop=F]
+    }
+    
+    last = 0;
+    ch = list();
+    for (i in 1:length(ASCATobj$chrs)) {
+      chrke = SNPpos[SNPpos[,1]==ASCATobj$chrs[i],]
+      chrpos = chrke[,2]
+      names(chrpos) = rownames(chrke)
+      chrpos = sort(chrpos)
+      ch[[i]] = (last+1):(last+length(chrpos))
+      last = last+length(chrpos)
     }
     
     for (s in 1:length(ASCATobj$samples)) {
@@ -272,6 +285,8 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
       GCcorrected[!flag_NA] <- model$residuals
       
       Tumor_LogR[,s] = GCcorrected
+      
+      chr = split_genome(SNPpos)
     }
     
     # add some plotting code for each sample while it is generated!!!!
@@ -279,7 +294,7 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
     return(list(Tumor_LogR = Tumor_LogR, Tumor_BAF = Tumor_BAF,
                 Tumor_LogR_segmented = NULL, Tumor_BAF_segmented = NULL,
                 Germline_LogR = Germline_LogR, Germline_BAF = Germline_BAF,
-                SNPpos = SNPpos, ch = ASCATobj$ch, chr = ASCATobj$chr, chrs = ASCATobj$chrs,
+                SNPpos = SNPpos, ch = ch, chr = chr, chrs = chrs,
                 samples = colnames(Tumor_LogR), gender = ASCATobj$gender,
                 sexchromosomes = ASCATobj$sexchromosomes))
   }
@@ -637,12 +652,12 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
     if(is.na(rho_manual)) {
       res[[arraynr]] = runASCAT(lrr,baf,lrrsegm,bafsegm,ASCATobj$gender[arraynr],ASCATobj$SNPpos,ASCATobj$ch,ASCATobj$chrs,ASCATobj$sexchromosomes, failedqualitycheck,
                                 paste(ASCATobj$samples[arraynr],".sunrise.png",sep=""),paste(ASCATobj$samples[arraynr],".ASCATprofile.", ending ,sep=""),
-                                paste(ASCATobj$samples[arraynr],".rawprofile.", ending ,sep=""),paste(ASCATobj$samples[arraynr],".aberrationreliability.png",sep=""),
+                                paste(ASCATobj$samples[arraynr],".rawprofile.", ending ,sep=""),NA,
                                 gamma,NA,NA,pdfPlot, y_limit, circosName)
     } else {
       res[[arraynr]] = runASCAT(lrr,baf,lrrsegm,bafsegm,ASCATobj$gender[arraynr],ASCATobj$SNPpos,ASCATobj$ch,ASCATobj$chrs,ASCATobj$sexchromosomes, failedqualitycheck,
                                 paste(ASCATobj$samples[arraynr],".sunrise.png",sep=""),paste(ASCATobj$samples[arraynr],".ASCATprofile.", ending,sep=""),
-                                paste(ASCATobj$samples[arraynr],".rawprofile.", ending,sep=""),paste(ASCATobj$samples[arraynr],".aberrationreliability.png",sep=""),
+                                paste(ASCATobj$samples[arraynr],".rawprofile.", ending,sep=""),NA,
                                 gamma,rho_manual[arraynr],psi_manual[arraynr], pdfPlot, y_limit, circosName)
     }
     if(!is.na(res[[arraynr]]$rho)) {
@@ -936,7 +951,7 @@ create_distance_matrix = function(segments, gamma) {
 #' @param distancepng if NA: distance is plotted, if filename is given, the plot is written to a .png file
 #' @param copynumberprofilespng if NA: possible copy number profiles are plotted, if filename is given, the plot is written to a .png file
 #' @param nonroundedprofilepng if NA: copy number profile before rounding is plotted (total copy number as well as the copy number of the minor allele), if filename is given, the plot is written to a .png file
-#' @param aberrationreliabilitypng if NA: aberration reliability score is plotted, if filename is given, the plot is written to a .png file
+#' @param aberrationreliabilitypng aberration reliability score is plotted if filename is given
 #' @param gamma technology parameter, compaction of Log R profiles (expected decrease in case of deletion in diploid sample, 100\% aberrant cells; 1 in ideal case, 0.55 of Illumina 109K arrays)
 #' @param rho_manual optional argument to override ASCAT optimization and supply rho parameter (not recommended)
 #' @param psi_manual optional argument to override ASCAT optimization and supply psi parameter (not recommended)
@@ -1411,7 +1426,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     }
     #plot ascat profile
     ascat.plotAscatProfile(n1all, n2all, heteroprobes, ploidy_opt1, rho_opt1, goodnessOfFit_opt1, nonaberrant,y_limit, ch, lrr, bafsegmented)
-
+    
     
     if (!is.na(copynumberprofilespng)) {
       dev.off()
@@ -1420,45 +1435,38 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     
     if (!is.na(aberrationreliabilitypng)) {
       png(filename = aberrationreliabilitypng, width = 2000, height = 500, res = 200)
-    }
-    else {
-      dev.new(10,2.5)
-    }
-    
-    par(mar = c(0.5,5,5,0.5), cex = 0.4, cex.main=3, cex.axis = 2.5)
-    
-    diploidprobes = !(SNPposhet[,1]%in%haploidchrs)
-    nullprobes = SNPposhet[,1]%in%nullchrs
-    
-    rBacktransform = ifelse(diploidprobes,
-                            gamma*log((rho*(nA+nB)+(1-rho)*2)/((1-rho)*2+rho*psi),2),
-                            # the value for nullprobes is arbitrary (but doesn't matter, as these are not plotted anyway because BAF=0.5)
-                            ifelse(nullprobes,-10,gamma*log((rho*(nA+nB)+(1-rho))/((1-rho)*2+rho*psi),2)))
-    
-    bBacktransform = ifelse(diploidprobes,
-                            (1-rho+rho*nB)/(2-2*rho+rho*(nA+nB)),
-                            ifelse(nullprobes,0.5,0))
-    
-    rConf = ifelse(abs(rBacktransform)>0.15,pmin(100,pmax(0,100*(1-abs(rBacktransform-r)/abs(r)))),NA)
-    bConf = ifelse(diploidprobes & bBacktransform!=0.5, pmin(100,pmax(0,ifelse(b==0.5,100,100*(1-abs(bBacktransform-b)/abs(b-0.5))))), NA)
-    confidence = ifelse(is.na(rConf),bConf,ifelse(is.na(bConf),rConf,(rConf+bConf)/2))
-    maintitle = paste("Aberration reliability score (%), average: ", sprintf("%2.0f",mean(confidence,na.rm=T)),"%",sep="")
-    plot(c(1,length(nAfull)), c(0,100), type = "n", xaxt = "n", main = maintitle, xlab = "", ylab = "")
-    points(confidence,col="blue",pch = "|")
-    abline(v=0,lty=1,col="lightgrey")
-    chrk_tot_len = 0
-    for (i in 1:length(ch)) {
-      chrk = ch[[i]];
-      chrk_hetero = intersect(names(lrr)[chrk],names(bafsegmented))
-      chrk_tot_len_prev = chrk_tot_len
-      chrk_tot_len = chrk_tot_len + length(chrk_hetero)
-      vpos = chrk_tot_len;
-      tpos = (chrk_tot_len+chrk_tot_len_prev)/2;
-      text(tpos,5,chrs[i], pos = 1, cex = 2)
-      abline(v=vpos,lty=1,col="lightgrey")
-    }
-    
-    if (!is.na(aberrationreliabilitypng)) {
+      par(mar = c(0.5,5,5,0.5), cex = 0.4, cex.main=3, cex.axis = 2.5)
+      
+      diploidprobes = !(SNPposhet[,1]%in%haploidchrs)
+      nullprobes = SNPposhet[,1]%in%nullchrs
+      
+      rBacktransform = ifelse(diploidprobes,
+                              gamma*log((rho*(nA+nB)+(1-rho)*2)/((1-rho)*2+rho*psi),2),
+                              # the value for nullprobes is arbitrary (but doesn't matter, as these are not plotted anyway because BAF=0.5)
+                              ifelse(nullprobes,-10,gamma*log((rho*(nA+nB)+(1-rho))/((1-rho)*2+rho*psi),2)))
+      
+      bBacktransform = ifelse(diploidprobes,
+                              (1-rho+rho*nB)/(2-2*rho+rho*(nA+nB)),
+                              ifelse(nullprobes,0.5,0))
+      
+      rConf = ifelse(abs(rBacktransform)>0.15,pmin(100,pmax(0,100*(1-abs(rBacktransform-r)/abs(r)))),NA)
+      bConf = ifelse(diploidprobes & bBacktransform!=0.5, pmin(100,pmax(0,ifelse(b==0.5,100,100*(1-abs(bBacktransform-b)/abs(b-0.5))))), NA)
+      confidence = ifelse(is.na(rConf),bConf,ifelse(is.na(bConf),rConf,(rConf+bConf)/2))
+      maintitle = paste("Aberration reliability score (%), average: ", sprintf("%2.0f",mean(confidence,na.rm=T)),"%",sep="")
+      plot(c(1,length(nAfull)), c(0,100), type = "n", xaxt = "n", main = maintitle, xlab = "", ylab = "")
+      points(confidence,col="blue",pch = "|")
+      abline(v=0,lty=1,col="lightgrey")
+      chrk_tot_len = 0
+      for (i in 1:length(ch)) {
+        chrk = ch[[i]];
+        chrk_hetero = intersect(names(lrr)[chrk],names(bafsegmented))
+        chrk_tot_len_prev = chrk_tot_len
+        chrk_tot_len = chrk_tot_len + length(chrk_hetero)
+        vpos = chrk_tot_len;
+        tpos = (chrk_tot_len+chrk_tot_len_prev)/2;
+        text(tpos,5,chrs[i], pos = 1, cex = 2)
+        abline(v=vpos,lty=1,col="lightgrey")
+      }
       dev.off()
     }
     
@@ -2267,6 +2275,13 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6") {
     proportionOpen = 0.015
     segmentLength = 100
   }
+  #   else if (platform=="OmniZhonghua8") {
+  #     maxHomozygous = 0.05
+  #     proportionHetero = 0.295
+  #     proportionHomo = 0.67
+  #     proportionOpen = 0.015
+  #     segmentLength = 100
+  #   }
   else {
     print("Error: platform unknown")
   }
