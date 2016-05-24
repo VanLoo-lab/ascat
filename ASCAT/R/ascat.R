@@ -256,9 +256,13 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
         td_chr<-Tumordata[GC_newlist$Chr==chrindex]
         
         flag_nona<-(complete.cases(td_chr) & complete.cases(GC_newlist_chr))
-        corr<-cor(GC_newlist_chr[flag_nona,3:ncol(GC_newlist_chr)],td_chr[flag_nona])
-        corr_tot<-cbind(corr_tot,corr)
-        length_tot<-c(length_tot,length(td_chr))
+        
+        #only work with chromosomes that have variance
+        if(var(td_chr[flag_nona])>0){
+          corr<-cor(GC_newlist_chr[flag_nona,3:ncol(GC_newlist_chr)],td_chr[flag_nona])
+          corr_tot<-cbind(corr_tot,corr)
+          length_tot<-c(length_tot,length(td_chr))
+        }
       }
       corr<-apply(corr_tot,1,function(x) sum(abs(x*length_tot))/sum(length_tot))
       index_1M<-c(which(names(corr)=="X1M"),which(names(corr)=="X1Mb"))
@@ -304,9 +308,7 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
 #' @title ascat.aspcf
 #' @description run ASPCF segmentation
 #' @details This function can be easily parallelised by controlling the selectsamples parameter\cr
-#' it saves the results in LogR_PCFed[sample]_[segment].txt and BAF_PCFed[sample]_[segment].txt;
-#' if these files exist, the results are read from them.\cr
-#' Hence, after parallelisation, copy all the files into the current directory, and run this function to read in the results
+#' it saves the results in LogR_PCFed[sample]_[segment].txt and BAF_PCFed[sample]_[segment].txt
 #' @param ASCATobj an ASCAT object
 #' @param selectsamples a vector containing the sample number(s) to PCF. Default = all
 #' @param ascat.gg germline genotypes (NULL if germline data is available)
