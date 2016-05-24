@@ -258,7 +258,7 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
         flag_nona<-(complete.cases(td_chr) & complete.cases(GC_newlist_chr))
         
         #only work with chromosomes that have variance
-        if(var(td_chr[flag_nona])>0){
+        if(length(td_chr[flag_nona])>0 & var(td_chr[flag_nona])>0){
           corr<-cor(GC_newlist_chr[flag_nona,3:ncol(GC_newlist_chr)],td_chr[flag_nona])
           corr_tot<-cbind(corr_tot,corr)
           length_tot<-c(length_tot,length(td_chr))
