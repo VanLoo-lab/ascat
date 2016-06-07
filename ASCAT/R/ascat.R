@@ -1279,11 +1279,34 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     nullprobes = SNPpos[,1]%in%nullchrs
     
     #this replaces an occurrence of unique that caused problems
+    #introduces segment spanning over chr ends, when two consecutive probes from diff chr have same logR!
+    # build helping vector
+    chrhelp = vector(length=length(lrrsegmented))
+    for (chrnr in 1:length(ch)) {
+      chrke = ch[[chrnr]]
+      chrhelp[chrke] = chrnr
+    }
+    
     tlr2 = rle(lrrsegmented)
-    tlr = tlr2$values
+    tlr.chr= rle(chrhelp)
+    
     tlrstart = c(1,cumsum(tlr2$lengths)+1)
     tlrstart = tlrstart[1:(length(tlrstart)-1)]
     tlrend = cumsum(tlr2$lengths)
+    
+    tlrstart.chr= c(1,cumsum(tlr.chr$lengths)+1)
+    tlrstart.chr = tlrstart.chr[1:(length(tlrstart.chr)-1)]
+    tlrend.chr = cumsum(tlr.chr$lengths)
+    
+    tlrend<-sort(union(tlrend, tlrend.chr))
+    tlrstart<-sort(union(tlrstart, tlrstart.chr))
+    
+    tlr=NULL
+    for(ind in tlrstart){
+      val<-lrrsegmented[ind]
+      tlr<-c(tlr, val)
+    }
+    
     seg = NULL
     for (i in 1:length(tlr)) {
       logR = tlr[i]
@@ -1343,13 +1366,6 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     }
     colnames(seg)=c("start","end","nA","nB")
     colnames(seg_raw)=c("start","end","nA","nB","nAraw","nBraw")
-    
-    # build helping vector
-    chrhelp = vector(length=length(lrrsegmented))
-    for (chrnr in 1:length(ch)) {
-      chrke = ch[[chrnr]]
-      chrhelp[chrke] = chrnr
-    }
     
     # every repeat joins 2 ends. 20 repeats will join about 1 million ends..
     for (rep in 1:20) {
