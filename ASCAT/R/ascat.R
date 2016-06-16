@@ -626,6 +626,7 @@ ascat.plotSegmentedData = function(ASCATobj) {
 #' 6. nonaberrantarrays: arrays on which ASCAT analysis indicates that they show virtually no aberrations\cr
 #' 7. segments: an array containing the copy number segments of each sample (not including failed arrays)\cr
 #' 8. segments_raw: an array containing the copy number segments of each sample without any rounding applied\cr
+#' 9. distance_matrix: distances for a range of ploidy and tumor percentage values
 #'
 #' @export
 #'
@@ -677,6 +678,12 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
     for (i in 1:length(goodarrays)) {
       n1[,i] = res[[goodarrays[i]]]$nA
       n2[,i] = res[[goodarrays[i]]]$nB
+    }
+    
+    distance_matrix = vector("list",length(goodarrays)) 
+    names(distance_matrix) <- colnames(ASCATobj$Tumor_LogR)[goodarrays]
+    for (i in 1:length(goodarrays)) {
+      distance_matrix[[i]] = res[[goodarrays[i]]]$distance_matrix
     }
     
     tp = vector(length=length(goodarrays))
@@ -743,10 +750,11 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
     naarrays = NULL
     seg = NULL
     seg_raw = NULL
+    distance_matrix = NULL
   }
   
   return(list(nA = n1, nB = n2, aberrantcellfraction = tp, ploidy = ploidy, psi = psi, goodnessOfFit = goodnessOfFit,
-              failedarrays = fa, nonaberrantarrays = naarrays, segments = seg, segments_raw = seg_raw))
+              failedarrays = fa, nonaberrantarrays = naarrays, segments = seg, segments_raw = seg_raw, distance_matrix = distance_matrix))
 }
 
 # helper function to split the genome into parts
@@ -1489,7 +1497,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     }
     
     return(list(rho = rho_opt1, psi = psi_opt1, goodnessOfFit = goodnessOfFit_opt1, nonaberrant = nonaberrant,
-                nA = n1all, nB = n2all, seg = seg, seg_raw = seg_raw))
+                nA = n1all, nB = n2all, seg = seg, seg_raw = seg_raw, distance_matrix = d))
     
   }
   
@@ -1502,7 +1510,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     dev.off()
     
     warning(paste("ASCAT could not find an optimal ploidy and cellularity value for sample ", name, ".\n", sep=""))
-    return(list(rho = NA, psi = NA, goodnessOfFit = NA, nonaberrant = F, nA = NA, nB = NA, seg = NA, seg_raw = NA))
+    return(list(rho = NA, psi = NA, goodnessOfFit = NA, nonaberrant = F, nA = NA, nB = NA, seg = NA, seg_raw = NA, distance_matrix = NA))
   }
   
 }
