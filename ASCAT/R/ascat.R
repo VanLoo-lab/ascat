@@ -256,9 +256,13 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
         td_chr<-Tumordata[GC_newlist$Chr==chrindex]
         
         flag_nona<-(complete.cases(td_chr) & complete.cases(GC_newlist_chr))
-        corr<-cor(GC_newlist_chr[flag_nona,3:ncol(GC_newlist_chr)],td_chr[flag_nona])
-        corr_tot<-cbind(corr_tot,corr)
-        length_tot<-c(length_tot,length(td_chr))
+        
+        #only work with chromosomes that have variance
+        if(length(td_chr[flag_nona])>0 & var(td_chr[flag_nona])>0){
+          corr<-cor(GC_newlist_chr[flag_nona,3:ncol(GC_newlist_chr)],td_chr[flag_nona])
+          corr_tot<-cbind(corr_tot,corr)
+          length_tot<-c(length_tot,length(td_chr))
+        }
       }
       corr<-apply(corr_tot,1,function(x) sum(abs(x*length_tot))/sum(length_tot))
       index_1M<-c(which(names(corr)=="X1M"),which(names(corr)=="X1Mb"))
@@ -304,9 +308,7 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
 #' @title ascat.aspcf
 #' @description run ASPCF segmentation
 #' @details This function can be easily parallelised by controlling the selectsamples parameter\cr
-#' it saves the results in LogR_PCFed[sample]_[segment].txt and BAF_PCFed[sample]_[segment].txt;
-#' if these files exist, the results are read from them.\cr
-#' Hence, after parallelisation, copy all the files into the current directory, and run this function to read in the results
+#' it saves the results in LogR_PCFed[sample]_[segment].txt and BAF_PCFed[sample]_[segment].txt
 #' @param ASCATobj an ASCAT object
 #' @param selectsamples a vector containing the sample number(s) to PCF. Default = all
 #' @param ascat.gg germline genotypes (NULL if germline data is available)
@@ -624,6 +626,7 @@ ascat.plotSegmentedData = function(ASCATobj) {
 #' 6. nonaberrantarrays: arrays on which ASCAT analysis indicates that they show virtually no aberrations\cr
 #' 7. segments: an array containing the copy number segments of each sample (not including failed arrays)\cr
 #' 8. segments_raw: an array containing the copy number segments of each sample without any rounding applied\cr
+#' 9. distance_matrix: distances for a range of ploidy and tumor percentage values
 #'
 #' @export
 #'
@@ -675,6 +678,12 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
     for (i in 1:length(goodarrays)) {
       n1[,i] = res[[goodarrays[i]]]$nA
       n2[,i] = res[[goodarrays[i]]]$nB
+    }
+    
+    distance_matrix = vector("list",length(goodarrays)) 
+    names(distance_matrix) <- colnames(ASCATobj$Tumor_LogR)[goodarrays]
+    for (i in 1:length(goodarrays)) {
+      distance_matrix[[i]] = res[[goodarrays[i]]]$distance_matrix
     }
     
     tp = vector(length=length(goodarrays))
@@ -741,10 +750,11 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
     naarrays = NULL
     seg = NULL
     seg_raw = NULL
+    distance_matrix = NULL
   }
   
   return(list(nA = n1, nB = n2, aberrantcellfraction = tp, ploidy = ploidy, psi = psi, goodnessOfFit = goodnessOfFit,
-              failedarrays = fa, nonaberrantarrays = naarrays, segments = seg, segments_raw = seg_raw))
+              failedarrays = fa, nonaberrantarrays = naarrays, segments = seg, segments_raw = seg_raw, distance_matrix = distance_matrix))
 }
 
 # helper function to split the genome into parts
@@ -1277,11 +1287,34 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     nullprobes = SNPpos[,1]%in%nullchrs
     
     #this replaces an occurrence of unique that caused problems
+    #introduces segment spanning over chr ends, when two consecutive probes from diff chr have same logR!
+    # build helping vector
+    chrhelp = vector(length=length(lrrsegmented))
+    for (chrnr in 1:length(ch)) {
+      chrke = ch[[chrnr]]
+      chrhelp[chrke] = chrnr
+    }
+    
     tlr2 = rle(lrrsegmented)
-    tlr = tlr2$values
+    tlr.chr= rle(chrhelp)
+    
     tlrstart = c(1,cumsum(tlr2$lengths)+1)
     tlrstart = tlrstart[1:(length(tlrstart)-1)]
     tlrend = cumsum(tlr2$lengths)
+    
+    tlrstart.chr= c(1,cumsum(tlr.chr$lengths)+1)
+    tlrstart.chr = tlrstart.chr[1:(length(tlrstart.chr)-1)]
+    tlrend.chr = cumsum(tlr.chr$lengths)
+    
+    tlrend<-sort(union(tlrend, tlrend.chr))
+    tlrstart<-sort(union(tlrstart, tlrstart.chr))
+    
+    tlr=NULL
+    for(ind in tlrstart){
+      val<-lrrsegmented[ind]
+      tlr<-c(tlr, val)
+    }
+    
     seg = NULL
     for (i in 1:length(tlr)) {
       logR = tlr[i]
@@ -1341,13 +1374,6 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     }
     colnames(seg)=c("start","end","nA","nB")
     colnames(seg_raw)=c("start","end","nA","nB","nAraw","nBraw")
-    
-    # build helping vector
-    chrhelp = vector(length=length(lrrsegmented))
-    for (chrnr in 1:length(ch)) {
-      chrke = ch[[chrnr]]
-      chrhelp[chrke] = chrnr
-    }
     
     # every repeat joins 2 ends. 20 repeats will join about 1 million ends..
     for (rep in 1:20) {
@@ -1471,15 +1497,20 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     }
     
     return(list(rho = rho_opt1, psi = psi_opt1, goodnessOfFit = goodnessOfFit_opt1, nonaberrant = nonaberrant,
-                nA = n1all, nB = n2all, seg = seg, seg_raw = seg_raw))
+                nA = n1all, nB = n2all, seg = seg, seg_raw = seg_raw, distance_matrix = d))
     
   }
   
   else {
     
     name=gsub(".sunrise.png","",basename(distancepng))
+    
+    png(filename = distancepng, width = 1000, height = 1000, res = 1000/7)
+    ascat.plotSunrise(d,0,0)
+    dev.off()
+    
     warning(paste("ASCAT could not find an optimal ploidy and cellularity value for sample ", name, ".\n", sep=""))
-    return(list(rho = NA, psi = NA, goodnessOfFit = NA, nonaberrant = F, nA = NA, nB = NA, seg = NA, seg_raw = NA))
+    return(list(rho = NA, psi = NA, goodnessOfFit = NA, nonaberrant = F, nA = NA, nB = NA, seg = NA, seg_raw = NA, distance_matrix = NA))
   }
   
 }
@@ -1512,7 +1543,9 @@ ascat.plotSunrise<-function(d, psi_opt1, rho_opt1, minim=T){
   axis(1, at = seq(0, 1, by = 1/(ploidy_max-1)), labels = seq(ploidy_min, ploidy_max, by = 1))
   axis(2, at = seq(0, 1/purity_max, by = 1/3/purity_max), labels = seq(purity_min, purity_max, by = 3/10))
   
-  points((psi_opt1-ploidy_min)/(ploidy_max-1),(rho_opt1-purity_min)/(1/purity_max),col="green",pch="X", cex = 2)
+  if(psi_opt1>0 && rho_opt1>0){
+    points((psi_opt1-ploidy_min)/(ploidy_max-1),(rho_opt1-purity_min)/(1/purity_max),col="green",pch="X", cex = 2)
+  }
 }
 
 
