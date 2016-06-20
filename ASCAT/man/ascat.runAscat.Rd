@@ -32,6 +32,7 @@ an ASCAT output object, containing:\cr
 6. nonaberrantarrays: arrays on which ASCAT analysis indicates that they show virtually no aberrations\cr
 7. segments: an array containing the copy number segments of each sample (not including failed arrays)\cr
 8. segments_raw: an array containing the copy number segments of each sample without any rounding applied\cr
+9. distance_matrix: distances for a range of ploidy and tumor percentage values
 }
 \description{
 ASCAT main function, calculating the allele-specific copy numbers

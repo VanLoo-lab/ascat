@@ -37,7 +37,7 @@ runASCAT(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromosomes,
 
 \item{nonroundedprofilepng}{if NA: copy number profile before rounding is plotted (total copy number as well as the copy number of the minor allele), if filename is given, the plot is written to a .png file}
 
-\item{aberrationreliabilitypng}{if NA: aberration reliability score is plotted, if filename is given, the plot is written to a .png file}
+\item{aberrationreliabilitypng}{aberration reliability score is plotted if filename is given}
 
 \item{gamma}{technology parameter, compaction of Log R profiles (expected decrease in case of deletion in diploid sample, 100\% aberrant cells; 1 in ideal case, 0.55 of Illumina 109K arrays)}
 

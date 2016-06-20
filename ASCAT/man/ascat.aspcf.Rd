@@ -33,8 +33,6 @@ run ASPCF segmentation
 }
 \details{
 This function can be easily parallelised by controlling the selectsamples parameter\cr
-it saves the results in LogR_PCFed[sample]_[segment].txt and BAF_PCFed[sample]_[segment].txt;
-if these files exist, the results are read from them.\cr
-Hence, after parallelisation, copy all the files into the current directory, and run this function to read in the results
+it saves the results in LogR_PCFed[sample]_[segment].txt and BAF_PCFed[sample]_[segment].txt
 }
 

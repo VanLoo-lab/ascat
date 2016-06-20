@@ -15,3 +15,10 @@ export(base.gw.plot)
 export(make_segments)
 export(runASCAT)
 import(RColorBrewer)
+importFrom("grDevices", "adjustcolor", "colorRampPalette", "dev.new",
+             "dev.off", "pdf", "png")
+importFrom("graphics", "abline", "axis", "image", "par", "plot",
+             "points", "rect", "text")
+importFrom("stats", "complete.cases", "cor", "lm", "mad", "median",
+             "na.omit", "runmed", "var")
+importFrom("utils", "read.table", "write.table")

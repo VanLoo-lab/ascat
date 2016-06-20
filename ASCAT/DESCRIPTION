@@ -15,7 +15,11 @@ Description: R package of ASCAT as published in http://www.ncbi.nlm.nih.gov/
     pubmed/20837533
 Depends:
     R (>= 2.13.0),
-    RColorBrewer
+    RColorBrewer,
+    grDevices,
+    graphics,
+    stats,
+    utils
 License: GPL-3
 LazyLoad: yes
 RoxygenNote: 5.0.1
