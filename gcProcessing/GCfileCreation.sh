@@ -5,17 +5,19 @@ SIZES=$2
 CORES=$3
 REF=$4
 
-createWindowBed.pl -s ${SIZES} -p ${SNPpos} -c ${CORES}
+perl createWindowBed.pl -s ${SIZES} -p ${SNPpos} -c ${CORES}
 
 output=$( basename ${SNPpos} )
 
-for i in {1..${CORES}}
+for i in $(eval echo "{0..$( expr $CORES - 1 )}")
 do
-    bedtools nuc -fi ${REF} -bed ${output}"_"${i}".bed" > ${output}"_"${i}".gcContent"
+    bedtools nuc -fi ${REF} -bed ${output}"_"${i}".bed" > ${output}"_"${i}".gcContent" &
 done
+
+wait
 
 cat *.gcContent > ${output}".combined.gcContent"
 
-R --no-save -args ${output}".combined.gcContent" "GC_"${output}".txt" <createGCcontentFile.R
+R --no-save --args ${output}".combined.gcContent" "GC_"${output}".txt" <createGCcontentFile.R
 
 
