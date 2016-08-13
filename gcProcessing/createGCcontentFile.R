@@ -10,5 +10,5 @@ agg[,1]<-NULL
 
 cols<-ifelse(unique(data$V6)/1000000>=1, paste(unique(data$V6)/1000000, "M", sep=""), unique(data$V6))
 colnames(agg)<-c("Chr","Position",cols)
-agg<-agg[order(agg$Chr, agg$Position),]
+agg<-agg[order(agg$Chr, as.numeric(as.character(agg$Position))),]
 write.table(agg,paste(name,".txt",sep=""),quote=F, row.names=T, sep="\t")
