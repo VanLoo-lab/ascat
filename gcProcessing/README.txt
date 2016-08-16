@@ -8,7 +8,7 @@ The script GCfileCreation.sh can help you create the input for ASCAT’s GC corr
 
 SNPpos should contain the list of all probes with their genomic location (tab-separated).
 
-Name	Chr	Position
+	Chr	Position
 rs3094315	1	752566
 rs2073813	1	753541
 rs2905040	1	770216
