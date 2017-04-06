@@ -40,5 +40,6 @@ HumanCNV370quad\cr
 HumanCore12\cr
 HumanCoreExome24\cr
 HumanOmniExpress12\cr
+IlluminaOmniExpressExome\cr
 }
 
