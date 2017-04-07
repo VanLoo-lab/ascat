@@ -1,4 +1,4 @@
-# ASCAT 2.4.3
+# ASCAT 2.4.4
 # author: Peter Van Loo
 # PCF and ASPCF: Gro Nilsen
 # GC correction: Jiqiu Cheng
@@ -2155,6 +2155,7 @@ psi <- function(x,z){
 #' HumanCore12\cr
 #' HumanCoreExome24\cr
 #' HumanOmniExpress12\cr
+#' IlluminaOmniExpressExome\cr
 #'
 #' @return predicted germline genotypes
 #'
@@ -2267,18 +2268,28 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6") {
     segmentLength = 100
   }
   else if (platform=="AffyOncoScan") {
-    maxHomozygous = 0.05
-    proportionHetero = 0.24
-    proportionHomo = 0.69
-    proportionOpen = 0.04
+    maxHomozygous = 0.04
+    proportionHetero = 0.355
+    proportionHomo = 0.605
+    proportionOpen = 0.025
     segmentLength = 30
+    # maxHomozygous = 0.05
+    # proportionHetero = 0.24
+    # proportionHomo = 0.69
+    # proportionOpen = 0.04
+    # segmentLength = 30
   }
   else if (platform=="AffyCytoScanHD") {
-    maxHomozygous = 0.05
-    proportionHetero = 0.26
-    proportionHomo = 0.69
+    # maxHomozygous = 0.05
+    # proportionHetero = 0.26
+    # proportionHomo = 0.69
+    # proportionOpen = 0.03
+    # segmentLength = 30
+    maxHomozygous = 0.04
+    proportionHetero = 0.32
+    proportionHomo = 0.60
     proportionOpen = 0.03
-    segmentLength = 30
+    segmentLength = 100
   }
   else if (platform=="HumanCNV370quad") {
     maxHomozygous = 0.05
@@ -2306,6 +2317,13 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6") {
     proportionHetero = 0.295
     proportionHomo = 0.67
     proportionOpen = 0.015
+    segmentLength = 100
+  }
+  else if (platform=="IlluminaOmniExpressExome") {
+    maxHomozygous = 0.05
+    proportionHetero = 0.35
+    proportionHomo = 0.60
+    proportionOpen = 0.03
     segmentLength = 100
   }
   #   else if (platform=="OmniZhonghua8") {
