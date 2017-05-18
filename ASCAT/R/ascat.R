@@ -2159,7 +2159,7 @@ fillNA = function(vec, zeroIsNA=TRUE) {
   }
   
   return(vec)
-})
+}
 
 
 psi <- function(x,z){
