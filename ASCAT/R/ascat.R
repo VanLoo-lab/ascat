@@ -1319,7 +1319,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     # and its position in bafsegmented
     probeLookup = data.frame(
       lrrprobe = names(lrrsegmented),
-      bafpos = match(names(lrrsegmented), names(bafsegmented))
+      bafpos = match(names(lrrsegmented), names(bafsegmented)),
       stringsAsFactors=F
     )
     
