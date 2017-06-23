@@ -2380,6 +2380,8 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6") {
     Undecided = sum(is.na(Hom))
     
     extraHetero = round(min(proportionHetero * length(Tumor_BAF_noNA),Undecided-proportionOpen*length(Tumor_BAF_noNA)))
+	
+	Hetero = 0
     
     if(extraHetero>0) {
       
