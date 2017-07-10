@@ -594,6 +594,7 @@ ascat.asmultipcf <- function(ASCATobj, ascat.gg = NULL, penalty = 25, wsample=NU
   segmentlengths = unique(c(penalty,25,50,100,200,400,800))
   segmentlengths = segmentlengths[segmentlengths>=penalty]
   for (segmentlength in segmentlengths) {
+    print(paste('Segmentlength',segmentlength)) ## TODO
     bafnames = lrnames = character()
     logRPCFed = matrix(nrow=0,ncol=length(ASCATobj$samples))
     bafPCFed = matrix(nrow=0,ncol=length(ASCATobj$samples))
@@ -805,8 +806,12 @@ ascat.asmultipcf <- function(ASCATobj, ascat.gg = NULL, penalty = 25, wsample=NU
           if(length(nakes)>0) {
             for (nake in 1:length(nakes)) {
               pna = nakes[nake]
-              closestnonna = nonnakes[which.min(abs(nonnakes-pna))]
-              logRC[pna,samplei] = logRC[closestnonna,samplei]
+              if (length(nonnakes)>0) {
+                closestnonna = nonnakes[which.min(abs(nonnakes-pna))]
+                logRC[pna,samplei] = logRC[closestnonna,samplei]
+              } else {
+                logRC[pna,samplei] = 0
+              }
             }
           }
         }
@@ -1111,6 +1116,7 @@ getMadwithNA <- function(x,k=25){
   
   return(SD)
 }
+
 
 
 #' @title ascat.plotSegmentedData
