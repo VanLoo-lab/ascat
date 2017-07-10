@@ -1137,7 +1137,7 @@ ascat.plotSegmentedData = function(ASCATobj) {
     png(filename = paste(ASCATobj$samples[arraynr],".ASPCF.png",sep=""), width = 2000, height = 1000, res = 200)
     par(mar = c(0.5,5,5,0.5), mfrow = c(2,1), cex = 0.4, cex.main=3, cex.axis = 2)
     r = ASCATobj$Tumor_LogR_segmented[rownames(ASCATobj$Tumor_BAF_segmented[[arraynr]]),arraynr]
-    beta = ASCATobj$Tumor_BAF_segmented[[arraynr]][,]
+    beta = ASCATobj$Tumor_BAF_segmented[[arraynr]][,,drop=FALSE]
     plot(c(1,length(r)), c(-1,1), type = "n", xaxt = "n", main = paste(colnames(ASCATobj$Tumor_BAF)[arraynr],", LogR",sep=""), xlab = "", ylab = "")
     points(ASCATobj$Tumor_LogR[rownames(ASCATobj$Tumor_BAF_segmented[[arraynr]]),arraynr], col = "red", pch=ifelse(dim(ASCATobj$Tumor_LogR)[1]>100000,".",20))
     points(r,col="green")
@@ -1208,7 +1208,7 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
     names(baf)=rownames(ASCATobj$Tumor_BAF)
     lrrsegm = ASCATobj$Tumor_LogR_segmented[,arraynr]
     names(lrrsegm) = rownames(ASCATobj$Tumor_LogR_segmented)
-    bafsegm = ASCATobj$Tumor_BAF_segmented[[arraynr]][,]
+    bafsegm = ASCATobj$Tumor_BAF_segmented[[arraynr]][,,drop=FALSE]
     names(bafsegm) = rownames(ASCATobj$Tumor_BAF_segmented[[arraynr]])
     failedqualitycheck = F
     if(ASCATobj$samples[arraynr]%in%ASCATobj$failedarrays) {
@@ -1474,7 +1474,7 @@ make_segments = function(r,b) {
     previousb = m[i,2];
     previousr = m[i,1];
   }
-  pcf_segments = as.matrix(na.omit(pcf_segments))[,]
+  pcf_segments = as.matrix(na.omit(pcf_segments))[,,drop=FALSE]
   return(pcf_segments);
 }
 
