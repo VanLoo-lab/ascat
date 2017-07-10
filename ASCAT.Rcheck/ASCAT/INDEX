@@ -1,0 +1,16 @@
+ascat.GCcorrect         ascat.GCcorrect
+ascat.asmultipcf        Allele-specific segmentation of multiple
+                        samples
+ascat.aspcf             ascat.aspcf
+ascat.loadData          ascat.loadData
+ascat.plotAscatProfile
+                        ascat.plotAscatProfile
+ascat.plotGenotypes     ascat.plotGenotypes
+ascat.plotNonRounded    ascat.plotNonRounded
+ascat.plotRawData       ascat.plotRawData
+ascat.plotSegmentedData
+                        ascat.plotSegmentedData
+ascat.plotSunrise       ascat.plotSunrise
+ascat.predictGermlineGenotypes
+                        ascat.predictGermlineGenotypes
+ascat.runAscat          ascat.runAscat

@@ -1,0 +1,16 @@
+ascat.asmultipcf	ascat.asmultipcf
+ascat.aspcf	ascat.aspcf
+ascat.GCcorrect	ascat.GCcorrect
+ascat.loadData	ascat.loadData
+ascat.plotAscatProfile	ascat.plotAscatProfile
+ascat.plotGenotypes	ascat.plotGenotypes
+ascat.plotNonRounded	ascat.plotNonRounded
+ascat.plotRawData	ascat.plotRawData
+ascat.plotSegmentedData	ascat.plotSegmentedData
+ascat.plotSunrise	ascat.plotSunrise
+ascat.predictGermlineGenotypes	ascat.predictGermlineGenotypes
+ascat.runAscat	ascat.runAscat
+base.gw.plot	base.gw.plot
+make_segments	make_segments
+predictGermlineHomozygousStretches	predictGermlineHomozygousStretches
+runASCAT	runASCAT
