@@ -1315,6 +1315,14 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
       tlr<-c(tlr, val)
     }
     
+    # For each LRR probe, find the matching BAF probe
+    # and its position in bafsegmented
+    probeLookup = data.frame(
+      lrrprobe = names(lrrsegmented),
+      bafpos = match(names(lrrsegmented), names(bafsegmented)),
+      stringsAsFactors=F
+    )
+    
     seg = NULL
     for (i in 1:length(tlr)) {
       logR = tlr[i]
@@ -1322,7 +1330,11 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
       pr = tlrstart[i]:tlrend[i]
       start = min(pr)
       end = max(pr)
-      bafke = bafsegmented[intersect(names(lrrsegmented)[pr],names(bafsegmented))][1]
+      
+      bafpos = probeLookup$bafpos[pr]
+      bafpos = bafpos[!is.na(bafpos)]
+      bafke  = bafsegmented[bafpos][1]
+      
       #if bafke is NA, this means that we are dealing with a germline homozygous stretch with a copy number change within it.
       #in this case, nA and nB are irrelevant, just their sum matters
       if(is.na(bafke)) {
