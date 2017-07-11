@@ -492,15 +492,8 @@ ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), asc
       }
       #fill in NAs (otherwise they cause problems):
       #some NA probes are filled in with zero, replace those too:
-      nakes = c(which(is.na(logRPCFed)),which(logRPCFed==0))
-      nonnakes = which(!is.na(logRPCFed)&!(logRPCFed==0))
-      if(length(nakes)>0) {
-        for (nake in 1:length(nakes)) {
-          pna = nakes[nake]
-          closestnonna = nonnakes[which.min(abs(nonnakes-pna))]
-          logRPCFed[pna] = logRPCFed[closestnonna]
-        }
-      }
+      logRPCFed = fillNA(logRPCFed, zeroIsNA=TRUE)
+      
       #adapt levels again
       seg = rle(logRPCFed)$lengths
       logRPCFed = numeric(0)
@@ -1315,6 +1308,14 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
       tlr<-c(tlr, val)
     }
     
+    # For each LRR probe, find the matching BAF probe
+    # and its position in bafsegmented
+    probeLookup = data.frame(
+      lrrprobe = names(lrrsegmented),
+      bafpos = match(names(lrrsegmented), names(bafsegmented)),
+      stringsAsFactors=F
+    )
+    
     seg = NULL
     for (i in 1:length(tlr)) {
       logR = tlr[i]
@@ -1322,7 +1323,11 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
       pr = tlrstart[i]:tlrend[i]
       start = min(pr)
       end = max(pr)
-      bafke = bafsegmented[intersect(names(lrrsegmented)[pr],names(bafsegmented))][1]
+      
+      bafpos = probeLookup$bafpos[pr]
+      bafpos = bafpos[!is.na(bafpos)]
+      bafke  = bafsegmented[bafpos][1]
+      
       #if bafke is NA, this means that we are dealing with a germline homozygous stretch with a copy number change within it.
       #in this case, nA and nB are irrelevant, just their sum matters
       if(is.na(bafke)) {
@@ -2116,7 +2121,60 @@ medianFilter <- function(x,k){
 }
 
 
+fillNA = function(vec, zeroIsNA=TRUE) {
+  if (zeroIsNA) {vec[vec==0] <- NA}
+  nas = which(is.na(vec))
 
+  if(length(nas) == 0) {
+    return(vec)
+  }
+  
+  # Find stretches of contiguous NAs
+  starts = c(1, which(diff(nas)>1)+1)
+  ends = c(starts[-1] - 1, length(nas))
+  
+  starts = nas[starts]
+  ends = nas[ends]
+  
+  # Special-case: vec[1] is NA
+  startAt = 1
+  if(starts[1]==1) {
+    vec[1:ends[1]] = vec[ends[1]+1]
+    startAt = 2
+  }
+  
+  if (startAt > length(starts)) {
+    return(vec)
+  }  
+
+  # Special-case: last element in vec is NA
+  endAt = length(starts)
+  if(is.na(vec[length(vec)])) {
+    vec[starts[endAt]:ends[endAt]] = vec[starts[endAt]-1]
+    endAt = endAt-1
+  }
+
+  if (endAt < startAt) {
+    return(vec)
+  }  
+    
+  # For each stretch of NAs, set start:midpoint to the value before,
+  # and midpoint+1:end to the value after.
+  for(i in startAt:endAt) {
+    start = starts[i]
+    end = ends[i]
+    N = 1 + end-start
+    if (N==1) {
+      vec[start] = vec[start-1]
+    } else {
+      midpoint = start+ceiling(N/2)
+      vec[start:midpoint] = vec[start-1]
+      vec[(midpoint+1):end] = vec[end+1]
+    }
+  }
+  
+  return(vec)
+}
 
 
 psi <- function(x,z){
@@ -2383,6 +2441,8 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6") {
     Undecided = sum(is.na(Hom))
     
     extraHetero = round(min(proportionHetero * length(Tumor_BAF_noNA),Undecided-proportionOpen*length(Tumor_BAF_noNA)))
+	
+	Hetero = 0
     
     if(extraHetero>0) {
       
