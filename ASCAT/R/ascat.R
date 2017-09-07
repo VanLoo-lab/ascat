@@ -1,4 +1,3 @@
-#EDITED: Bernat Gel. Added img.dir and img.prefix to functions creating plots to control image location
 # ASCAT 2.5
 # author: Peter Van Loo
 # PCF and ASPCF: Gro Nilsen
