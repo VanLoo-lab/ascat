@@ -122,6 +122,8 @@ ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = 
 #' @title ascat.plotRawData
 #' @description Plots SNP array data
 #' @param ASCATobj an ASCAT object (e.g. data structure from ascat.loadData)
+#' @param img.dir directory in which figures will be written
+#' @param img.prefix prefix for figure names
 #'
 #' @return Produces png files showing the logR and BAF values for tumour and germline samples
 #'
@@ -315,6 +317,8 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
 #' @param selectsamples a vector containing the sample number(s) to PCF. Default = all
 #' @param ascat.gg germline genotypes (NULL if germline data is available)
 #' @param penalty penalty of introducing an additional ASPCF breakpoint (expert parameter, don't adapt unless you know what you're doing)
+#' @param out.dir directory in which output files will be written
+#' @param out.prefix prefix for output file names
 #'
 #' @return output: ascat data structure containing:\cr
 #' 1. Tumor_LogR data matrix\cr
@@ -550,6 +554,8 @@ ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), asc
 #' @description plots the SNP array data before and after segmentation
 #'
 #' @param ASCATobj an ASCAT object (e.g. from ascat.aspcf)
+#' @param img.dir directory in which figures will be written
+#' @param img.prefix prefix for figure names
 #'
 #' @return png files showing raw and segmented tumour logR and BAF
 #'
@@ -610,6 +616,8 @@ ascat.plotSegmentedData = function(ASCATobj, img.dir=".", img.prefix="") {
 #' @param circos Optional file to output the non-rounded values in Circos track format. Default=NA
 #' @param rho_manual optional argument to override ASCAT optimization and supply rho parameter (not recommended)
 #' @param psi_manual optional argument to override ASCAT optimization and supply psi parameter (not recommended)
+#' @param img.dir directory in which figures will be written
+#' @param img.prefix prefix for figure names
 #' @details Note: for copy number only probes, nA contains the copy number value and nB = 0.
 #' @return an ASCAT output object, containing:\cr
 #' 1. nA: copy number of the A allele\cr
@@ -2196,6 +2204,8 @@ psi <- function(x,z){
 #' is available
 #' @param ASCATobj an ASCAT object
 #' @param platform used array platform
+#' @param img.dir directory in which figures will be written
+#' @param img.prefix prefix for figure names
 #' @details Currently possible values for platform:\cr
 #' AffySNP6 (default)\cr
 #' Custom10k\cr
