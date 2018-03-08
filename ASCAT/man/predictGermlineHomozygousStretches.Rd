@@ -18,4 +18,3 @@ germline homozyguous segments
 helper function to predict germline homozyguous segments for later re-segmentation
 }
 \keyword{internal}
-

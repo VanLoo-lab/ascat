@@ -37,4 +37,3 @@ basic plot containing chromosome positions and names, plots copy number for eith
 Basis for the genome-wide plots
 }
 \keyword{internal}
-

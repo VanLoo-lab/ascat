@@ -4,12 +4,17 @@
 \alias{ascat.predictGermlineGenotypes}
 \title{ascat.predictGermlineGenotypes}
 \usage{
-ascat.predictGermlineGenotypes(ASCATobj, platform = "AffySNP6")
+ascat.predictGermlineGenotypes(ASCATobj, platform = "AffySNP6",
+  img.dir = ".", img.prefix = "")
 }
 \arguments{
 \item{ASCATobj}{an ASCAT object}
 
 \item{platform}{used array platform}
+
+\item{img.dir}{directory in which figures will be written}
+
+\item{img.prefix}{prefix for figure names}
 }
 \value{
 predicted germline genotypes
@@ -42,4 +47,3 @@ HumanCoreExome24\cr
 HumanOmniExpress12\cr
 IlluminaOmniExpressExome\cr
 }
-

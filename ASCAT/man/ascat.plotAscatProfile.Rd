@@ -38,4 +38,3 @@ plot showing the ASCAT profile of the sample
 \description{
 Function plotting the rounded ASCAT profiles over all chromosomes
 }
-

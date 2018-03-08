@@ -42,4 +42,3 @@ Function to read in SNP array data
 \details{
 germline data files can be NULL - in that case these are not read in
 }
-

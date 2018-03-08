@@ -39,4 +39,3 @@ between samples, e.g. due to a common ancestry.
 \details{
 This function saves the results in in [sample].LogR.PCFed.txt and [sample].BAF.PCFed.txt
 }
-

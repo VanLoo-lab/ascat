@@ -36,4 +36,3 @@ plot showing the nonrounded copy number profile, using base plotting function
 \description{
 Function plotting the unrounded ASCAT copy number over all chromosomes
 }
-
