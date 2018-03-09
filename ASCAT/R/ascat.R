@@ -1254,8 +1254,8 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
           valA<-chrSegmA$values[i]
           valB<-chrSegmB$values[i]
           size<-chrSegmA$lengths[i]
-          write(c(paste("hs",frame[start,]$Chr,sep=""),frame[start,]$Position,frame[(start+size-1),]$Position,valA), file = paste(circos,"_major",sep=""), ncolumns = 4, append = TRUE, sep = "\t")
-          write(c(paste("hs",frame[start,]$Chr,sep=""),frame[start,]$Position,frame[(start+size-1),]$Position,valB), file = paste(circos,"_minor",sep=""), ncolumns = 4, append = TRUE, sep = "\t")
+          write(c(paste("hs",frame[start,1],sep=""),frame[start,2],frame[(start+size-1),2],valA), file = paste(circos,"_major",sep=""), ncolumns = 4, append = TRUE, sep = "\t")
+          write(c(paste("hs",frame[start,1],sep=""),frame[start,2],frame[(start+size-1),2],valB), file = paste(circos,"_minor",sep=""), ncolumns = 4, append = TRUE, sep = "\t")
           start=start+size
         }
       }
