@@ -4,8 +4,9 @@
 \alias{base.gw.plot}
 \title{base.gw.plot}
 \usage{
-base.gw.plot(bafsegmented, nAfullPlot, nBfullPlot, colourTotal, colourMinor,
-  maintitle, chr.segs, lrr, chr.names, y_limit, twoColours = FALSE)
+base.gw.plot(bafsegmented, nAfullPlot, nBfullPlot, colourTotal,
+  colourMinor, maintitle, chr.segs, lrr, chr.names, y_limit,
+  twoColours = FALSE)
 }
 \arguments{
 \item{bafsegmented}{B Allele Frequency, segmented, in genomic sequence (only probes heterozygous in germline), with probe IDs}
