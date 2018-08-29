@@ -296,7 +296,7 @@ ascat.asmultipcf <- function(ASCATobj, ascat.gg = NULL, penalty = 25, wsample=NU
     }
   
     # if less than 800 segments: this segmentlength is ok, otherwise, rerun with higher segmentlength
-    if(length(unique(logRPCFed))<800) {
+    if(all(apply(logRPCFed,2,function(x) length(unique(x)))<800)) {
       break
     }
   } ## end for segmentlength in segmentlengths
