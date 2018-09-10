@@ -994,6 +994,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
   
   s = make_segments(r2,b2)
   d = create_distance_matrix(s, gamma)
+  plot_d=d
   
   TheoretMaxdist = sum(rep(0.25,dim(s)[1]) * s[,"length"] * ifelse(s[,"b"]==0.5,0.05,1),na.rm=T)
   
@@ -1217,7 +1218,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     if (!is.na(distancepng)) {
       png(filename = distancepng, width = 1000, height = 1000, res = 1000/7)
     }
-    ascat.plotSunrise(d,psi_opt1,rho_opt1)
+    ascat.plotSunrise(plot_d,psi_opt1,rho_opt1)
     if (!is.na(distancepng)) {
       dev.off()
     }
@@ -1520,7 +1521,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     name=gsub(".sunrise.png","",basename(distancepng))
     
     png(filename = distancepng, width = 1000, height = 1000, res = 1000/7)
-    ascat.plotSunrise(d,0,0)
+    ascat.plotSunrise(plot_d,0,0)
     dev.off()
     
     warning(paste("ASCAT could not find an optimal ploidy and cellularity value for sample ", name, ".\n", sep=""))
@@ -1558,7 +1559,7 @@ ascat.plotSunrise<-function(d, psi_opt1, rho_opt1, minim=T){
   axis(2, at = seq(0, 1/purity_max, by = 1/3/purity_max), labels = seq(purity_min, purity_max, by = 3/10))
   
   if(psi_opt1>0 && rho_opt1>0){
-    points((psi_opt1-ploidy_min)/(ploidy_max-1),(rho_opt1-purity_min)/(1/purity_max),col="green",pch="X", cex = 2)
+    points((psi_opt1-ploidy_min)/(ploidy_max-1),(rho_opt1-purity_min)/(1/purity_max),col="green",pch=4, cex = 2)
   }
 }
 
