@@ -4,10 +4,14 @@
 \alias{ascat.plotSegmentedData}
 \title{ascat.plotSegmentedData}
 \usage{
-ascat.plotSegmentedData(ASCATobj)
+ascat.plotSegmentedData(ASCATobj, img.dir = ".", img.prefix = "")
 }
 \arguments{
 \item{ASCATobj}{an ASCAT object (e.g. from ascat.aspcf)}
+
+\item{img.dir}{directory in which figures will be written}
+
+\item{img.prefix}{prefix for figure names}
 }
 \value{
 png files showing raw and segmented tumour logR and BAF
@@ -15,4 +19,3 @@ png files showing raw and segmented tumour logR and BAF
 \description{
 plots the SNP array data before and after segmentation
 }
-

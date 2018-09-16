@@ -1,0 +1,102 @@
+---
+title: "Multi-sample analysis with ASCAT"
+author: "Edith Ross"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Multi-sample analysis with ASCAT}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Vignette Info
+
+This vignette demonstrates how to use ASCAT to analyse multiple phylogenetically related samples. For the general usage of ASCAT including parameters that are not specific to multi-sample analysis please refer to the [ASCAT webpage](https://www.crick.ac.uk/peter-van-loo/software/ASCAT) and the [example pipeline](https://github.com/Crick-CancerGenomics/ascat/blob/master/ExampleData/ASCAT_examplePipeline.R).
+
+## Using ASCAT for multi-sample analyses
+
+We start by loading the ASCAT package.
+```{r,message=FALSE}
+library(ASCAT)
+```
+Next we load the data. 
+```{r}
+ascat.bcMulti <- ascat.loadData(
+  Tumor_LogR_file = system.file("extdata", "tumour.logR.txt", package="ASCAT"),
+  Tumor_BAF_file = system.file("extdata", "tumour.BAF.txt", package="ASCAT"),
+  Germline_LogR_file = system.file("extdata", "singlenormal.logR.txt", package="ASCAT"),
+  Germline_BAF_file = system.file("extdata", "singlenormal.BAF.txt", package="ASCAT"))
+```
+Both <tt>Tumor_LogR_file</tt> and <tt>Tumor_BAF_file</tt> are expected to contain a column for each of the samples to analyse.
+```{r}
+head(ascat.bcMulti$Tumor_LogR)                          
+head(ascat.bcMulti$Tumor_BAF)       
+```
+
+The next step is to run the segmentation. When analysing phylogenetically related samples, it is expected that some of the copy number segment boundaries are shared between samples. In this case a joint segmentation of all samples is recommended. The synthetic data set used in this example was also simulated with partly shared segment boundaries. The ground truth copy number plots of the two samples we are going to analyse are shown in the following plots.
+
+```{r,echo=FALSE,fig.show='hold', fig.width=7, fig.height= 3, fig.align='center'}
+groundTruth1 <- rep(c(2,2,3,2,3,2),times=c(200,100,100,30,50,120))
+groundTruth2 <- rep(c(1,2,3,2,3,2),times=c(200,100,100,30,50,120))
+
+par(mar=c(4,4,3,1),yaxp=c(0,3,3))
+plot(x=1:length(groundTruth1),y=groundTruth1,type='l',ylim=c(0,3),xlab='Position',ylab='Copy number',main='Sample 1',yaxt='n')
+axis(side = 2, at = 0:3, labels = 0:3)
+plot(x=1:length(groundTruth2),y=groundTruth2,type='l',ylim=c(0,3),xlab='Position',ylab='Copy number',main='Sample 2',yaxt='n')
+axis(side = 2, at = 0:3, labels = 0:3)
+```
+
+The multi-sample segmentation algorithm can be run using the function <tt>ascat.asmultipcf</tt>.
+```{r,message=FALSE}
+ascat.bcMulti <- ascat.asmultipcf(ascat.bcMulti,penalty = 5)
+```
+
+Finally ASCAT can be run on the segmented data set.
+```{r,eval=FALSE}
+ascat.outputMulti = ascat.runAscat(ascat.bcMulti)
+```
+
+## Comparison with single sample segmentation
+Finally, we compare our result to that of standard single sample segmentation using <tt>ascat.aspcf</tt>.
+```{r,message=FALSE}
+ascat.bc = ascat.loadData(system.file("extdata", "tumour.logR.txt", package="ASCAT"),
+                          system.file("extdata", "tumour.BAF.txt", package="ASCAT"),
+                          system.file("extdata", "normal.logR.txt", package="ASCAT"),
+                          system.file("extdata", "normal.BAF.txt", package="ASCAT"))
+ascat.bc = ascat.aspcf(ascat.bc,penalty = 25)
+```
+Note that in the single-sample case the same segmentation sensitivity is achieved with a higher penalty parameter compared to the multi-sample case. This means, when switching from single- to multi-sample segmentation, the penalty parameter needs to be lowered to maintain a similar sensitivity.
+
+```{r,echo=FALSE}
+plot.segments <- function(v1,v2,main) {
+  par(mfrow=c(2,1))
+  par(mar=c(0,1,4,7))
+  plot(x=1,y=1,xlim=c(200,700),ylim=c(1,2),axes=FALSE,ylab="",xlab="",main=main)
+  abline(v=v1,col="red")
+  par(xpd=TRUE)
+  legend(x='right',legend = c('Sample 1'), lty=1, col=c('red'),bty='n',inset=c(-0.24,-1))
+  par(xpd=FALSE)
+  par(mar=c(4,1,0,7))
+  plot(x=1,y=1,xlim=c(200,700),ylim=c(1,2),axes=FALSE,ylab="",xlab="Chromosome position")
+  abline(v=v2,col="blue")
+  par(xpd=TRUE)
+  legend(x='right',legend = c('Sample 2'), lty=1, col=c('blue'),bty='n',inset=c(-0.24,-1))
+  par(xpd=FALSE)
+  axis(side = 1)  
+}
+```
+
+We plot the segment boundaries inferred for each of the two samples by multi- and single-sample segmentation.
+```{r, fig.show='hold', fig.width=7, fig.height= 2, fig.align='center'}
+plot.segments(v1=cumsum(rle(ascat.bc$Tumor_LogR_segmented[,1])$lengths),
+              v2=cumsum(rle(ascat.bc$Tumor_LogR_segmented[,2])$lengths),
+              main="Single-sample segmentation")
+
+plot.segments(v1=cumsum(rle(ascat.bcMulti$Tumor_LogR_segmented[,1])$lengths),
+              v2=cumsum(rle(ascat.bcMulti$Tumor_LogR_segmented[,2])$lengths),
+              main="Multi-sample segmentation")
+```
+In case of single-sample segmentation the inferred positions of most of the shared segment boundaries vary slightly between the two samples, whereas the multi-sample segmentation infers a common breakpoint when there is no significant evidence that the boundaries differ between samples.
+
+
+

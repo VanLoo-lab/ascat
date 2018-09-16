@@ -4,8 +4,8 @@
 \alias{ascat.plotAscatProfile}
 \title{ascat.plotAscatProfile}
 \usage{
-ascat.plotAscatProfile(n1all, n2all, heteroprobes, ploidy, rho, goodnessOfFit,
-  nonaberrant, y_limit = 5, ch, lrr, bafsegmented)
+ascat.plotAscatProfile(n1all, n2all, heteroprobes, ploidy, rho,
+  goodnessOfFit, nonaberrant, y_limit = 5, ch, lrr, bafsegmented, chrs)
 }
 \arguments{
 \item{n1all}{copy number major allele}
@@ -29,6 +29,8 @@ ascat.plotAscatProfile(n1all, n2all, heteroprobes, ploidy, rho, goodnessOfFit,
 \item{lrr}{(unsegmented) log R, in genomic sequence (all probes), with probe IDs}
 
 \item{bafsegmented}{B Allele Frequency, segmented, in genomic sequence (only probes heterozygous in germline), with probe IDs}
+
+\item{chrs}{a vector containing the names for the chromosomes (e.g. c(1:22,"X"))}
 }
 \value{
 plot showing the ASCAT profile of the sample
@@ -36,4 +38,3 @@ plot showing the ASCAT profile of the sample
 \description{
 Function plotting the rounded ASCAT profiles over all chromosomes
 }
-

@@ -4,8 +4,8 @@
 \alias{ascat.plotNonRounded}
 \title{ascat.plotNonRounded}
 \usage{
-ascat.plotNonRounded(ploidy, rho, goodnessOfFit, nonaberrant, nAfull, nBfull,
-  y_limit = 5, bafsegmented, ch, lrr)
+ascat.plotNonRounded(ploidy, rho, goodnessOfFit, nonaberrant, nAfull,
+  nBfull, y_limit = 5, bafsegmented, ch, lrr, chrs)
 }
 \arguments{
 \item{ploidy}{ploidy of the sample}
@@ -27,6 +27,8 @@ ascat.plotNonRounded(ploidy, rho, goodnessOfFit, nonaberrant, nAfull, nBfull,
 \item{ch}{a list containing c vectors, where c is the number of chromosomes and every vector contains all probe numbers per chromosome}
 
 \item{lrr}{(unsegmented) log R, in genomic sequence (all probes), with probe IDs}
+
+\item{chrs}{a vector containing the names for the chromosomes (e.g. c(1:22,"X"))}
 }
 \value{
 plot showing the nonrounded copy number profile, using base plotting function
@@ -34,4 +36,3 @@ plot showing the nonrounded copy number profile, using base plotting function
 \description{
 Function plotting the unrounded ASCAT copy number over all chromosomes
 }
-

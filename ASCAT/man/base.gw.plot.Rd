@@ -4,8 +4,9 @@
 \alias{base.gw.plot}
 \title{base.gw.plot}
 \usage{
-base.gw.plot(bafsegmented, nAfullPlot, nBfullPlot, colourTotal, colourMinor,
-  maintitle, chr.segs, lrr, y_limit, twoColours = FALSE)
+base.gw.plot(bafsegmented, nAfullPlot, nBfullPlot, colourTotal,
+  colourMinor, maintitle, chr.segs, lrr, chr.names, y_limit,
+  twoColours = FALSE)
 }
 \arguments{
 \item{bafsegmented}{B Allele Frequency, segmented, in genomic sequence (only probes heterozygous in germline), with probe IDs}
@@ -24,6 +25,8 @@ base.gw.plot(bafsegmented, nAfullPlot, nBfullPlot, colourTotal, colourMinor,
 
 \item{lrr}{(unsegmented) log R, in genomic sequence (all probes), with probe IDs}
 
+\item{chr.names}{Vector giving the names of the chromosomes as displayed on the figure}
+
 \item{y_limit}{Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5}
 
 \item{twoColours}{Optional flag to specify colours, if TRUE colour is paler for CN values > y_limit}
@@ -35,4 +38,3 @@ basic plot containing chromosome positions and names, plots copy number for eith
 Basis for the genome-wide plots
 }
 \keyword{internal}
-

@@ -21,4 +21,3 @@ plot visualising range of ploidy and tumour percentage values
 \description{
 ascat.plotSunrise
 }
-

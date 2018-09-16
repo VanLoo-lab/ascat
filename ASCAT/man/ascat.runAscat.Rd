@@ -5,7 +5,8 @@
 \title{ascat.runAscat}
 \usage{
 ascat.runAscat(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5,
-  circos = NA, rho_manual = NA, psi_manual = NA)
+  circos = NA, rho_manual = NA, psi_manual = NA, img.dir = ".",
+  img.prefix = "")
 }
 \arguments{
 \item{ASCATobj}{an ASCAT object from ascat.aspcf}
@@ -21,6 +22,10 @@ ascat.runAscat(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5,
 \item{rho_manual}{optional argument to override ASCAT optimization and supply rho parameter (not recommended)}
 
 \item{psi_manual}{optional argument to override ASCAT optimization and supply psi parameter (not recommended)}
+
+\item{img.dir}{directory in which figures will be written}
+
+\item{img.prefix}{prefix for figure names}
 }
 \value{
 an ASCAT output object, containing:\cr
@@ -40,4 +45,3 @@ ASCAT main function, calculating the allele-specific copy numbers
 \details{
 Note: for copy number only probes, nA contains the copy number value and nB = 0.
 }
-

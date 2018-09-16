@@ -58,4 +58,3 @@ list containing optimal purity and ploidy
 the ASCAT main function
 }
 \keyword{internal}
-

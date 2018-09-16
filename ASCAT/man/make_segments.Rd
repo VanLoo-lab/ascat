@@ -19,4 +19,3 @@ Function to make segments of constant LRR and BAF.\cr
 This function is more general and does not depend on specific ASPCF output, it can also handle segmention performed on LRR and BAF separately
 }
 \keyword{internal}
-

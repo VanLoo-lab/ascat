@@ -5,7 +5,7 @@
 \title{ascat.aspcf}
 \usage{
 ascat.aspcf(ASCATobj, selectsamples = 1:length(ASCATobj$samples),
-  ascat.gg = NULL, penalty = 25)
+  ascat.gg = NULL, penalty = 25, out.dir = ".", out.prefix = "")
 }
 \arguments{
 \item{ASCATobj}{an ASCAT object}
@@ -15,6 +15,10 @@ ascat.aspcf(ASCATobj, selectsamples = 1:length(ASCATobj$samples),
 \item{ascat.gg}{germline genotypes (NULL if germline data is available)}
 
 \item{penalty}{penalty of introducing an additional ASPCF breakpoint (expert parameter, don't adapt unless you know what you're doing)}
+
+\item{out.dir}{directory in which output files will be written}
+
+\item{out.prefix}{prefix for output file names}
 }
 \value{
 output: ascat data structure containing:\cr
@@ -35,4 +39,3 @@ run ASPCF segmentation
 This function can be easily parallelised by controlling the selectsamples parameter\cr
 it saves the results in LogR_PCFed[sample]_[segment].txt and BAF_PCFed[sample]_[segment].txt
 }
-

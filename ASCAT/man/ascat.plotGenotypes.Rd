@@ -23,4 +23,3 @@ plot showing classified BAF per sample, with unused SNPs in green, germline homo
 \description{
 ascat.plotGenotypes
 }
-

@@ -20,4 +20,3 @@ Corrects logR of the tumour sample(s) with genomic GC content
 \details{
 Note that probes not present in the GCcontentfile will be lost from the results
 }
-
