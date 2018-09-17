@@ -204,11 +204,12 @@ ascat.plotRawData = function(ASCATobj, img.dir=".", img.prefix="") {
 #' @description Corrects logR of the tumour sample(s) with genomic GC content
 #' @param ASCATobj an ASCAT object
 #' @param GCcontentfile File containing the GC content around every SNP for increasing window sizes
+#' @param replictimingfile File containing replication timing at every SNP for various cell lines (optional)
 #' @details Note that probes not present in the GCcontentfile will be lost from the results
 #' @return ASCAT object with corrected tumour logR
 #'
 #' @export
-ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
+ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL, replictimingfile = NULL) {
   if(is.null(GCcontentfile)) {
     print.noquote("Error: no GC content file given!")
   }
@@ -221,6 +222,14 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
     ovl = intersect(row.names(ASCATobj$Tumor_LogR),row.names(GC_newlist))
     
     GC_newlist<-GC_newlist[ovl,]
+    
+    if (!is.null(replictimingfile)) {
+      replic_newlist<-read.table(file=replictimingfile,header=TRUE,as.is=TRUE)[ovl,]
+      colnames(replic_newlist)[c(1,2)] = c("Chr","Position")
+      replic_newlist$Chr<-as.character(replic_newlist$Chr)
+    } else {
+      print.noquote("Warning: no replication timing file given, proceeding with GC correction only!")
+    }
     
     SNPpos = ASCATobj$SNPpos[ovl,]
     Tumor_LogR = ASCATobj$Tumor_LogR[ovl,,drop=F]
@@ -251,48 +260,43 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
       Tumordata = Tumor_LogR[,s]
       names(Tumordata) = rownames(Tumor_LogR)
       
-      # Calculate weighted correlation
-      length_tot<-NULL
-      corr_tot<-NULL
-      for(chrindex in unique(SNPpos[,1])) {
-        GC_newlist_chr<-GC_newlist[GC_newlist$Chr==chrindex,]
-        td_chr<-Tumordata[GC_newlist$Chr==chrindex]
-        
-        flag_nona<-(complete.cases(td_chr) & complete.cases(GC_newlist_chr))
-        
-        #only work with chromosomes that have variance
-        chr_var=var(td_chr[flag_nona])#Will be NA if there is exactly one element.
-        if(length(td_chr[flag_nona])>0 && !is.na(chr_var) && chr_var>0){
-          corr<-cor(GC_newlist_chr[flag_nona,3:ncol(GC_newlist_chr)],td_chr[flag_nona])
-          corr_tot<-cbind(corr_tot,corr)
-          length_tot<-c(length_tot,length(td_chr))
-        }
+      # Calculate correlation (explicit weighting now automatically done)
+      corr = abs(cor(GC_newlist[, 3:ncol(GC_newlist)], Tumordata, use="complete.obs")[,1])
+      
+      index_1kb = grep(pattern = "X?1([06]00bp|kb)", x = names(corr))
+      maxGCcol_insert = names(which.max(corr[1:index_1kb]))
+      # if no replication timing data, expand large windows to 500kb
+      if (!is.null(replictimingfile)) {
+        index_max = grep(pattern = "X?1(0(00|24)00bp|kb)", x = names(corr))
+      } else {
+        index_max = grep(pattern = "X?1M", x = names(corr)) - 1
       }
-      corr<-apply(corr_tot,1,function(x) sum(abs(x*length_tot))/sum(length_tot))
-      index_1M<-c(which(names(corr)=="X1M"),which(names(corr)=="X1Mb"))
-      maxGCcol_short<-which(corr[1:(index_1M-1)]==max(corr[1:(index_1M-1)]))
-      maxGCcol_long<-which(corr[index_1M:length(corr)]==max(corr[index_1M:length(corr)]))
-      maxGCcol_long<-(maxGCcol_long+(index_1M-1))
+      # start large window sizes at 5kb rather than 2kb to avoid overly correlated expl variables
+      maxGCcol_amplic = names(which.max(corr[(index_1kb+2):index_max]))
       
-      cat("weighted correlation: ",paste(names(corr),format(corr,digits=2), ";"),"\n")
-      cat("Short window size: ",names(GC_newlist)[maxGCcol_short+2],"\n")
-      cat("Long window size: ",names(GC_newlist)[maxGCcol_long+2],"\n")
+      cat("GC correlation: ",paste(names(corr),format(corr,digits=2), ";"),"\n")   
+      cat("Short window size: ",maxGCcol_insert,"\n")
+      cat("Long window size: ",maxGCcol_amplic,"\n")
       
-      # Multiple regression
-      flag_NA<-(is.na(Tumordata))|(is.na(GC_newlist[,2+maxGCcol_short]))|(is.na(GC_newlist[,2+maxGCcol_long]))
-      td_select<-Tumordata[!flag_NA]
-      GC_newlist_select <- GC_newlist[!flag_NA,]
-      x1<-GC_newlist_select[,2+maxGCcol_short]
-      x2<-GC_newlist_select[,2+maxGCcol_long]
-      x3<-(x1)^2
-      x4<-(x2)^2
-      model<-lm(td_select~x1+x2+x3+x4,y=TRUE)
+      corrdata = data.frame(logr = Tumordata,
+                            GC_insert = GC_newlist[,maxGCcol_insert],
+                            GC_amplic = GC_newlist[,maxGCcol_amplic])
       
-      GCcorrected<-Tumordata
-      GCcorrected[]<-NA
-      GCcorrected[!flag_NA] <- model$residuals
-      
-      Tumor_LogR[,s] = GCcorrected
+      if (!is.null(replictimingfile)) {
+        corr_rep = abs(cor(replic_newlist[, 3:ncol(replic_newlist)], Tumordata, use="complete.obs")[,1])
+        maxreplic = names(which.max(corr_rep))
+        
+        cat("Replication timing correlation: ",paste(names(corr_rep),format(corr_rep,digits=2), ";"),"\n") 
+        cat("Replication dataset: " ,maxreplic,"\n")
+        
+        # Multiple regression 
+        corrdata$replic <- replic_newlist[, maxreplic]
+        model = lm(logr ~ splines::ns(x = GC_insert, df = 5, intercept = T) + splines::ns(x = GC_amplic, df = 5, intercept = T) + splines::ns(x = replic, df = 5, intercept = T), y=F, model = F, data = corrdata, na.action="na.exclude")
+        Tumor_LogR[,s] = residuals(model)
+      } else {
+        model = lm(logr ~ splines::ns(x = GC_insert, df = 5, intercept = T) + splines::ns(x = GC_amplic, df = 5, intercept = T), y=F, model = F, data = corrdata, na.action="na.exclude")
+        Tumor_LogR[,s] = residuals(model)
+      }
       
       chr = split_genome(SNPpos)
     }
