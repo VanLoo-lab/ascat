@@ -204,12 +204,11 @@ ascat.plotRawData = function(ASCATobj, img.dir=".", img.prefix="") {
 #' @description Corrects logR of the tumour sample(s) with genomic GC content
 #' @param ASCATobj an ASCAT object
 #' @param GCcontentfile File containing the GC content around every SNP for increasing window sizes
-#' @param replictimingfile File containing replication timing at every SNP for various cell lines (optional)
 #' @details Note that probes not present in the GCcontentfile will be lost from the results
 #' @return ASCAT object with corrected tumour logR
 #'
 #' @export
-ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL, replictimingfile = NULL) {
+ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
   if(is.null(GCcontentfile)) {
     print.noquote("Error: no GC content file given!")
   }
@@ -222,14 +221,6 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL, replictimingfile = NU
     ovl = intersect(row.names(ASCATobj$Tumor_LogR),row.names(GC_newlist))
     
     GC_newlist<-GC_newlist[ovl,]
-    
-    if (!is.null(replictimingfile)) {
-      replic_newlist<-read.table(file=replictimingfile,header=TRUE,as.is=TRUE)[ovl,]
-      colnames(replic_newlist)[c(1,2)] = c("Chr","Position")
-      replic_newlist$Chr<-as.character(replic_newlist$Chr)
-    } else {
-      print.noquote("Warning: no replication timing file given, proceeding with GC correction only!")
-    }
     
     SNPpos = ASCATobj$SNPpos[ovl,]
     Tumor_LogR = ASCATobj$Tumor_LogR[ovl,,drop=F]
@@ -260,43 +251,48 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL, replictimingfile = NU
       Tumordata = Tumor_LogR[,s]
       names(Tumordata) = rownames(Tumor_LogR)
       
-      # Calculate correlation (explicit weighting now automatically done)
-      corr = abs(cor(GC_newlist[, 3:ncol(GC_newlist)], Tumordata, use="complete.obs")[,1])
-      
-      index_1kb = grep(pattern = "X?1([06]00bp|kb)", x = names(corr))
-      maxGCcol_insert = names(which.max(corr[1:index_1kb]))
-      # if no replication timing data, expand large windows to 500kb
-      if (!is.null(replictimingfile)) {
-        index_max = grep(pattern = "X?1(0(00|24)00bp|kb)", x = names(corr))
-      } else {
-        index_max = grep(pattern = "X?1M", x = names(corr)) - 1
-      }
-      # start large window sizes at 5kb rather than 2kb to avoid overly correlated expl variables
-      maxGCcol_amplic = names(which.max(corr[(index_1kb+2):index_max]))
-      
-      cat("GC correlation: ",paste(names(corr),format(corr,digits=2), ";"),"\n")   
-      cat("Short window size: ",maxGCcol_insert,"\n")
-      cat("Long window size: ",maxGCcol_amplic,"\n")
-      
-      corrdata = data.frame(logr = Tumordata,
-                            GC_insert = GC_newlist[,maxGCcol_insert],
-                            GC_amplic = GC_newlist[,maxGCcol_amplic])
-      
-      if (!is.null(replictimingfile)) {
-        corr_rep = abs(cor(replic_newlist[, 3:ncol(replic_newlist)], Tumordata, use="complete.obs")[,1])
-        maxreplic = names(which.max(corr_rep))
+      # Calculate weighted correlation
+      length_tot<-NULL
+      corr_tot<-NULL
+      for(chrindex in unique(SNPpos[,1])) {
+        GC_newlist_chr<-GC_newlist[GC_newlist$Chr==chrindex,]
+        td_chr<-Tumordata[GC_newlist$Chr==chrindex]
         
-        cat("Replication timing correlation: ",paste(names(corr_rep),format(corr_rep,digits=2), ";"),"\n") 
-        cat("Replication dataset: " ,maxreplic,"\n")
+        flag_nona<-(complete.cases(td_chr) & complete.cases(GC_newlist_chr))
         
-        # Multiple regression 
-        corrdata$replic <- replic_newlist[, maxreplic]
-        model = lm(logr ~ splines::ns(x = GC_insert, df = 5, intercept = T) + splines::ns(x = GC_amplic, df = 5, intercept = T) + splines::ns(x = replic, df = 5, intercept = T), y=F, model = F, data = corrdata, na.action="na.exclude")
-        Tumor_LogR[,s] = residuals(model)
-      } else {
-        model = lm(logr ~ splines::ns(x = GC_insert, df = 5, intercept = T) + splines::ns(x = GC_amplic, df = 5, intercept = T), y=F, model = F, data = corrdata, na.action="na.exclude")
-        Tumor_LogR[,s] = residuals(model)
+        #only work with chromosomes that have variance
+        chr_var=var(td_chr[flag_nona])#Will be NA if there is exactly one element.
+        if(length(td_chr[flag_nona])>0 && !is.na(chr_var) && chr_var>0){
+          corr<-cor(GC_newlist_chr[flag_nona,3:ncol(GC_newlist_chr)],td_chr[flag_nona])
+          corr_tot<-cbind(corr_tot,corr)
+          length_tot<-c(length_tot,length(td_chr))
+        }
       }
+      corr<-apply(corr_tot,1,function(x) sum(abs(x*length_tot))/sum(length_tot))
+      index_1M<-c(which(names(corr)=="X1M"),which(names(corr)=="X1Mb"))
+      maxGCcol_short<-which(corr[1:(index_1M-1)]==max(corr[1:(index_1M-1)]))
+      maxGCcol_long<-which(corr[index_1M:length(corr)]==max(corr[index_1M:length(corr)]))
+      maxGCcol_long<-(maxGCcol_long+(index_1M-1))
+      
+      cat("weighted correlation: ",paste(names(corr),format(corr,digits=2), ";"),"\n")
+      cat("Short window size: ",names(GC_newlist)[maxGCcol_short+2],"\n")
+      cat("Long window size: ",names(GC_newlist)[maxGCcol_long+2],"\n")
+      
+      # Multiple regression
+      flag_NA<-(is.na(Tumordata))|(is.na(GC_newlist[,2+maxGCcol_short]))|(is.na(GC_newlist[,2+maxGCcol_long]))
+      td_select<-Tumordata[!flag_NA]
+      GC_newlist_select <- GC_newlist[!flag_NA,]
+      x1<-GC_newlist_select[,2+maxGCcol_short]
+      x2<-GC_newlist_select[,2+maxGCcol_long]
+      x3<-(x1)^2
+      x4<-(x2)^2
+      model<-lm(td_select~x1+x2+x3+x4,y=TRUE)
+      
+      GCcorrected<-Tumordata
+      GCcorrected[]<-NA
+      GCcorrected[!flag_NA] <- model$residuals
+      
+      Tumor_LogR[,s] = GCcorrected
       
       chr = split_genome(SNPpos)
     }
@@ -328,7 +324,7 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL, replictimingfile = NU
 #' 1. Tumor_LogR data matrix\cr
 #' 2. Tumor_BAF data matrix\cr
 #' 3. Tumor_LogR_segmented: matrix of LogR segmented values\cr
-#' 4. Tumor_BAF_segmented: list of BAF segmented values; each element in the list is a matrix containing the segmented values for one sample (only for probes that are germline homozygous)\cr
+#' 4. Tumor_BAF_segmented: list of BAF segmented values; each element in the list is a matrix containing the segmented values for one sample (only for probes that are not germline homozygous)\cr
 #' 5. Germline_LogR data matrix\cr
 #' 6. Germline_BAF data matrix\cr
 #' 7. SNPpos: position of all SNPs\cr
@@ -337,7 +333,7 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL, replictimingfile = NU
 #'
 #' @export
 #'
-ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), ascat.gg = NULL, penalty = 25, out.dir=".", out.prefix="") {
+ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), ascat.gg = NULL, penalty = 70, out.dir=".", out.prefix="") {
   #first, set germline genotypes
   gg = NULL
   if(!is.null(ascat.gg)) {
@@ -1764,6 +1760,7 @@ fastAspcf <- function(logR, allB, kmin, gamma){
   
   nseg = 0
   var2 = 0
+  var3 = 0
   breakpts = 0
   larger = TRUE
   repeat{
@@ -1776,6 +1773,7 @@ fastAspcf <- function(logR, allB, kmin, gamma){
     
     sd1 <- getMad(logRpart)
     sd2 <- getMad(allBflip)
+    sd3 <- getMad(allBpart) 
     
     #Must check that sd1 and sd2 are defined and != 0:
     sd.valid <- c(!is.na(sd1),!is.na(sd2),sd1!=0,sd2!=0)
@@ -1788,6 +1786,7 @@ fastAspcf <- function(logR, allB, kmin, gamma){
       larger = breakptspart>breakpts[length(breakpts)]
       breakpts <- c(breakpts, breakptspart[larger])
       var2 <- var2 + sd2^2
+      var3 <- var3 + sd3^2
       nseg = nseg+1
     }
     
@@ -1802,6 +1801,7 @@ fastAspcf <- function(logR, allB, kmin, gamma){
   breakpts <- unique(c(breakpts, N))
   if(nseg==0){nseg=1}  #just in case the sd-test never passes.
   sd2 <- sqrt(var2/nseg)
+  sd3 <- sqrt(var3/nseg)
   
   # On each segment calculate mean of unflipped B allele data
   frst <- breakpts[1:length(breakpts)-1] + 1
@@ -1810,7 +1810,7 @@ fastAspcf <- function(logR, allB, kmin, gamma){
   
   yhat1 <- rep(NA,N)
   yhat2 <- rep(NA,N)
-  
+
   for(i in 1:nseg){
     yhat1[frst[i]:last[i]] <- rep(mean(logR[frst[i]:last[i]]), last[i]-frst[i]+1)
     yi2 <- allB[frst[i]:last[i]]
@@ -1824,7 +1824,8 @@ fastAspcf <- function(logR, allB, kmin, gamma){
     # Make a (slightly arbitrary) decision concerning branches
     # This may be improved by a test of equal variances
     if(sqrt(sd2^2+mu^2) < 2*sd2){
-      mu <- 0
+    # if(sd3 < 1.8*sd2){
+       mu <- 0
     }
     yhat2[frst[i]:last[i]] <- rep(mu+0.5,last[i]-frst[i]+1)
   }
