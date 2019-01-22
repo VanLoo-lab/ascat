@@ -328,7 +328,7 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL, replictimingfile = NU
 #' 1. Tumor_LogR data matrix\cr
 #' 2. Tumor_BAF data matrix\cr
 #' 3. Tumor_LogR_segmented: matrix of LogR segmented values\cr
-#' 4. Tumor_BAF_segmented: list of BAF segmented values; each element in the list is a matrix containing the segmented values for one sample (only for probes that are germline homozygous)\cr
+#' 4. Tumor_BAF_segmented: list of BAF segmented values; each element in the list is a matrix containing the segmented values for one sample (only for probes that are not germline homozygous)\cr
 #' 5. Germline_LogR data matrix\cr
 #' 6. Germline_BAF data matrix\cr
 #' 7. SNPpos: position of all SNPs\cr
@@ -337,7 +337,7 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL, replictimingfile = NU
 #'
 #' @export
 #'
-ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), ascat.gg = NULL, penalty = 25, out.dir=".", out.prefix="") {
+ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), ascat.gg = NULL, penalty = 70, out.dir=".", out.prefix="") {
   #first, set germline genotypes
   gg = NULL
   if(!is.null(ascat.gg)) {
