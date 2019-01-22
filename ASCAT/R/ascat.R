@@ -267,7 +267,7 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL, replictimingfile = NU
       maxGCcol_insert = names(which.max(corr[1:index_1kb]))
       # if no replication timing data, expand large windows to 500kb
       if (!is.null(replictimingfile)) {
-        index_max = grep(pattern = "X?1(0(00|24)00bp|kb)", x = names(corr))
+        index_max = grep(pattern = "X?10((00|24)00bp|0kb)", x = names(corr))
       } else {
         index_max = grep(pattern = "X?1M", x = names(corr)) - 1
       }
