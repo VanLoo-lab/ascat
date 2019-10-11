@@ -618,6 +618,8 @@ ascat.plotSegmentedData = function(ASCATobj, img.dir=".", img.prefix="") {
 #' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
 #  @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
 #' @param circos Optional file to output the non-rounded values in Circos track format. Default=NA
+#' @param min_ploidy optional numerical parameter determining the minimum boundary of the ploidy solution search space. Default=1.5
+#' @param max_ploidy optional numerical parameter determining the maximum boundary of the ploidy solution search space. Default=5.5
 #' @param rho_manual optional argument to override ASCAT optimization and supply rho parameter (not recommended)
 #' @param psi_manual optional argument to override ASCAT optimization and supply psi parameter (not recommended)
 #' @param img.dir directory in which figures will be written
@@ -636,7 +638,7 @@ ascat.plotSegmentedData = function(ASCATobj, img.dir=".", img.prefix="") {
 #'
 #' @export
 #'
-ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circos=NA, rho_manual = NA, psi_manual = NA, img.dir=".", img.prefix="") {
+ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circos=NA, min_ploidy = 1.5, max_ploidy = 5.5, rho_manual = NA, psi_manual = NA, img.dir=".", img.prefix="") {
   goodarrays=NULL
   res = vector("list",dim(ASCATobj$Tumor_LogR)[2])
   for (arraynr in 1:dim(ASCATobj$Tumor_LogR)[2]) {
@@ -662,12 +664,12 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
       res[[arraynr]] = runASCAT(lrr,baf,lrrsegm,bafsegm,ASCATobj$gender[arraynr],ASCATobj$SNPpos,ASCATobj$ch,ASCATobj$chrs,ASCATobj$sexchromosomes, failedqualitycheck,
                                 file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".sunrise.png",sep="")),file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".ASCATprofile.", ending ,sep="")),
                                 file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".rawprofile.", ending ,sep="")),NA,
-                                gamma,NA,NA,pdfPlot, y_limit, circosName)
+                                gamma,NA,NA,pdfPlot, y_limit, circosName, min_ploidy, max_ploidy)
     } else {
       res[[arraynr]] = runASCAT(lrr,baf,lrrsegm,bafsegm,ASCATobj$gender[arraynr],ASCATobj$SNPpos,ASCATobj$ch,ASCATobj$chrs,ASCATobj$sexchromosomes, failedqualitycheck,
                                 file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".sunrise.png",sep="")),file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".ASCATprofile.", ending,sep="")),
                                 file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".rawprofile.", ending,sep="")),NA,
-                                gamma,rho_manual[arraynr],psi_manual[arraynr], pdfPlot, y_limit, circosName)
+                                gamma,rho_manual[arraynr],psi_manual[arraynr], pdfPlot, y_limit, circosName, min_ploidy, max_ploidy)
     }
     if(!is.na(res[[arraynr]]$rho)) {
       goodarrays[length(goodarrays)+1] = arraynr
@@ -974,6 +976,8 @@ create_distance_matrix = function(segments, gamma) {
 #' @param pdfPlot Optional flag if nonrounded plots and ASCAT profile in pdf format are desired. Default=F
 #' @param circos Optional file to output the non-rounded values in Circos track format. Default=NA
 #' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
+#' @param min_ploidy a numerical parameter determining the minimum boundary of the ploidy solution search space. Default=1.5
+#' @param max_ploidy a numerical parameter determining the maximum boundary of the ploidy solution search space. Default=5.5
 #'
 #' @keywords internal
 #'
@@ -984,7 +988,7 @@ create_distance_matrix = function(segments, gamma) {
 #' @export
 runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromosomes, chrnames, sexchromosomes, failedqualitycheck = F,
                     distancepng = NA, copynumberprofilespng = NA, nonroundedprofilepng = NA, aberrationreliabilitypng = NA, gamma = 0.55,
-                    rho_manual = NA, psi_manual = NA, pdfPlot = F, y_limit = 5, circos=NA) {
+                    rho_manual = NA, psi_manual = NA, pdfPlot = F, y_limit = 5, circos=NA, min_ploidy, max_ploidy) {
   ch = chromosomes
   chrs = chrnames
   b = bafsegmented
@@ -1014,8 +1018,8 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
   }
   
   
-  MINPLOIDY = 1.5
-  MAXPLOIDY = 5.5
+  MINPLOIDY = min_ploidy
+  MAXPLOIDY = max_ploidy
   MINRHO = 0.2
   MINGOODNESSOFFIT = 80
   MINPERCZERO = 0.02
