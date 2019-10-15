@@ -1055,7 +1055,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     }
     
     # if no solution, drop the percentzero > MINPERCZERO filter (allow non-aberrant solutions - but limit the ploidy options)
-    if (nropt == 0) {
+    if (nropt == 0 & MINPLOIDY < MAXPLOIDYSTRICT & MAXPLOIDY > MINPLOIDYSTRICT) {
       for (i in 4:(dim(d)[1]-3)) {
         for (j in 4:(dim(d)[2]-3)) {
           m = d[i,j]
@@ -1128,7 +1128,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     }
     
     # if still no solution, drop the percentzero > MINPERCENTZERO filter, but strict ploidy borders
-    if (nropt == 0) {
+    if (nropt == 0 & MINPLOIDY < MAXPLOIDYSTRICT & MAXPLOIDY > MINPLOIDYSTRICT) {
       for (i in 4:(dim(d)[1]-3)) {
         for (j in 4:(dim(d)[2]-3)) {
           m = d[i,j]
