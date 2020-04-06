@@ -1,6 +1,6 @@
 ---
 title: "Multi-sample analysis with ASCAT"
-author: "Edith Ross"
+author: "Edith Ross, Kerstin Haase"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -97,6 +97,182 @@ plot.segments(v1=cumsum(rle(ascat.bcMulti$Tumor_LogR_segmented[,1])$lengths),
               main="Multi-sample segmentation")
 ```
 In case of single-sample segmentation the inferred positions of most of the shared segment boundaries vary slightly between the two samples, whereas the multi-sample segmentation infers a common breakpoint when there is no significant evidence that the boundaries differ between samples.
+
+
+##Validation
+
+In order to compare asmultipcf segmentation to other copy number inference methods, we ran ASCAT on two samples from two patients from a metastatic prostate cancer study ([Gundem et al](https://www.ncbi.nlm.nih.gov/pubmed/25830880)). For the same study, copy number profiles are available from HATCHet ([github repository](https://github.com/raphael-group/hatchet); [publication](https://www.biorxiv.org/content/10.1101/496174v1)).
+
+Load all neccessary packages.
+```{r,message=FALSE}
+library(ggplot2)
+library(plyr)
+```
+
+Because HATCHet can model a mixture of copy number states but ASCAT only detects the major clone, we need to define
+the major clone in the HATCHet data.
+```{r}
+getMajorClone<-function(row){
+  maj<-names(which.max(row[c(8,10,12)]))
+  maj.cn<-row[(match(maj,names(row))-1)]
+  return(maj.cn)
+}
+```
+
+Define function to load HATCHet data, define the major clone for each segment, i.e. row and split copy number annotation from "a|b" format into two columns.
+```{r}
+readHatchetFile<-function(path){
+  hatchet.raw<-read.table(path, header=F, sep="\t", stringsAsFactors = F)
+  
+  ##find major clone
+  major.cn<-apply(hatchet.raw, 1, function(z) getMajorClone(z))
+  hatchet.raw$major.cn<-major.cn
+  
+  hatchet.short<-hatchet.raw[c(1:4,13)]
+  names(hatchet.short)<-c("chr","start","end","sample","hatchet.cn")
+  
+  major.cn<-unlist(lapply(strsplit(hatchet.short$hatchet.cn, "\\|"), function(z) z[1]))
+  minor.cn<-unlist(lapply(strsplit(hatchet.short$hatchet.cn, "\\|"), function(z) z[2]))
+  
+  hatchet.short$major.cn<-major.cn
+  hatchet.short$minor.cn<-minor.cn
+  
+  return(hatchet.short[-5])
+}
+```
+In order to provide a quantitative measure of how much ASCAT using asmultipcf and HATCHet agree with regard to the sample segmentation, we analysed what fraction of asmultipcf breakpoints has a corresponding HATCHet breakpoint.
+First, we centred the ASCAT breakpoints in the middle of two segments.
+
+```{r, echo =F}
+returnBreakpoints<-function(df.chr){
+  bp.df<-NULL
+  df.sorted<-df.chr[order(df.chr$start),]
+  for(i in 1:(nrow(df.sorted)-1)){
+    first<-df.sorted[i,]
+    second<-df.sorted[(i+1),]
+    ##verify real cn bp
+    if(first$major.cn==second$major.cn & first$minor.cn==second$minor.cn){
+      print("Consecutive rows have identical CN!")
+    }
+    else{
+      bp.df<-rbind(bp.df, data.frame(bp.location=(first$end+((second$start-first$end)/2))))
+    }
+  }
+  return(bp.df)
+}
+```
+
+HATCHet output is provided for 50kb bins and not specifically segmented. Hence, in order to compare consecutive segments
+with the same major clonal copy number, we are merging neighbouring segments with matching allele specific copy number.
+Then we calculate the distance of the closest HATCHet breakpoint for every asmultipcf breakpoint.
+
+```{r}
+findMatchingBPs<-function(ascat.bps, hatchet.segs){
+  ##limit hatchet df to true CN segs
+  hatchet.true<-NULL
+  hatchet.sorted<-hatchet.segs[order(hatchet.segs$start),]
+  
+  rles<-rle(paste0(hatchet.sorted$major.cn,"_",hatchet.sorted$minor.cn))$lengths
+  idx<-1
+  for(k in rles){
+    hatchet.true<-rbind(hatchet.true, data.frame(start=hatchet.sorted[idx, "start"], end=hatchet.sorted[(idx+k-1), "end"]))
+    idx<-(idx+k)
+  }
+  
+  ascat.flag<-NULL
+  for(i in 1:nrow(ascat.bps)){
+    ascat.bp<-ascat.bps[i,"bp.location"]
+    min.dist<-min(c(abs(ascat.bp-hatchet.true$end),abs(ascat.bp-hatchet.true$start)))
+    
+    ascat.flag<-rbind(ascat.flag, data.frame(bkp=ascat.bp, min.dist=min.dist))
+  }
+  return(ascat.flag)
+}
+```
+
+This is the main function visualising the copy number of asmultipcf and HATCHet for all four analysed samples and
+calculates the fraction of ASCAT breakpoints with a HATCHet breakpoint fewer than 50kb bases away (size of HATCHet bins).
+
+```{r}
+compareCN<-function(cn.ascat, cn.hatchet){
+  ##split into samples
+  shared.samples<-intersect(cn.ascat$sample, cn.hatchet$sample)
+  
+  for(s in shared.samples){
+    ascat.sub<-cn.ascat[cn.ascat$sample==s,]
+    hatchet.sub<-cn.hatchet[cn.hatchet$sample==s,]
+    ##move values slightly for plotting
+    ascat.plot<- ascat.sub
+    hatchet.plot<- hatchet.sub
+    ascat.plot$major.cn<-(as.numeric(ascat.plot$major.cn)+0.1)
+    hatchet.plot$major.cn<-(as.numeric(hatchet.plot$major.cn)-0.1)
+    
+    ##visualise
+    joint.df<-rbind(ascat.plot,hatchet.plot)
+    joint.df$chr<-factor(joint.df$chr, levels=c(1:22,"X","Y"))
+    p1<-ggplot(joint.df, aes(x=start, y=(as.numeric(major.cn)+as.numeric(minor.cn)), xend=end, yend=(as.numeric(major.cn)+as.numeric(minor.cn)), col=as.factor(method)))+
+      geom_segment()+
+      theme(axis.text.x=element_text(angle=45,hjust=1), panel.background = element_blank(), panel.grid.major = element_line(color="grey80"))+
+      ggtitle(paste0("Sample ",s))+
+      scale_color_manual(values=c("cyan4","coral3"), name="")+
+      scale_x_continuous(name="")+
+      scale_y_continuous(name="Copy number", limits=(c(0,15)))+
+      facet_wrap(.~chr, scales = "free_x", nrow = 3)
+    print(p1)
+    
+    
+    ##give quality in measure: what fraction of ASCAT bp has hatchet bp in < threshold vincinity?
+    bps<-ddply(ascat.sub, .(chr), function(z) returnBreakpoints(z))
+    bp.list<-split(bps, bps$chr)
+    
+    bkp.list<-NULL
+    for(c in names(bp.list)){
+      if(c!="X"){
+        bkp.list<-rbind(bkp.list,findMatchingBPs(bp.list[[c]], hatchet.sub[hatchet.sub$chr==c,]))
+      }
+    }
+    ##use bin size of HATCHet as threshold
+    threshold=50000
+    bkp.list$match<-ifelse(bkp.list$min.dist<threshold,T,F)
+    print(prop.table(table(bkp.list$match)))
+  }
+}
+```
+
+Now we can carry out the comparison. Load the HATCHet segmentation for patient A17.
+```{r}
+path<-"https://raw.githubusercontent.com/raphael-group/hatchet-paper/master/cancer/prostate/A17/best.seg.ucn"
+hatchet.seg<-readHatchetFile(path)
+hatchet.seg$method<-"HATCHet"
+```
+
+Now we can load the asmultipcf results for patient A17.
+```{r}
+ascat.seg<-read.table(system.file("extdata", "A17.fast.segments.txt", package="ASCAT"), header=T, sep="\t", stringsAsFactors = F)
+ascat.seg$tmp<-unlist(lapply(strsplit(ascat.seg$sample, "-"), function(z) z[1]))
+ascat.seg<-ascat.seg[-1]
+names(ascat.seg)<-c("chr","start","end","major.cn","minor.cn","sample")
+ascat.seg$method<-"ASCAT"
+```
+
+Finally, we can create the visual comparison and segmentation comparison between the copy number of asmultipcf and HATCHet.
+```{r}
+compareCN(ascat.seg, hatchet.seg)
+```
+We can repeat the same analysis for patient A32.
+
+```{r}
+path<-"https://raw.githubusercontent.com/raphael-group/hatchet-paper/master/cancer/prostate/A32/best.seg.ucn"
+hatchet.seg<-readHatchetFile(path)
+hatchet.seg$method<-"HATCHet"
+ascat.seg<-read.table(system.file("extdata", "A32.fast.segments.txt", package="ASCAT"), header=T, sep="\t", stringsAsFactors = F)
+ascat.seg$tmp<-unlist(lapply(strsplit(ascat.seg$sample, "-"), function(z) z[1]))
+ascat.seg<-ascat.seg[-1]
+names(ascat.seg)<-c("chr","start","end","major.cn","minor.cn","sample")
+ascat.seg$method<-"ASCAT"
+compareCN(ascat.seg, hatchet.seg)
+```
+
 
 
 
