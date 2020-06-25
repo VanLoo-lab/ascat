@@ -2215,8 +2215,10 @@ psi <- function(x,z){
 #' @details Currently possible values for platform:\cr
 #' AffySNP6 (default)\cr
 #' Custom10k\cr
+#' IlluminaASA\cr
 #' Illumina109k\cr
 #' IlluminaCytoSNP\cr
+#' IlluminaCytoSNP850k\cr
 #' Illumina610k\cr
 #' Illumina660k\cr
 #' Illumina700k\cr
@@ -2250,6 +2252,13 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6", img.d
     proportionOpen = 0.02
     segmentLength = 20
   }
+  else if (platform=="IlluminaASA") {
+    maxHomozygous = 0.05
+    proportionHetero = 0.15
+    proportionHomo = 0.82
+    proportionOpen = 0.01
+    segmentLength = 100
+  }
   else if (platform=="Illumina109k") {
     maxHomozygous = 0.05
     proportionHetero = 0.35
@@ -2263,6 +2272,13 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6", img.d
     proportionHomo = 0.62
     proportionOpen = 0.03
     segmentLength = 100
+  }
+  else if (platform=="IlluminaCytoSNP850k") {
+    maxHomozygous = 0.05
+    proportionHetero = 0.23
+    proportionHomo = 0.72
+    proportionOpen = 0.01
+    segmentLength = 60
   }
   else if (platform=="Illumina610k") {
     maxHomozygous = 0.05
