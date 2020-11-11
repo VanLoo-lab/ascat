@@ -2216,6 +2216,7 @@ psi <- function(x,z){
 #' AffySNP6 (default)\cr
 #' Custom10k\cr
 #' IlluminaASA\cr
+#' IlluminaGSAv3\cr
 #' Illumina109k\cr
 #' IlluminaCytoSNP\cr
 #' IlluminaCytoSNP850k\cr
@@ -2256,6 +2257,13 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6", img.d
     maxHomozygous = 0.05
     proportionHetero = 0.15
     proportionHomo = 0.82
+    proportionOpen = 0.01
+    segmentLength = 100
+  }
+  else if (platform=="IlluminaGSAv3") {
+    maxHomozygous = 0.05
+    proportionHetero = 0.16
+    proportionHomo = 0.80
     proportionOpen = 0.01
     segmentLength = 100
   }
