@@ -318,18 +318,9 @@ ascat.asmultipcf <- function(ASCATobj, ascat.gg = NULL, penalty = 25, wsample=NU
     write.table(bafPCFed_sample,baffilename,sep="\t",col.names=F,quote=F)
   }
   
-  ASCATobj = list(Tumor_LogR = ASCATobj$Tumor_LogR,
-                  Tumor_BAF = ASCATobj$Tumor_BAF,
-                  Tumor_LogR_segmented = logRPCFed,
-                  Tumor_BAF_segmented = Tumor_BAF_segmented,
-                  Germline_LogR = ASCATobj$Germline_LogR,
-                  Germline_BAF = ASCATobj$Germline_BAF,
-                  SNPpos = ASCATobj$SNPpos,
-                  ch = ASCATobj$ch,
-                  chr = ASCATobj$chr,
-                  chrs = ASCATobj$chrs,
-                  samples = colnames(ASCATobj$Tumor_LogR), gender = ASCATobj$gender,
-                  sexchromosomes = ASCATobj$sexchromosomes, failedarrays = ascat.gg$failedarrays)
+  ASCATobj$Tumor_LogR_segmented=Tumor_LogR_segmented
+  ASCATobj$Tumor_BAF_segmented=Tumor_BAF_segmented
+  ASCATobj$failedarrays=ascat.gg$failedarrays
   return(ASCATobj)
 
 }
