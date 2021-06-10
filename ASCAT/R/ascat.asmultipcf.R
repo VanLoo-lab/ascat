@@ -25,7 +25,7 @@
 #' 
 #' @export
 #'
-ascat.asmultipcf <- function(ASCATobj, ascat.gg = NULL, penalty = 25, wsample=NULL,
+ascat.asmultipcf <- function(ASCATobj, ascat.gg = NULL, penalty = 70, wsample=NULL,
                        selectAlg="exact",refine=TRUE) {
   
   useLogRonlySites=TRUE
@@ -318,7 +318,7 @@ ascat.asmultipcf <- function(ASCATobj, ascat.gg = NULL, penalty = 25, wsample=NU
     write.table(bafPCFed_sample,baffilename,sep="\t",col.names=F,quote=F)
   }
   
-  ASCATobj$Tumor_LogR_segmented=Tumor_LogR_segmented
+  ASCATobj$Tumor_LogR_segmented=logRPCFed
   ASCATobj$Tumor_BAF_segmented=Tumor_BAF_segmented
   ASCATobj$failedarrays=ascat.gg$failedarrays
   return(ASCATobj)

@@ -4,12 +4,14 @@
 \alias{ascat.GCcorrect}
 \title{ascat.GCcorrect}
 \usage{
-ascat.GCcorrect(ASCATobj, GCcontentfile = NULL)
+ascat.GCcorrect(ASCATobj, GCcontentfile = NULL, replictimingfile = NULL)
 }
 \arguments{
 \item{ASCATobj}{an ASCAT object}
 
 \item{GCcontentfile}{File containing the GC content around every SNP for increasing window sizes}
+
+\item{replictimingfile}{File containing replication timing at every SNP for various cell lines (optional)}
 }
 \value{
 ASCAT object with corrected tumour logR
