@@ -21,6 +21,7 @@ Depends:
     grDevices,
     graphics,
     stats,
+    splines,
     readr,
     GenomicRanges,
     IRanges,
