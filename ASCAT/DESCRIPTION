@@ -21,6 +21,7 @@ Depends:
     grDevices,
     graphics,
     stats,
+    readr,
     GenomicRanges,
     IRanges,
     parallel,

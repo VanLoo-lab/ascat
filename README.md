@@ -16,7 +16,7 @@ This repository also contains the code underlying additional publication:
 ## Major changes since v2.5.2
 - Default penalty for ASPCF is now 70 (was 25).
 - LogR correction (*ascat.GCcorrect*) can now be used to correct for both GC content and replication timing. Also, the correction method has been updated (now uses *splines*).
-- New set of instructions, as part of the main *ascat.prepareWES* function, to prepare high-throughput sequencing (HTS) data (WES & targeted sequencing). See example in he *ExampleData* folder. Briefly, [alleleCounter](https://github.com/cancerit/alleleCount) is used to get allele counts at 1000G SNP positions on a pair of BAM/CRAM files. This information is then converted into logR and BAF values. This method is derived from the [Battenberg package](https://github.com/Wedge-lab/battenberg). Although this method allows running ASCAT on WGS data, we recommand running Battenberg for WGS and ASCAT for WES and targeted sequencing.
+- New set of instructions, as part of the main *ascat.prepareWTS* function, to prepare high-throughput sequencing (HTS) data (WGS, WES & targeted sequencing). See example in he *ExampleData* folder. Briefly, [alleleCounter](https://github.com/cancerit/alleleCount) is used to get allele counts at 1000G SNP positions on a pair of BAM/CRAM files. This information is then converted into logR and BAF values. This method is derived from the [Battenberg package](https://github.com/Wedge-lab/battenberg). Although this method allows running ASCAT on WGS data, we recommand running Battenberg for WGS and ASCAT for WES and targeted sequencing.
 - A QC function (*ascat.QC*) has been added.
 
 ### Testing

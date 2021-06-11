@@ -41,12 +41,13 @@ ascat.getAlleleCounts = function(seq.file, output.file, g1000.loci, min.base.qua
 #' @param normalBAF_file File where BAF from the normal will be written.
 #' @param g1000file.prefix Prefix to where 1000 Genomes reference files can be found.
 #' @param chrom_names A vector with allowed chromosome names (optional, default=c(1:22,'X')).
-#' @param minCounts Integer, minimum depth required for a SNP to be considered (optional, default=8).
+#' @param minCounts Minimum depth, in mormal, required for a SNP to be considered (optional, default=8).
 #' @param BED_file A BED file for only looking at SNPs within specific intervals (optional, default=NA).
+#' @param probloci_file A file (chromosome <tab> position; no header) containing specific loci to ignore (optional, default=NA).
 #' @param seed A seed to be set for when randomising the alleles (optional, default=as.integer(Sys.time())).
 #' @author dw9, sd11, tl
 #' @export
-ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, normalAlleleCountsFile.prefix, tumourLogR_file, tumourBAF_file, normalLogR_file, normalBAF_file, g1000file.prefix, chrom_names=c(1:22,'X'), minCounts=8, BED_file=NA, seed=as.integer(Sys.time())) {
+ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, normalAlleleCountsFile.prefix, tumourLogR_file, tumourBAF_file, normalLogR_file, normalBAF_file, g1000file.prefix, chrom_names=c(1:22,'X'), minCounts=8, BED_file=NA, probloci_file=NA, seed=as.integer(Sys.time())) {
   set.seed(seed)
   # Load data, only keep SNPs with enough coverage
   tumour_input_data = readAlleleCountFiles(tumourAlleleCountsFile.prefix, ".txt", chrom_names, 1)
@@ -58,12 +59,26 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
   normal_input_data = normal_input_data[rownames(normal_input_data) %in% matched_data,]
   allele_data = allele_data[rownames(allele_data) %in% matched_data,]
   rm(matched_data)
+  # If a probloci file is provided, remove those
+  if (!is.na(probloci_file)) {
+    stopifnot(file.exists(probloci_file) && file.info(probloci_file)$size>0)
+    probloci=readr::read_tsv(probloci_file,col_names=F,col_types='ci',progress=F)
+    probloci=paste0(probloci[,1],'_',probloci[,2])
+    probloci=which(rownames(tumour_input_data) %in% probloci)
+    if (length(probloci>0)) {
+      tumour_input_data = tumour_input_data[-probloci,]
+      normal_input_data = normal_input_data[-probloci,]
+      allele_data = allele_data[-probloci,]
+    }
+    rm(probloci)
+  }
   stopifnot(identical(allele_data[,1],tumour_input_data[,1]) && identical(allele_data[,1],normal_input_data[,1]))
   stopifnot(identical(allele_data[,2],tumour_input_data[,2]) && identical(allele_data[,2],normal_input_data[,2]))
   tumour_input_data = tumour_input_data[,3:6]
   normal_input_data = normal_input_data[,3:6]
   # If a BED is provided, only look at SNPs within those intervals
   if (!is.na(BED_file)) {
+    stopifnot(file.exists(BED_file) && file.info(BED_file)$size>0)
     BED=read.table(BED_file,sep='\t',header=F,stringsAsFactors=F)[,1:3]
     colnames(BED)=c('chr','start','end')
     BED$chr=gsub('^chr','',BED$chr)
@@ -153,9 +168,9 @@ ascat.synchroniseFiles=function(samplename,tumourLogR_file,tumourBAF_file,normal
   write.table(normalBAF,file=normalBAF_file,sep='\t',quote=F,row.names=T,col.names=NA)
 }
 
-#' Extract both logR and BAF values from sequencing data, correct logR for GC content (and replication timing if provided)
+#' Extract both logR and BAF values from sequencing data
 #'
-#' Method derived from the Battenberg package (https://github.com/Wedge-lab/battenberg). Should be used for pre-processing WES data, not suitable for WGS nor targeted sequencing data.
+#' Method derived from the Battenberg package (https://github.com/Wedge-lab/battenberg).
 #'
 #' @param tumourseqfile Full path to the tumour BAM/CRAM file.
 #' @param normalseqfile Full path to the normal BAM/CRAM file.
@@ -164,24 +179,26 @@ ascat.synchroniseFiles=function(samplename,tumourLogR_file,tumourBAF_file,normal
 #' @param allelecounter_exe Path to the allele counter executable.
 #' @param g1000allelesprefix Prefix path to the 1000 Genomes alleles reference files.
 #' @param g1000lociprefix Prefix path to the 1000 Genomes SNP reference files.
-#' @param nthreads The number of parallel processes for getting allele counts.
-#' @param probloci_file A file (chromosome <tab> position; no header) containing loci to ignore (optional, default=NULL).
+#' @param nthreads The number of parallel processes for getting allele counts (optional, default=1).
 #' @param tumourLogR_file Path to the tumour logR output (optional, paste0(tumourname,"_tumourLogR.txt")).
 #' @param tumourBAF_file Path to the tumour BAF output (optional, paste0(tumourname,"_tumourBAF.txt")).
 #' @param normalLogR_file Path to the normal logR output (optional, paste0(tumourname,"_normalLogR.txt")).
 #' @param normalBAF_file Path to the normal BAF output (optional, paste0(tumourname,"_normalBAF.txt")).
-#' @param minCounts Minimum depth required in the normal for a SNP to be considered (optional, default=8).
+#' @param minCounts Minimum depth required in the normal for a SNP to be considered (optional, default=10).
 #' @param BED_file A BED file for only looking at SNPs within specific intervals (optional, default=NA).
+#' @param probloci_file A file (chromosome <tab> position; no header) containing specific loci to ignore (optional, default=NA).
 #' @param chrom_names A vector containing the names of chromosomes to be considered (optional, default=c(1:22,'X')).
 #' @param min_base_qual Minimum base quality required for a read to be counted (optional, default=20).
 #' @param min_map_qual Minimum mapping quality required for a read to be counted (optional, default=35).
 #' @param ref.fasta FASTA file used for generating CRAMs (optional, default=NA).
-#' @param skip_allele_counting_tumour Flag, set to TRUE if tumour allele counting is already complete (files are expected in the working directory on disk).
-#' @param skip_allele_counting_normal Flag, set to TRUE if normal allele counting is already complete (files are expected in the working directory on disk).
+#' @param skip_allele_counting_tumour Flag, set to TRUE if tumour allele counting is already complete (files are expected in the working directory on disk; optional, default=FALSE).
+#' @param skip_allele_counting_normal Flag, set to TRUE if normal allele counting is already complete (files are expected in the working directory on disk; optional, default=FALSE).
 #' @author sd11, tl
 #' @export
-ascat.prepareWES = function(tumourseqfile, normalseqfile, tumourname, normalname, allelecounter_exe, g1000allelesprefix, g1000lociprefix, nthreads,
-                            probloci_file=NULL, tumourLogR_file=NA, tumourBAF_file=NA, normalLogR_file=NA, normalBAF_file=NA, minCounts=8, BED_file=NA, chrom_names=c(1:22,'X'), min_base_qual=20, min_map_qual=35, ref.fasta=NA, skip_allele_counting_tumour=F, skip_allele_counting_normal=F) {
+ascat.prepareHTS = function(tumourseqfile, normalseqfile, tumourname, normalname, allelecounter_exe, g1000allelesprefix, g1000lociprefix,
+                            nthreads=1, tumourLogR_file=NA, tumourBAF_file=NA, normalLogR_file=NA, normalBAF_file=NA, minCounts=10, BED_file=NA,
+                            probloci_file=NA, chrom_names=c(1:22,'X'), min_base_qual=20, min_map_qual=35, ref.fasta=NA,
+                            skip_allele_counting_tumour=F, skip_allele_counting_normal=F) {
   requireNamespace("foreach")
   requireNamespace("doParallel")
   requireNamespace("parallel")
@@ -227,7 +244,8 @@ ascat.prepareWES = function(tumourseqfile, normalseqfile, tumourname, normalname
                         g1000file.prefix=g1000allelesprefix,
                         chrom_names=chrom_names,
                         minCounts=minCounts,
-                        BED_file=BED_file)
+                        BED_file=BED_file,
+                        probloci_file=probloci_file)
 
   # Synchronise all information
   ascat.synchroniseFiles(samplename=tumourname,
