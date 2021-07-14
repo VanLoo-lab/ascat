@@ -62,7 +62,7 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
   # If a probloci file is provided, remove those
   if (!is.na(probloci_file)) {
     stopifnot(file.exists(probloci_file) && file.info(probloci_file)$size>0)
-    probloci=readr::read_tsv(probloci_file,col_names=F,col_types='ci',progress=F)
+    probloci=readr::read_tsv(probloci_file,col_names=T,col_types='ci',progress=F)
     probloci=paste0(probloci[,1],'_',probloci[,2])
     probloci=which(rownames(tumour_input_data) %in% probloci)
     if (length(probloci>0)) {

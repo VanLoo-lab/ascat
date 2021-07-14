@@ -14,9 +14,11 @@ This repository also contains the code underlying additional publication:
 `devtools::install_github('Crick-CancerGenomics/ascat/ASCAT')`
 
 ## Major changes since v2.5.2
-- Default penalty for ASPCF is now 70 (was 25).
-- LogR correction (*ascat.GCcorrect*) can now be used to correct for both GC content and replication timing. Also, the correction method has been updated (now uses *splines*).
-- New set of instructions, as part of the main *ascat.prepareWTS* function, to prepare high-throughput sequencing (HTS) data (WGS, WES & targeted sequencing). See example in he *ExampleData* folder. Briefly, [alleleCounter](https://github.com/cancerit/alleleCount) is used to get allele counts at 1000G SNP positions on a pair of BAM/CRAM files. This information is then converted into logR and BAF values. This method is derived from the [Battenberg package](https://github.com/Wedge-lab/battenberg). Although this method allows running ASCAT on WGS data, we recommand running Battenberg for WGS and ASCAT for WES and targeted sequencing.
+- Default penalty for both ASPCF and ASmultiPCF is now 70 (was 25).
+- LogR correction (*ascat.GCcorrect*) can now be used to correct for both GC content (standard requirement) and replication timing (optional). Also, the correction method has been updated (it now uses a linear model with *splines*).
+- New set of instructions, as part of the main *ascat.prepareHTS* function, to prepare high-throughput sequencing (HTS) data (WGS, WES & targeted sequencing). See example in he *ExampleData* folder. Briefly, [alleleCounter](https://github.com/cancerit/alleleCount) is used to get allele counts at specific loci on a pair of tumour/normal (either BAM or CRAM files). This information is then converted into logR and BAF values. This method is derived from the [Battenberg package](https://github.com/Wedge-lab/battenberg). Although this method allows running ASCAT on different HTS data:
+  - We recommend running [Battenberg](https://github.com/Wedge-lab/battenberg) on WGS data for accurate clonal and subclonal allele-specific copy-number alterations.
+  - Targeted sequencing data must be preprocessed using the *ascat.preprocessTargSeq* function to extract loci of interest. Once done, such loci list may be used as part of the *ascat.prepareHTS* function.
 - A QC function (*ascat.QC*) has been added.
 
 ### Testing
