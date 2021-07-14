@@ -27,7 +27,8 @@ ascat.getAlleleCounts = function(seq.file, output.file, g1000.loci, min.base.qua
   if (!is.na(ref.fasta)) {
     cmd = paste(cmd, "-r", ref.fasta)
   }
-  system(cmd, wait=T)
+  EXIT_CODE=system(cmd, wait=T)
+  stopifnot(EXIT_CODE==0)
 }
 
 #' Obtain BAF and LogR from the allele counts.
