@@ -63,7 +63,7 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
   # If a probloci file is provided, remove those
   if (!is.na(probloci_file)) {
     stopifnot(file.exists(probloci_file) && file.info(probloci_file)$size>0)
-    probloci=readr::read_tsv(probloci_file,col_names=T,col_types='ci',progress=F)
+    probloci=data.frame(readr::read_tsv(probloci_file,col_names=T,col_types='ci',progress=F),stringsAsFactors=F)
     probloci=paste0(probloci[,1],'_',probloci[,2])
     probloci=which(rownames(tumour_input_data) %in% probloci)
     if (length(probloci>0)) {
@@ -96,11 +96,24 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
   }
   # Obtain depth for both alleles for tumour and normal
   len = nrow(allele_data)
-  mutCount1 = tumour_input_data[cbind(1:len,allele_data[,3])]
-  mutCount2 = tumour_input_data[cbind(1:len,allele_data[,4])]
+  tumour_input_data$REF=tumour_input_data[cbind(1:len,allele_data[,3])]
+  tumour_input_data$ALT=tumour_input_data[cbind(1:len,allele_data[,4])]
+  normal_input_data$REF=normal_input_data[cbind(1:len,allele_data[,3])]
+  normal_input_data$ALT=normal_input_data[cbind(1:len,allele_data[,4])]
+  # Make sure that ALT+REF fit with minimal counts
+  TO_KEEP=which(tumour_input_data$REF+tumour_input_data$ALT>=1 & normal_input_data$REF+normal_input_data$ALT>=minCounts)
+  stopifnot(length(TO_KEEP)>0)
+  allele_data=allele_data[TO_KEEP,]
+  tumour_input_data=tumour_input_data[TO_KEEP,]
+  normal_input_data=normal_input_data[TO_KEEP,]
+  rm(TO_KEEP)
+  # Prepare allele counts to derive BAF and logR
+  len = nrow(allele_data)
+  mutCount1 = tumour_input_data$REF
+  mutCount2 = tumour_input_data$ALT
   totalTumour = mutCount1 + mutCount2
-  normCount1 = normal_input_data[cbind(1:len,allele_data[,3])]
-  normCount2 = normal_input_data[cbind(1:len,allele_data[,4])]
+  normCount1 = normal_input_data$REF
+  normCount2 = normal_input_data$ALT
   totalNormal = normCount1 + normCount2
   rm(tumour_input_data,normal_input_data)
   normalBAF = vector(length=len, mode="numeric")
