@@ -1,13 +1,12 @@
 #' @title ascat.GCcorrect
-#' @description Corrects logR of the tumour sample(s) with genomic GC content
+#' @description Corrects logR of the tumour sample(s) with genomic GC content (replication timing is optional)
 #' @param ASCATobj an ASCAT object
 #' @param GCcontentfile File containing the GC content around every SNP for increasing window sizes
 #' @param replictimingfile File containing replication timing at every SNP for various cell lines (optional)
-#' @details Note that probes not present in the GCcontentfile will be lost from the results
+#' @details Note that probes not present in the GC content file will be lost from the results
 #' @return ASCAT object with corrected tumour logR
 #'
 #' @export
-
 ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL, replictimingfile = NULL) {
   if (is.null(GCcontentfile)) {
     stop("No GC content file given!")

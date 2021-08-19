@@ -3,16 +3,17 @@
 #' @param ASCATobj an ASCAT object (e.g. data structure from ascat.loadData)
 #' @param img.dir directory in which figures will be written
 #' @param img.prefix prefix for figure names
+#' @param logr.y_values define Y min and max values for logR track (optional; default: c(-2,2))
 #'
 #' @return Produces png files showing the logR and BAF values for tumour and germline samples
 #'
 #' @export
-ascat.plotRawData = function(ASCATobj, img.dir=".", img.prefix="") {
+ascat.plotRawData = function(ASCATobj, img.dir=".", img.prefix="", logr.y_values=c(-2,2)) {
   print.noquote("Plotting tumor data")
   for (i in 1:dim(ASCATobj$Tumor_LogR)[2]) {
     png(filename = file.path(img.dir, paste(img.prefix, ASCATobj$samples[i],".tumour.png",sep="")), width = 2000, height = 1000, res = 200)
     par(mar = c(0.5,5,5,0.5), mfrow = c(2,1), cex = 0.4, cex.main=3, cex.axis = 2, pch = ifelse(dim(ASCATobj$Tumor_LogR)[1]>100000,".",20))
-    plot(c(1,dim(ASCATobj$Tumor_LogR)[1]), c(-1,1), type = "n", xaxt = "n", main = paste(ASCATobj$samples[i], ", tumor data, LogR", sep = ""), xlab = "", ylab = "")
+    plot(c(1,dim(ASCATobj$Tumor_LogR)[1]), logr.y_values, type = "n", xaxt = "n", main = paste(ASCATobj$samples[i], ", tumor data, LogR", sep = ""), xlab = "", ylab = "")
     points(ASCATobj$Tumor_LogR[,i],col="red")
     #points(ASCATobj$Tumor_LogR[,i],col=rainbow(24)[ASCATobj$SNPpos$Chr])
     abline(v=0.5,lty=1,col="lightgrey")
@@ -47,7 +48,7 @@ ascat.plotRawData = function(ASCATobj, img.dir=".", img.prefix="") {
     for (i in 1:dim(ASCATobj$Germline_LogR)[2]) {
       png(filename = file.path(img.dir, paste(img.prefix, ASCATobj$samples[i],".germline.png",sep="")), width = 2000, height = 1000, res = 200)
       par(mar = c(0.5,5,5,0.5), mfrow = c(2,1), cex = 0.4, cex.main=3, cex.axis = 2, pch = ifelse(dim(ASCATobj$Tumor_LogR)[1]>100000,".",20))
-      plot(c(1,dim(ASCATobj$Germline_LogR)[1]), c(-1,1), type = "n", xaxt = "n", main = paste(ASCATobj$samples[i], ", germline data, LogR", sep = ""), xlab = "", ylab = "")
+      plot(c(1,dim(ASCATobj$Germline_LogR)[1]), logr.y_values, type = "n", xaxt = "n", main = paste(ASCATobj$samples[i], ", germline data, LogR", sep = ""), xlab = "", ylab = "")
       points(ASCATobj$Germline_LogR[,i],col="red")
       abline(v=0.5,lty=1,col="lightgrey")
       chrk_tot_len = 0
@@ -84,12 +85,13 @@ ascat.plotRawData = function(ASCATobj, img.dir=".", img.prefix="") {
 #' @param ASCATobj an ASCAT object (e.g. from ascat.aspcf)
 #' @param img.dir directory in which figures will be written
 #' @param img.prefix prefix for figure names
+#' @param logr.y_values define Y min and max values for logR track (optional; default: c(-2,2))
 #'
 #' @return png files showing raw and segmented tumour logR and BAF
 #'
 #' @export
 #'
-ascat.plotSegmentedData = function(ASCATobj, img.dir=".", img.prefix="") {
+ascat.plotSegmentedData = function(ASCATobj, img.dir=".", img.prefix="", logr.y_values=c(-2,2)) {
   for (arraynr in 1:dim(ASCATobj$Tumor_LogR)[2]) {
     Select_nonNAs = rownames(ASCATobj$Tumor_BAF_segmented[[arraynr]])
     AllIDs = 1:dim(ASCATobj$Tumor_LogR)[1]
@@ -99,7 +101,7 @@ ascat.plotSegmentedData = function(ASCATobj, img.dir=".", img.prefix="") {
     par(mar = c(0.5,5,5,0.5), mfrow = c(2,1), cex = 0.4, cex.main=3, cex.axis = 2)
     r = ASCATobj$Tumor_LogR_segmented[rownames(ASCATobj$Tumor_BAF_segmented[[arraynr]]),arraynr]
     beta = ASCATobj$Tumor_BAF_segmented[[arraynr]][,,drop=FALSE]
-    plot(c(1,length(r)), c(-1,1), type = "n", xaxt = "n", main = paste(colnames(ASCATobj$Tumor_BAF)[arraynr],", LogR",sep=""), xlab = "", ylab = "")
+    plot(c(1,length(r)), logr.y_values, type = "n", xaxt = "n", main = paste(colnames(ASCATobj$Tumor_BAF)[arraynr],", LogR",sep=""), xlab = "", ylab = "")
     points(ASCATobj$Tumor_LogR[rownames(ASCATobj$Tumor_BAF_segmented[[arraynr]]),arraynr], col = "red", pch=ifelse(dim(ASCATobj$Tumor_LogR)[1]>100000,".",20))
     points(r,col="green")
     abline(v=0.5,lty=1,col="lightgrey")

@@ -4,7 +4,12 @@
 \alias{ascat.plotSegmentedData}
 \title{ascat.plotSegmentedData}
 \usage{
-ascat.plotSegmentedData(ASCATobj, img.dir = ".", img.prefix = "")
+ascat.plotSegmentedData(
+  ASCATobj,
+  img.dir = ".",
+  img.prefix = "",
+  logr.y_values = c(-2, 2)
+)
 }
 \arguments{
 \item{ASCATobj}{an ASCAT object (e.g. from ascat.aspcf)}
@@ -12,6 +17,8 @@ ascat.plotSegmentedData(ASCATobj, img.dir = ".", img.prefix = "")
 \item{img.dir}{directory in which figures will be written}
 
 \item{img.prefix}{prefix for figure names}
+
+\item{logr.y_values}{define Y min and max values for logR track (optional; default: c(-2,2))}
 }
 \value{
 png files showing raw and segmented tumour logR and BAF

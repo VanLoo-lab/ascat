@@ -4,7 +4,12 @@
 \alias{ascat.plotRawData}
 \title{ascat.plotRawData}
 \usage{
-ascat.plotRawData(ASCATobj, img.dir = ".", img.prefix = "")
+ascat.plotRawData(
+  ASCATobj,
+  img.dir = ".",
+  img.prefix = "",
+  logr.y_values = c(-2, 2)
+)
 }
 \arguments{
 \item{ASCATobj}{an ASCAT object (e.g. data structure from ascat.loadData)}
@@ -12,6 +17,8 @@ ascat.plotRawData(ASCATobj, img.dir = ".", img.prefix = "")
 \item{img.dir}{directory in which figures will be written}
 
 \item{img.prefix}{prefix for figure names}
+
+\item{logr.y_values}{define Y min and max values for logR track (optional; default: c(-2,2))}
 }
 \value{
 Produces png files showing the logR and BAF values for tumour and germline samples

@@ -17,8 +17,8 @@ ascat.GCcorrect(ASCATobj, GCcontentfile = NULL, replictimingfile = NULL)
 ASCAT object with corrected tumour logR
 }
 \description{
-Corrects logR of the tumour sample(s) with genomic GC content
+Corrects logR of the tumour sample(s) with genomic GC content (replication timing is optional)
 }
 \details{
-Note that probes not present in the GCcontentfile will be lost from the results
+Note that probes not present in the GC content file will be lost from the results
 }

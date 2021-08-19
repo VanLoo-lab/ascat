@@ -284,7 +284,7 @@ readAlleleCountFiles=function(prefix,suffix,chrom_names,minCounts) {
   return(data)
 }
 
-#' Function to concatenate 1000 Genomes SNP reference files
+#' Function to concatenate 1000 Genomes SNP reference files (allele indices)
 #' @noRd
 readG1000SnpFiles=function(prefix,suffix,chrom_names) {
   files=paste0(prefix,chrom_names,suffix)
@@ -295,6 +295,20 @@ readG1000SnpFiles=function(prefix,suffix,chrom_names) {
     tmp=tmp[!duplicated(tmp[,1]),]
     tmp$chromosome=gsub(paste0(prefix,'(',paste(chrom_names,collapse='|'),')',suffix),'\\1',x)
     tmp=tmp[,c(4,1:3)]
+    rownames(tmp)=paste0(tmp[,1],'_',tmp[,2])
+    return(tmp)
+  }))
+  return(data)
+}
+
+#' Function to concatenate 1000 Genomes SNP reference files (loci)
+#' @noRd
+readLociFiles=function(prefix,suffix,chrom_names) {
+  files=paste0(prefix,chrom_names,suffix)
+  files=files[sapply(files,function(x) file.exists(x) && file.info(x)$size>0)]
+  data=do.call(rbind,lapply(files,function(x) {
+    tmp=data.frame(readr::read_tsv(x,col_types='ci',progress=F,col_names=F))
+    tmp[,1]=gsub('^chr','',tmp[,1])
     rownames(tmp)=paste0(tmp[,1],'_',tmp[,2])
     return(tmp)
   }))
