@@ -31,7 +31,7 @@ The created output file should start like this, with one row per provided probe:
 # Replication timing correction file creation
 The R script *createReplicTimingfile.R* can help you create the optional replication timing input for ASCAT’s wave correction for any platform (both array and sequencing data). Please note that this currently only works on hg19/GRCh37 due to the lack of publicly available replication data on other genomes. However, one may lift-over hg38/GRCh38 loci to hg19/GRCh37 coordinates to extract information and reset coordinates back to hg38/GRCh38. It also requires that you have the *rtracklayer* package installed (R/Bioconductor).
 
-`./createReplicTimingfile.R SNPpos`
+`Rscript createReplicTimingFile.R SNPpos`
 
  - `SNPpos` is the same file provided to generate the GC correction file above.
 
