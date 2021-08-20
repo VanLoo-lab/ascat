@@ -35,8 +35,8 @@ This repository also contains the code underlying additional publication:
 ## Testing
 We provide some scripts and input data in the *ExampleData* folder.
 
-## GC correction script
-We provide a method that creates a GC correction file in the *gcProcessing* folder.
+## Reference files for logR correction
+We provide scripts to generate correction files for any platform in the *LogRcorrection* folder.
 
 ## Supported arrays without matched germline
 *Custom10k*, *IlluminaASA*, *IlluminaGSAv3*, *Illumina109k*, *IlluminaCytoSNP*, *IlluminaCytoSNP850k*, *Illumina610k*, *Illumina660k*, *Illumina700k*, *Illumina1M*, *Illumina2.5M*, *IlluminaOmni5*, *Affy10k*, *Affy100k*, *Affy250k_sty*, *Affy250k_nsp*, *AffyOncoScan*, *AffyCytoScanHD*, *AffySNP6*, *HumanCNV370quad*, *HumanCore12*, *HumanCoreExome24*, *HumanOmniExpress12* and *IlluminaOmniExpressExome*.
