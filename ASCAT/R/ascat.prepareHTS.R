@@ -41,6 +41,7 @@ ascat.getAlleleCounts = function(seq.file, output.file, g1000.loci, min.base.qua
 #' @param normalLogR_file File where LogR from the normal will be written.
 #' @param normalBAF_file File where BAF from the normal will be written.
 #' @param g1000file.prefix Prefix to where 1000 Genomes reference files can be found.
+#' @param gender Gender information, either 'XX' (=female) or 'XY' (=male).
 #' @param chrom_names A vector with allowed chromosome names (optional, default=c(1:22,'X')).
 #' @param minCounts Minimum depth, in mormal, required for a SNP to be considered (optional, default=8).
 #' @param BED_file A BED file for only looking at SNPs within specific intervals (optional, default=NA).
@@ -48,8 +49,9 @@ ascat.getAlleleCounts = function(seq.file, output.file, g1000.loci, min.base.qua
 #' @param seed A seed to be set for when randomising the alleles (optional, default=as.integer(Sys.time())).
 #' @author dw9, sd11, tl
 #' @export
-ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, normalAlleleCountsFile.prefix, tumourLogR_file, tumourBAF_file, normalLogR_file, normalBAF_file, g1000file.prefix, chrom_names=c(1:22,'X'), minCounts=8, BED_file=NA, probloci_file=NA, seed=as.integer(Sys.time())) {
+ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, normalAlleleCountsFile.prefix, tumourLogR_file, tumourBAF_file, normalLogR_file, normalBAF_file, g1000file.prefix, gender, chrom_names=c(1:22,'X'), minCounts=8, BED_file=NA, probloci_file=NA, seed=as.integer(Sys.time())) {
   set.seed(seed)
+  stopifnot(gender %in% c('XX','XY'))
   # Load data, only keep SNPs with enough coverage
   tumour_input_data = readAlleleCountFiles(tumourAlleleCountsFile.prefix, ".txt", chrom_names, 1)
   normal_input_data = readAlleleCountFiles(normalAlleleCountsFile.prefix, ".txt", chrom_names, minCounts)
@@ -83,6 +85,7 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
     BED=read.table(BED_file,sep='\t',header=F,stringsAsFactors=F)[,1:3]
     colnames(BED)=c('chr','start','end')
     BED$chr=gsub('^chr','',BED$chr)
+    BED$start=BED$start+1 # Start is 0-based in BED files
     BED=BED[BED$chr %in% chrom_names,]
     if (nrow(BED)==0) stop('Major issue with BED file, please double-check its content')
     requireNamespace("GenomicRanges")
@@ -120,16 +123,20 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
   tumourBAF = vector(length=len, mode="numeric")
   normalLogR = vector(length=len, mode="numeric")
   tumourLogR = vector(length=len, mode="numeric")
-  # randomise A and B alleles
+  # Randomise A and B alleles
   selector = round(runif(len))
   normalBAF[which(selector==0)] = normCount1[which(selector==0)] / totalNormal[which(selector==0)]
   normalBAF[which(selector==1)] = normCount2[which(selector==1)] / totalNormal[which(selector==1)]
   tumourBAF[which(selector==0)] = mutCount1[which(selector==0)] / totalTumour[which(selector==0)]
   tumourBAF[which(selector==1)] = mutCount2[which(selector==1)] / totalTumour[which(selector==1)]
-  # normalise tumourLogR to normalLogR
+  # Normalise tumourLogR to normalLogR
   tumourLogR = totalTumour/totalNormal
   tumourLogR = log2(tumourLogR/mean(tumourLogR, na.rm=T))
   rm(selector)
+  # For males, chrX needs to be adjusted as logR baseline will be 0 because of T/N ratio. Add -1 to logR here so gamma=1 in ascat.runAscat will get CN states.
+  if (gender=='XY') {
+    tumourLogR[which(allele_data$chromosome=='X')]=tumourLogR[which(allele_data$chromosome=='X')]-1
+  }
   # Create the output data.frames
   tumor.LogR = data.frame(Chromosome=allele_data$chromosome, Position=allele_data$position, logr=tumourLogR, ID=rownames(allele_data), row.names=4, stringsAsFactors=F)
   tumor.BAF = data.frame(Chromosome=allele_data$chromosome, Position=allele_data$position, baf=tumourBAF, ID=rownames(allele_data), row.names=4, stringsAsFactors=F)
