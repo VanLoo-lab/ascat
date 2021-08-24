@@ -15,7 +15,7 @@ This repository also contains the code underlying additional publication:
 
 ## Changes since v2.5.2
 ### Major changes:
-- Default penalty for both ASPCF and ASmultiPCF is now 70 (was 25).
+- Default penalty for both ASPCF (*ascat.aspcf*) and ASmultiPCF (*ascat.asmultipcf*) is now 70 (was 25).
 - LogR correction (*ascat.GCcorrect*) can now be used to correct for both GC content (standard requirement) and replication timing (optional). Also, the correction method has been updated (it now uses a linear model with *splines*).
 - Color scheme has been changed for CNA profiles:
 	- Rounded profiles: TBD1 is the major allele and TBD2 is the minor allele.
@@ -24,12 +24,12 @@ This repository also contains the code underlying additional publication:
 ### Minor changes:
 - *ascat.plotRawData* and *ascat.plotSegmentedData* have an extra parameter (*logr.y_values*) to change Y scale for the logR track. Default is: c(-2,2), whereas previous plot were: c(-1,1).
 
-### New features:
-- New set of instructions, as part of the main *ascat.prepareHTS* function, to derive logR and BAF from high-throughput sequencing (HTS) data (WGS, WES & targeted sequencing). Briefly, [alleleCounter](https://github.com/cancerit/alleleCount) is used to get allele counts at specific loci on a pair of tumour/normal (either BAM or CRAM files). This information is then converted into logR and BAF values, based on a similar method than in the [Battenberg package](https://github.com/Wedge-lab/battenberg). Although this method allows running ASCAT on different HTS data:
-  - We recommand providing a BED file for WES.
-  - We recommend running [Battenberg](https://github.com/Wedge-lab/battenberg) on WGS data for accurate clonal and subclonal allele-specific copy-number alterations. ASCAT can still be used to get a fast purity/ploidy fit (~30 mins with 12 cores from BAMs to CNA profiles).
-  - Targeted sequencing data must be preprocessed using the *ascat.preprocessTargSeq* function to extract loci of interest. Once done, such loci list may be used as part of the *ascat.prepareHTS* function.
-  - Gamma must be set to 1 in *ascat.runASCAT* for HTS data.
+### New features in v3.0:
+- New set of instructions, as part of the main *ascat.prepareHTS* function, to derive logR and BAF from high-throughput sequencing (HTS) data (WES, WGS & targeted sequencing). Briefly, [alleleCounter](https://github.com/cancerit/alleleCount) is used to get allele counts at specific loci on a pair of tumour/normal (either BAM or CRAM files). This information is then converted into logR and BAF values, based on a similar method than in the [Battenberg package](https://github.com/Wedge-lab/battenberg). Although this method allows running ASCAT on different HTS data:
+  - WES: we recommand providing a BED file covering sequenced regions of the genome.
+  - WGS: we recommend running [Battenberg](https://github.com/Wedge-lab/battenberg) for accurate clonal and subclonal allele-specific copy-number alteration calling. However, ASCAT can still be used to get a fast purity/ploidy fit (~30 minutes with 12 CPUs from BAMs to CNA profiles). To this end, we provide a set of files that can be used (see *ReferenceFiles/WGS*).
+  - Targeted sequencing: data must be preprocessed using the *ascat.preprocessTargSeq* function to extract loci of interest. Then, such curated loci list may be used as part of the *ascat.prepareHTS* function.
+  - **For HTS data, gamma must be set to 1 in *ascat.runASCAT*.**
 - A new function to collect metrics of interest has been added: *ascat.metrics*.
 
 ## Testing
