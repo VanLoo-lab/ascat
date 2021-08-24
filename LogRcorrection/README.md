@@ -1,6 +1,6 @@
 # GC correction file creation
 
-The script *createGCcontentFile.R* can help you create the input for ASCAT’s GC correction for any platform (both array and sequencing data). Please note that this can be quite CPU intensive so should be run on a HPC.
+The script *createGCcontentFile.R* can help you create the input for ASCAT’s GC correction for any platform (both array and sequencing data). Please note that this can be quite CPU intensive so should be run on a HPC. R dependencies: *doParallel*, *foreach* and *Biostrings*.
 
 `Rscript createGCcontentFile.R SNPpos CORES REF`
 
@@ -28,7 +28,7 @@ The created output file (*GCcontent_SNPloci.txt*) should start like this, with o
 | rs2980314 | 1 | 781258 | 0.6 | 0.568627 | 0.544554 | 0.527363 | 0.433134 | 0.431568 | 0.435282 | 0.462507 | 0.471153 | 0.460927 | 0.467091 | 0.444976 | 0.486573 | 0.510809 | 0.52383 |
 
 # Replication timing correction file creation
-The R script *createReplicTimingfile.R* can help you create the optional replication timing input for ASCAT’s wave correction for any platform (both array and sequencing data). Please note that this currently only works on hg19/GRCh37 due to the lack of publicly available replication data on other genomes. However, one may lift-over hg38/GRCh38 loci to hg19/GRCh37 coordinates to extract information and reset coordinates back to hg38/GRCh38. It also requires that you have the *rtracklayer* package installed (R/Bioconductor).
+The R script *createReplicTimingfile.R* can help you create the optional replication timing input for ASCAT’s wave correction for any platform (both array and sequencing data). R dependency: *rtracklayer*.
 
 `Rscript createReplicTimingFile.R SNPpos`
 
@@ -43,3 +43,5 @@ The created output file (*ReplicationTiming_SNPloci.txt*) should start like this
 | rs2905040 | 1 | 770216 | 56.000576 | 61.533062 | 59.517155 | 60.315243 | 60.879486 | 58.433681 | 61.421215 | 63.689762 | 68.565933 | 59.307125 | 68.349823 | 69.068848 | 65.135139 | 58.516354 | 57.936165 |
 | rs12124819 | 1 | 776546 | 56.495754 | 62.174568 | 59.858677 | 60.523235 | 61.383484 | 58.944229 | 61.69376 | 64.059311 | 68.656227 | 59.664303 | 68.723213 | 69.572342 | 65.509315 | 59.173409 | 58.08889 |
 | rs2980314 | 1 | 781258 | 56.79295 | 62.546955 | 60.079067 | 60.68153 | 61.683388 | 59.267509 | 61.892082 | 64.298447 | 68.724228 | 59.908783 | 68.960464 | 69.863716 | 65.745972 | 59.575733 | 58.227413 |
+
+Please note that replication timing information comes from [ENCODE](http://hgdownload.cse.ucsc.edu/goldenpath/hg19/encodeDCC/wgEncodeUwRepliSeq/) and is based on hg19. Therefore, script will only works on hg19/GRCh37 SNPs due to the lack of publicly available replication data on other genomes like hg38. However, one may lift-over hg38/GRCh38 loci to hg19/GRCh37 coordinates, extract replication timing information and reset coordinates back to hg38/GRCh38.
