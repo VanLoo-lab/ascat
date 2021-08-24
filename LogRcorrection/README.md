@@ -16,7 +16,7 @@ The script *GCfileCreation.sh* can help you create the input for ASCAT’s GC co
 
  - `SIZES` contains the length of all reference chromosomes. The annotation for hg19 can be found in the ASCAT repository.
  - `CORES` defines how many cores to use for the computation.
- - `REF` should provide the path to your local reference genome.
+ - `REF` should be the path to your local reference genome. Make sure that chromosome names in `SNPpos` fit with `REF` (e.g. *chr1* is different from *1*).
 
 The created output file should start like this, with one row per provided probe:
 
@@ -33,7 +33,7 @@ The R script *createReplicTimingfile.R* can help you create the optional replica
 
 `Rscript createReplicTimingFile.R SNPpos`
 
- - `SNPpos` is the same file provided to generate the GC correction file above.
+ - `SNPpos` is the same file provided to generate the GC correction file above. Please note that chromosomes names for replication timing is chr-based (e.g. *chr1*).
 
 The created output file should start like this, with one row per provided probe:
 
