@@ -58,10 +58,10 @@ while(<IN>){
         }
         
         if($w==12){
-            print OUT "chr".$tab[1]."\t".$start."\t".$stop."\t".$tab[0]."\t".$tab[2]."\t".($w*2+1)."\n";
+            print OUT $tab[1]."\t".$start."\t".$stop."\t".$tab[0]."\t".$tab[2]."\t".($w*2+1)."\n";
         }
         else{
-           print OUT "chr".$tab[1]."\t".$start."\t".$stop."\t".$tab[0]."\t".$tab[2]."\t".($w*2)."\n";
+           print OUT $tab[1]."\t".$start."\t".$stop."\t".$tab[0]."\t".$tab[2]."\t".($w*2)."\n";
         }
         $counter++;
         
