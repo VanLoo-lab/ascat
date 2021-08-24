@@ -1,9 +1,7 @@
+suppressPackageStartupMessages(library(rtracklayer))
+
 args = commandArgs(TRUE)
 locifile = toString(args[1])
-
-UCSCdownloadpath <- "http://hgdownload.cse.ucsc.edu/goldenpath/hg19/encodeDCC/wgEncodeUwRepliSeq/"
-
-library(rtracklayer)
 
 ## load locifile for array and turn into GRanges object
 loci <- read.delim(file = locifile, header = T, as.is = T)
@@ -20,7 +18,7 @@ UWrepliseqbigwigs <- c("wgEncodeUwRepliSeqBg02esWaveSignalRep1.bigWig","wgEncode
                        "wgEncodeUwRepliSeqImr90WaveSignalRep1.bigWig","wgEncodeUwRepliSeqK562WaveSignalRep1.bigWig",
                        "wgEncodeUwRepliSeqMcf7WaveSignalRep1.bigWig","wgEncodeUwRepliSeqNhekWaveSignalRep1.bigWig",
                        "wgEncodeUwRepliSeqSknshWaveSignalRep1.bigWig")
-
+UCSCdownloadpath <- "http://hgdownload.cse.ucsc.edu/goldenpath/hg19/encodeDCC/wgEncodeUwRepliSeq/"
 print("Downloading UW Repli-seq data from UCSC")
 invisible(lapply(X = UWrepliseqbigwigs, FUN = function(x) download.file(url = paste0(UCSCdownloadpath, x), destfile = x)))
 wavelets <- lapply(UWrepliseqbigwigs, rtracklayer::import.bw)
@@ -33,6 +31,7 @@ colnames(mcols(loci_gr)) <- sub(pattern = "^wgEncodeUwRepliSeq", replacement = "
 
 locidf <- as.data.frame(loci_gr)[, -c(3:5)]
 colnames(locidf) <- c("Chr", "Position", colnames(locidf)[-c(1,2)])
+locidf[,3:ncol(locidf)]=round(locidf[,3:ncol(locidf)],6)
 write.table(file = "ReplicationTiming_SNPloci.txt", x = locidf, sep = "\t", row.names = T, quote = F, col.names = NA)
 
 ## clean up
