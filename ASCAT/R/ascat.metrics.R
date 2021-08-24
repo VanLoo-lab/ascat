@@ -146,7 +146,8 @@ ascat.metrics = function(ASCAT_input_object,ASCAT_output_object) {
                    mode_minA=mode_minA,
                    mode_majA=mode_majA,
                    WGD=WGD,
-                   GI=GI)
+                   GI=GI,
+                   stringsAsFactors=F)
     rownames(OUT)=SAMPLE
     return(OUT)
   }))
