@@ -15,7 +15,7 @@ The script *createGCcontentFile.R* can help you create the input for ASCAT’s G
 | rs2980314 | 1 | 781258 |
 
  - `CORES` defines how many cores to use for the computation.
- - `REF` should be the path to your local reference genome. Make sure that chromosome names in `SNPpos` fit with `REF` (e.g. *chr1* is different from *1*).
+ - `REF` should be the path to your local reference genome. Make sure that chromosome names in `SNPpos` fit with `REF` (e.g. *chr1* is different from *1*). Please note that sequence must be A/C/G/T/N-based (some references contain lowercase letters for specific regions such as repetitive sequences).
 
 The created output file (*GCcontent_SNPloci.txt*) should start like this, with one row per provided probe:
 

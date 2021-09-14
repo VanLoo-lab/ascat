@@ -1,23 +1,23 @@
 process=function(CHRSEQ,SNP_POS,WINDOW,THRESH,NCORES) {
-  subprocess=function(CHRSEQ,START,STOP,SIZE,THRESH) {
-    VALS=letterFrequency(DNAStringSet(CHRSEQ,start=START,end=STOP),c('G','C','N'))
-    NREALS=SIZE-VALS[,'N']
-    GC=(VALS[,'G']+VALS[,'C'])/NREALS
-    GC[NREALS<THRESH]=NA
-    return(GC)
-  }
-  FLANK=ceiling((WINDOW-1)/2)
-  SIZE=FLANK*2+1
-  SNP_POS$START=SNP_POS$Position-FLANK
-  SNP_POS$STOP=SNP_POS$Position+FLANK
-  INDEX=which(SNP_POS$START<1); if (length(INDEX)>0) {SNP_POS$START[INDEX]=1}; rm(INDEX)
-  INDEX=which(SNP_POS$STOP>CHRSEQ@length); if (length(INDEX)>0) {SNP_POS$STOP[INDEX]=CHRSEQ@length}; rm(INDEX)
-  SEQS=round(seq(1,nrow(SNP_POS),length.out=NCORES+1))
-  SEQS=lapply(1:NCORES,function(x) c(SEQS[x],ifelse(x==NCORES,SEQS[x+1],SEQS[x+1]-1)))
-  GC=foreach(x=1:NCORES) %dopar%  subprocess(CHRSEQ,SNP_POS$START[(SEQS[[x]][1]):(SEQS[[x]][2])],SNP_POS$STOP[(SEQS[[x]][1]):(SEQS[[x]][2])],SIZE,THRESH)
-  rm(SNP_POS)
-  gc()
-  return(round(as.numeric(unlist(GC)),6))
+  CHRSIZE=length(CHRSEQ)
+  # Quick check: make sure that A/C/G/T/N represent >99.99% of reference sequence
+  stopifnot(letterFrequency(CHRSEQ,c('ACGTN'))/CHRSIZE>0.9999)
+  if (WINDOW%%2==0) WINDOW=WINDOW+1
+  # Add Ns at chromosome extremities so nearby SNPs can be processed.
+  CHRSEQ=xscat(paste0(rep('N',floor(WINDOW/2)),collapse=''),CHRSEQ,paste0(rep('N',floor(WINDOW/2)),collapse=''))
+  # Get G+C and A+T counts for all positions
+  LFISV=as.data.frame(letterFrequencyInSlidingView(CHRSEQ,WINDOW,c('GC','AT'),OR='_'))
+  # Make sure that we have one value for each position
+  stopifnot(CHRSIZE==nrow(LFISV))
+  # Keep SNP information
+  LFISV=LFISV[SNP_POS$Position,]
+  # Effective window size (A/C/G/T only)
+  LFISV$NREALS=LFISV$G_C+LFISV$A_T
+  # Compute GC%
+  LFISV$GC=LFISV$G_C/LFISV$NREALS
+  # If effective size is smaller than threshold, set NA
+  LFISV$GC[LFISV$NREALS<THRESH]=NA
+  return(round(LFISV$GC,6))
 }
 
 suppressPackageStartupMessages(library(doParallel))
@@ -39,17 +39,17 @@ stopifnot(is.finite(NCORES) && NCORES %in% 1:24)
 registerDoParallel(cores=NCORES)
 refFASTA=args[3]
 stopifnot(file.exists(refFASTA))
+print('Loading reference genome')
 CHRSEQ=readDNAStringSet(refFASTA,format='fasta')
 names(CHRSEQ)=sapply(strsplit(names(CHRSEQ),' '),function(x) x[[1]])
 CHRSEQ=CHRSEQ[which(names(CHRSEQ) %in% as.character(LOCI$Chr))]
 stopifnot(all(unique(LOCI$Chr) %in% names(CHRSEQ)))
 
-OUT=foreach(CHR=unique(as.character(LOCI$Chr)),.combine=rbind) %do% {
+OUT=foreach(CHR=unique(as.character(LOCI$Chr)),.combine=rbind) %dopar% {
   print(paste0('Processing chromosome: ',CHR))
   stopifnot(CHR %in% names(CHRSEQ))
   SNP_POS=LOCI[which(LOCI$Chr==CHR),]
   for (i in 1:length(WINDOWS)) {
-    print(paste0('   Window: ',names(WINDOWS)[i]))
     SNP_POS[,names(WINDOWS)[i]]=process(CHRSEQ[[CHR]],SNP_POS,WINDOWS[i],THRESH,NCORES)
   }; rm(i)
   return(SNP_POS)
