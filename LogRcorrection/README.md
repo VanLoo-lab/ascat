@@ -1,6 +1,6 @@
 # GC correction file creation
 
-The script *createGCcontentFile.R* can help you create the input for ASCAT’s GC correction for any platform (both array and sequencing data). Please note that this can be quite CPU intensive so should be run on a HPC. R dependencies: *doParallel*, *foreach* and *Biostrings*.
+The script *createGCcontentFile.R* can help you create the input for ASCAT’s GC correction for any platform (both array and sequencing data). Please note that this can be quite CPU/memory intensive so should be run on a HPC. R dependencies: *doParallel*, *foreach* and *Biostrings*.
 
 `Rscript createGCcontentFile.R SNPpos CORES REF`
 
