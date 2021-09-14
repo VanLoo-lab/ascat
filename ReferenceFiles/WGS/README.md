@@ -8,7 +8,7 @@ Briefly, such list was derived from 1000 Genomes Project SNPs ([hg19](http://ftp
 - SNPs located in the [ENCODE blacklisted regions](https://github.com/Boyle-Lab/Blacklist/) were discared.
 - SNPs with noisy BAF (distant from 0/0.5/1) in normal samples (a.k.a probloci) as part of the [Battenberg](https://github.com/Wedge-lab/battenberg) package were discarded.
 
-Since hg38 data for the non-PAR region of chrX is not available (as of September 2020), hg38 data for the whole chrX comes from a lift-over from hg19.
+Since hg38 data for the non-PAR region of chrX is not available (as of September 2021), hg38 data for the whole chrX comes from a lift-over from hg19.
 
 GC content and replication timing correction files were then generated using scripts provided in the *LogRcorrection* folder.
 
