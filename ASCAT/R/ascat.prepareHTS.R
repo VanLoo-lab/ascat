@@ -200,6 +200,7 @@ ascat.synchroniseFiles=function(samplename,tumourLogR_file,tumourBAF_file,normal
 #' @param allelecounter_exe Path to the allele counter executable.
 #' @param g1000allelesprefix Prefix path to the 1000 Genomes alleles reference files.
 #' @param g1000lociprefix Prefix path to the 1000 Genomes SNP reference files.
+#' @param gender Gender information, either 'XX' (=female) or 'XY' (=male).
 #' @param nthreads The number of parallel processes for getting allele counts (optional, default=1).
 #' @param tumourLogR_file Path to the tumour logR output (optional, paste0(tumourname,"_tumourLogR.txt")).
 #' @param tumourBAF_file Path to the tumour BAF output (optional, paste0(tumourname,"_tumourBAF.txt")).
@@ -216,7 +217,7 @@ ascat.synchroniseFiles=function(samplename,tumourLogR_file,tumourBAF_file,normal
 #' @param skip_allele_counting_normal Flag, set to TRUE if normal allele counting is already complete (files are expected in the working directory on disk; optional, default=FALSE).
 #' @author sd11, tl
 #' @export
-ascat.prepareHTS = function(tumourseqfile, normalseqfile, tumourname, normalname, allelecounter_exe, g1000allelesprefix, g1000lociprefix,
+ascat.prepareHTS = function(tumourseqfile, normalseqfile, tumourname, normalname, allelecounter_exe, g1000allelesprefix, g1000lociprefix, gender,
                             nthreads=1, tumourLogR_file=NA, tumourBAF_file=NA, normalLogR_file=NA, normalBAF_file=NA, minCounts=10, BED_file=NA,
                             probloci_file=NA, chrom_names=c(1:22,'X'), min_base_qual=20, min_map_qual=35, ref.fasta=NA,
                             skip_allele_counting_tumour=F, skip_allele_counting_normal=F) {
@@ -263,6 +264,7 @@ ascat.prepareHTS = function(tumourseqfile, normalseqfile, tumourname, normalname
                         normalLogR_file=normalLogR_file,
                         normalBAF_file=normalBAF_file,
                         g1000file.prefix=g1000allelesprefix,
+                        gender=gender,
                         chrom_names=chrom_names,
                         minCounts=minCounts,
                         BED_file=BED_file,

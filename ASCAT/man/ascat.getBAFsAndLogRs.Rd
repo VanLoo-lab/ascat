@@ -13,6 +13,7 @@ ascat.getBAFsAndLogRs(
   normalLogR_file,
   normalBAF_file,
   g1000file.prefix,
+  gender,
   chrom_names = c(1:22, "X"),
   minCounts = 8,
   BED_file = NA,
@@ -36,6 +37,8 @@ ascat.getBAFsAndLogRs(
 \item{normalBAF_file}{File where BAF from the normal will be written.}
 
 \item{g1000file.prefix}{Prefix to where 1000 Genomes reference files can be found.}
+
+\item{gender}{Gender information, either 'XX' (=female) or 'XY' (=male).}
 
 \item{chrom_names}{A vector with allowed chromosome names (optional, default=c(1:22,'X')).}
 

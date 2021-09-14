@@ -12,6 +12,7 @@ ascat.prepareHTS(
   allelecounter_exe,
   g1000allelesprefix,
   g1000lociprefix,
+  gender,
   nthreads = 1,
   tumourLogR_file = NA,
   tumourBAF_file = NA,
@@ -42,6 +43,8 @@ ascat.prepareHTS(
 \item{g1000allelesprefix}{Prefix path to the 1000 Genomes alleles reference files.}
 
 \item{g1000lociprefix}{Prefix path to the 1000 Genomes SNP reference files.}
+
+\item{gender}{Gender information, either 'XX' (=female) or 'XY' (=male).}
 
 \item{nthreads}{The number of parallel processes for getting allele counts (optional, default=1).}
 
