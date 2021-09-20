@@ -42,6 +42,7 @@ ascat.getAlleleCounts = function(seq.file, output.file, g1000.loci, min.base.qua
 #' @param normalBAF_file File where BAF from the normal will be written.
 #' @param g1000file.prefix Prefix to where 1000 Genomes reference files can be found.
 #' @param gender Gender information, either 'XX' (=female) or 'XY' (=male).
+#' @param genomeVersion Genome version, either 'hg19' or 'hg38'.
 #' @param chrom_names A vector with allowed chromosome names (optional, default=c(1:22,'X')).
 #' @param minCounts Minimum depth, in mormal, required for a SNP to be considered (optional, default=8).
 #' @param BED_file A BED file for only looking at SNPs within specific intervals (optional, default=NA).
@@ -49,9 +50,10 @@ ascat.getAlleleCounts = function(seq.file, output.file, g1000.loci, min.base.qua
 #' @param seed A seed to be set for when randomising the alleles (optional, default=as.integer(Sys.time())).
 #' @author dw9, sd11, tl
 #' @export
-ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, normalAlleleCountsFile.prefix, tumourLogR_file, tumourBAF_file, normalLogR_file, normalBAF_file, g1000file.prefix, gender, chrom_names=c(1:22,'X'), minCounts=8, BED_file=NA, probloci_file=NA, seed=as.integer(Sys.time())) {
+ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, normalAlleleCountsFile.prefix, tumourLogR_file, tumourBAF_file, normalLogR_file, normalBAF_file, g1000file.prefix, gender, genomeVersion, chrom_names=c(1:22,'X'), minCounts=8, BED_file=NA, probloci_file=NA, seed=as.integer(Sys.time())) {
   set.seed(seed)
   stopifnot(gender %in% c('XX','XY'))
+  stopifnot(genomeVersion %in% c('hg19','hg38'))
   # Load data, only keep SNPs with enough coverage
   tumour_input_data = readAlleleCountFiles(tumourAlleleCountsFile.prefix, ".txt", chrom_names, 1)
   normal_input_data = readAlleleCountFiles(normalAlleleCountsFile.prefix, ".txt", chrom_names, minCounts)
@@ -133,9 +135,17 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
   tumourLogR = totalTumour/totalNormal
   tumourLogR = log2(tumourLogR/mean(tumourLogR, na.rm=T))
   rm(selector)
-  # For males, chrX needs to be adjusted as logR baseline will be 0 because of T/N ratio. Add -1 to logR here so gamma=1 in ascat.runAscat will get CN states.
+  # For males, chrX needs to be adjusted as logR baseline will be 0 because of T/N ratio
   if (gender=='XY') {
-    tumourLogR[which(allele_data$chromosome=='X')]=tumourLogR[which(allele_data$chromosome=='X')]-1
+    # PAR1 and PAR2 information should be a mix of chrX and chrY so we should expect 1+1 (1 from X and 1 from Y).
+    # nonPAR should be X-specific and baseline is 1+0 so logR needs to be decreased according to gamma parameter (ascat.runAscat)
+    if (genomeVersion=='hg19') {
+      nonPAR=c(2699521,154931043)
+    } else if (genomeVersion=='hg38') {
+      nonPAR=c(2781480,155701382)
+    }
+    nonPAR=which(allele_data$chromosome=='X' & allele_data$position>=nonPAR[1] & allele_data$position<=nonPAR[2])
+    tumourLogR[nonPAR]=tumourLogR[nonPAR]-1
   }
   # Create the output data.frames
   tumor.LogR = data.frame(Chromosome=allele_data$chromosome, Position=allele_data$position, logr=tumourLogR, ID=rownames(allele_data), row.names=4, stringsAsFactors=F)
@@ -201,6 +211,7 @@ ascat.synchroniseFiles=function(samplename,tumourLogR_file,tumourBAF_file,normal
 #' @param g1000allelesprefix Prefix path to the 1000 Genomes alleles reference files.
 #' @param g1000lociprefix Prefix path to the 1000 Genomes SNP reference files.
 #' @param gender Gender information, either 'XX' (=female) or 'XY' (=male).
+#' @param genomeVersion Genome version, either 'hg19' or 'hg38'.
 #' @param nthreads The number of parallel processes for getting allele counts (optional, default=1).
 #' @param tumourLogR_file Path to the tumour logR output (optional, paste0(tumourname,"_tumourLogR.txt")).
 #' @param tumourBAF_file Path to the tumour BAF output (optional, paste0(tumourname,"_tumourBAF.txt")).
@@ -217,7 +228,7 @@ ascat.synchroniseFiles=function(samplename,tumourLogR_file,tumourBAF_file,normal
 #' @param skip_allele_counting_normal Flag, set to TRUE if normal allele counting is already complete (files are expected in the working directory on disk; optional, default=FALSE).
 #' @author sd11, tl
 #' @export
-ascat.prepareHTS = function(tumourseqfile, normalseqfile, tumourname, normalname, allelecounter_exe, g1000allelesprefix, g1000lociprefix, gender,
+ascat.prepareHTS = function(tumourseqfile, normalseqfile, tumourname, normalname, allelecounter_exe, g1000allelesprefix, g1000lociprefix, gender, genomeVersion,
                             nthreads=1, tumourLogR_file=NA, tumourBAF_file=NA, normalLogR_file=NA, normalBAF_file=NA, minCounts=10, BED_file=NA,
                             probloci_file=NA, chrom_names=c(1:22,'X'), min_base_qual=20, min_map_qual=35, ref.fasta=NA,
                             skip_allele_counting_tumour=F, skip_allele_counting_normal=F) {
@@ -265,6 +276,7 @@ ascat.prepareHTS = function(tumourseqfile, normalseqfile, tumourname, normalname
                         normalBAF_file=normalBAF_file,
                         g1000file.prefix=g1000allelesprefix,
                         gender=gender,
+                        genomeVersion=genomeVersion,
                         chrom_names=chrom_names,
                         minCounts=minCounts,
                         BED_file=BED_file,
