@@ -16,7 +16,7 @@ This repository also contains the code underlying additional publication:
 ## Changes since v2.5.2
 ### Major changes:
 - Default penalty for both ASPCF (*ascat.aspcf*) and ASmultiPCF (*ascat.asmultipcf*) is now 70 (was 25).
-- LogR correction (*ascat.GCcorrect*) can now be used to correct for both GC content (standard requirement) and replication timing (optional). Also, the correction method has been updated (it now uses a linear model with *splines*).
+- LogR correction (*ascat.GCcorrect*) can now be used to correct for both GC content (standard requirement) and replication timing (optional). Also, the correction method has been updated (it now uses autosomes to compute correlations with covariates and applies a linear model with *splines*).
 - Color scheme has been changed for CNA profiles:
 	- Rounded profiles: TBD1 is the major allele and TBD2 is the minor allele.
 	- Unrounded profiles: TBD3 is the total CN and TBD4 is the minor allele.

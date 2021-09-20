@@ -53,6 +53,7 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL, replictimingfile = NU
     GC_correction_after=c()
     RT_correction_before=c()
     RT_correction_after=c()
+    AUTOSOMES=!GC_newlist$Chr %in% ASCATobj$sexchromosomes
     
     for (s in 1:length(ASCATobj$samples)) {
       print.noquote(paste("Sample ", ASCATobj$samples[s], " (",s,"/",length(ASCATobj$samples),")",sep=""))
@@ -60,7 +61,7 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL, replictimingfile = NU
       names(Tumordata) = rownames(Tumor_LogR)
       
       # Calculate correlation (explicit weighting now automatically done)
-      corr = abs(cor(GC_newlist[, 3:ncol(GC_newlist)], Tumordata, use="complete.obs")[,1])
+      corr = abs(cor(GC_newlist[AUTOSOMES, 3:ncol(GC_newlist)], Tumordata[AUTOSOMES], use="complete.obs")[,1])
       
       index_1kb = grep(pattern = "X?1([06]00bp|kb)", x = names(corr))
       maxGCcol_insert = names(which.max(corr[1:index_1kb]))
@@ -82,7 +83,7 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL, replictimingfile = NU
                             GC_amplic = GC_newlist[,maxGCcol_amplic])
       
       if (!is.null(replictimingfile)) {
-        corr_rep = abs(cor(replic_newlist[, 3:ncol(replic_newlist)], Tumordata, use="complete.obs")[,1])
+        corr_rep = abs(cor(replic_newlist[AUTOSOMES, 3:ncol(replic_newlist)], Tumordata[AUTOSOMES], use="complete.obs")[,1])
         maxreplic = names(which.max(corr_rep))
         
         cat("Replication timing correlation: ",paste(names(corr_rep),format(corr_rep,digits=2), ";"),"\n") 
