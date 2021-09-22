@@ -2,12 +2,12 @@
 % Please edit documentation in R/ascat.prepareHTS.R
 \name{ascat.getAlleleCounts}
 \alias{ascat.getAlleleCounts}
-\title{Obtain allele counts for 1000 Genomes loci through external program alleleCounter.}
+\title{Obtain allele counts for a given set of loci through external program alleleCounter.}
 \usage{
 ascat.getAlleleCounts(
   seq.file,
   output.file,
-  g1000.loci,
+  loci.file,
   min.base.qual = 20,
   min.map.qual = 35,
   allelecounter.exe = "alleleCounter",
@@ -19,7 +19,7 @@ ascat.getAlleleCounts(
 
 \item{output.file}{The file where output should go.}
 
-\item{g1000.loci}{A file with 1000 Genomes SNP loci.}
+\item{loci.file}{A file with SNP loci.}
 
 \item{min.base.qual}{The minimum base quality required for it to be counted (optional, default=20).}
 
@@ -30,7 +30,7 @@ ascat.getAlleleCounts(
 \item{ref.fasta}{A FASTA file for CRAM processing (optional).}
 }
 \description{
-Obtain allele counts for 1000 Genomes loci through external program alleleCounter.
+Obtain allele counts for a given set of loci through external program alleleCounter.
 }
 \author{
 sd11, tl

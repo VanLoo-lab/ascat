@@ -10,8 +10,8 @@ ascat.prepareHTS(
   tumourname,
   normalname,
   allelecounter_exe,
-  g1000allelesprefix,
-  g1000lociprefix,
+  alleles.prefix,
+  loci.prefix,
   gender,
   genomeVersion,
   nthreads = 1,
@@ -41,9 +41,9 @@ ascat.prepareHTS(
 
 \item{allelecounter_exe}{Path to the allele counter executable.}
 
-\item{g1000allelesprefix}{Prefix path to the 1000 Genomes alleles reference files.}
+\item{alleles.prefix}{Prefix path to the allele data (e.g. "G1000_alleles_chr").}
 
-\item{g1000lociprefix}{Prefix path to the 1000 Genomes SNP reference files.}
+\item{loci.prefix}{Prefix path to the loci data (e.g. "G1000_loci_chr").}
 
 \item{gender}{Gender information, either 'XX' (=female) or 'XY' (=male).}
 

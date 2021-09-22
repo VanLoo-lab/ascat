@@ -12,7 +12,7 @@ ascat.getBAFsAndLogRs(
   tumourBAF_file,
   normalLogR_file,
   normalBAF_file,
-  g1000file.prefix,
+  alleles.prefix,
   gender,
   genomeVersion,
   chrom_names = c(1:22, "X"),
@@ -25,9 +25,9 @@ ascat.getBAFsAndLogRs(
 \arguments{
 \item{samplename}{String, name of the sample.}
 
-\item{tumourAlleleCountsFile.prefix}{Prefix of the allele counts files for the tumour.}
+\item{tumourAlleleCountsFile.prefix}{Prefix of the allele counts files for the tumour (e.g. "Tumour_alleleFrequencies_chr").}
 
-\item{normalAlleleCountsFile.prefix}{Prefix of the allele counts files for the normal.}
+\item{normalAlleleCountsFile.prefix}{Prefix of the allele counts files for the normal (e.g. "Normal_alleleFrequencies_chr").}
 
 \item{tumourLogR_file}{File where LogR from the tumour will be written.}
 
@@ -37,7 +37,7 @@ ascat.getBAFsAndLogRs(
 
 \item{normalBAF_file}{File where BAF from the normal will be written.}
 
-\item{g1000file.prefix}{Prefix to where 1000 Genomes reference files can be found.}
+\item{alleles.prefix}{Prefix path to the allele data (e.g. "G1000_alleles_chr")}
 
 \item{gender}{Gender information, either 'XX' (=female) or 'XY' (=male).}
 
