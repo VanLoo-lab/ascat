@@ -22,7 +22,7 @@ Depends:
     graphics,
     stats,
     splines,
-    readr,
+    data.table,
     GenomicRanges,
     IRanges,
     parallel,
@@ -31,4 +31,4 @@ Depends:
     utils
 License: GPL-3
 LazyLoad: yes
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2

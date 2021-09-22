@@ -67,7 +67,7 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
   # If a probloci file is provided, remove those
   if (!is.na(probloci_file)) {
     stopifnot(file.exists(probloci_file) && file.info(probloci_file)$size>0)
-    probloci=data.frame(readr::read_tsv(probloci_file,col_names=T,col_types='ci',progress=F),stringsAsFactors=F)
+    probloci=data.frame(data.table::fread(probloci_file,sep='\t',showProgress=F,header=T),stringsAsFactors=F)
     probloci=paste0(probloci[,1],'_',probloci[,2])
     probloci=which(rownames(tumour_input_data) %in% probloci)
     if (length(probloci>0)) {
@@ -174,29 +174,23 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
 #' @export
 ascat.synchroniseFiles=function(samplename,tumourLogR_file,tumourBAF_file,normalLogR_file,normalBAF_file) {
   # read all files
-  tumourLogR=data.frame(readr::read_tsv(tumourLogR_file,col_types='ccin',progress=F,col_names=c('SNP_ID','Chromosome','Position',samplename),skip=1,na=c('-Inf','Inf','NA','NaN','','-')),row.names=1,stringsAsFactors=F,check.names=F)
-  tumourLogR=tumourLogR[!is.na(tumourLogR[,3]),]
-  tumourBAF=data.frame(readr::read_tsv(tumourBAF_file,col_types='ccin',progress=F,col_names=c('SNP_ID','Chromosome','Position',samplename),skip=1,na=c('-Inf','Inf','NA','NaN','','-')),row.names=1,stringsAsFactors=F,check.names=F)
-  tumourBAF=tumourBAF[!is.na(tumourBAF[,3]),]
-  normalLogR=data.frame(readr::read_tsv(normalLogR_file,col_types='ccin',progress=F,col_names=c('SNP_ID','Chromosome','Position',samplename),skip=1,na=c('-Inf','Inf','NA','NaN','','-')),row.names=1,stringsAsFactors=F,check.names=F)
-  normalLogR=normalLogR[!is.na(normalLogR[,3]),]
-  normalBAF=data.frame(readr::read_tsv(normalBAF_file,col_types='ccin',progress=F,col_names=c('SNP_ID','Chromosome','Position',samplename),skip=1,na=c('-Inf','Inf','NA','NaN','','-')),row.names=1,stringsAsFactors=F,check.names=F)
-  normalBAF=normalBAF[!is.na(normalBAF[,3]),]
+  FILES=lapply(c(tumourLogR_file,tumourBAF_file,normalLogR_file,normalBAF_file),function(x) {
+    tmp=data.frame(data.table::fread(x,sep='\t',showProgress=F,header=T,na.strings=c('-Inf','Inf','NA','NaN','','-')),row.names=1,stringsAsFactors=F,check.names=F)
+    colnames(tmp)=c('Chromosome','Position',samplename)
+    tmp=tmp[!is.na(tmp[,3]),]
+    return(tmp)
+  })
+  names(FILES)=c(tumourLogR_file,tumourBAF_file,normalLogR_file,normalBAF_file)
   # get IDs shared between DFs
-  IDs=Reduce(intersect, list(rownames(tumourLogR),rownames(tumourBAF),rownames(normalLogR),rownames(normalBAF)))
-  tumourLogR=tumourLogR[rownames(tumourLogR) %in% IDs,]
-  tumourBAF=tumourBAF[rownames(tumourBAF) %in% IDs,]
-  normalLogR=normalLogR[rownames(normalLogR) %in% IDs,]
-  normalBAF=normalBAF[rownames(normalBAF) %in% IDs,]
+  IDs=Reduce(intersect, lapply(FILES,rownames))
+  FILES=lapply(FILES,function(x) x[rownames(x) %in% IDs,])
   rm(IDs)
   # check whether DFs have been synchronised
-  stopifnot(identical(tumourLogR[,1],tumourBAF[,1]) && identical(tumourLogR[,1],normalLogR[,1]) && identical(tumourLogR[,1],normalBAF[,1]))
-  stopifnot(identical(tumourLogR[,2],tumourBAF[,2]) && identical(tumourLogR[,2],normalLogR[,2]) && identical(tumourLogR[,2],normalBAF[,2]))
+  stopifnot(all(sapply(2:4,function(x) identical(FILES[[1]][,1:2],FILES[[x]][,1:2]))))
   # write output
-  write.table(tumourLogR,file=tumourLogR_file,sep='\t',quote=F,row.names=T,col.names=NA)
-  write.table(tumourBAF,file=tumourBAF_file,sep='\t',quote=F,row.names=T,col.names=NA)
-  write.table(normalLogR,file=normalLogR_file,sep='\t',quote=F,row.names=T,col.names=NA)
-  write.table(normalBAF,file=normalBAF_file,sep='\t',quote=F,row.names=T,col.names=NA)
+  for (i in 1:4) {
+    write.table(FILES[[i]],file=names(FILES)[i],sep='\t',quote=F,row.names=T,col.names=NA)
+  }; rm(i)
 }
 
 #' Extract both logR and BAF values from sequencing data
@@ -296,7 +290,7 @@ readAlleleCountFiles=function(prefix,suffix,chrom_names,minCounts) {
   files=paste0(prefix,chrom_names,suffix)
   files=files[sapply(files,function(x) file.exists(x) && file.info(x)$size>0)]
   data=do.call(rbind,lapply(files,function(x) {
-    tmp=data.frame(readr::read_tsv(x,col_types='ciiiiii',progress=F))
+    tmp=data.frame(data.table::fread(x,sep='\t',showProgress=F,header=T),stringsAsFactors=F)
     tmp=tmp[tmp[,7]>=minCounts,]
     tmp[,1]=gsub('^chr','',tmp[,1])
     rownames(tmp)=paste0(tmp[,1],'_',tmp[,2])
@@ -311,7 +305,7 @@ readG1000SnpFiles=function(prefix,suffix,chrom_names) {
   files=paste0(prefix,chrom_names,suffix)
   files=files[sapply(files,function(x) file.exists(x) && file.info(x)$size>0)]
   data=do.call(rbind,lapply(files,function(x) {
-    tmp=data.frame(readr::read_tsv(x,col_types='iii',progress=F))
+    tmp=data.frame(data.table::fread(x,sep='\t',showProgress=F,header=T))
     tmp=tmp[!is.na(tmp[,2] & !is.na(tmp[,3])),]
     tmp=tmp[!duplicated(tmp[,1]),]
     tmp$chromosome=gsub(paste0(prefix,'(',paste(chrom_names,collapse='|'),')',suffix),'\\1',x)
@@ -328,7 +322,7 @@ readLociFiles=function(prefix,suffix,chrom_names) {
   files=paste0(prefix,chrom_names,suffix)
   files=files[sapply(files,function(x) file.exists(x) && file.info(x)$size>0)]
   data=do.call(rbind,lapply(files,function(x) {
-    tmp=data.frame(readr::read_tsv(x,col_types='ci',progress=F,col_names=F))
+    tmp=data.frame(data.table::fread(x,sep='\t',showProgress=F,header=F))
     tmp[,1]=gsub('^chr','',tmp[,1])
     rownames(tmp)=paste0(tmp[,1],'_',tmp[,2])
     return(tmp)

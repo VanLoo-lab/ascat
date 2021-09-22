@@ -130,14 +130,7 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL, replictimingfile = NU
 #' @noRd
 readCorrectionFile=function(correction_file) {
   if (file.exists(correction_file) && file.info(correction_file)$size>0) {
-    header=as.character(readr::read_delim(file=correction_file, delim='\t', col_names=F, n_max=1, skip=0, col_types = readr::cols()))[-1]
-    tmp=readr::read_tsv(file=correction_file,col_names=F,progress=F,col_types=paste0('cci',paste(rep('d',length(header)-2),collapse='')),skip=1)
-    tmp=data.frame(tmp,stringsAsFactors=F)
-    rownames(tmp)=tmp[,1]
-    tmp[,1]=NULL
-    colnames(tmp)=header
-    colnames(tmp)[1:2]=c("Chr","Position")
-    return(tmp)
+    return(data.frame(data.table::fread(correction_file,sep='\t',showProgress=F,header=T),row.names=1,check.names=F,stringsAsFactors=F))
   } else {
     return(NULL)
   }
