@@ -13,6 +13,7 @@ ascat.prepareHTS(
   g1000allelesprefix,
   g1000lociprefix,
   gender,
+  genomeVersion,
   nthreads = 1,
   tumourLogR_file = NA,
   tumourBAF_file = NA,
@@ -45,6 +46,8 @@ ascat.prepareHTS(
 \item{g1000lociprefix}{Prefix path to the 1000 Genomes SNP reference files.}
 
 \item{gender}{Gender information, either 'XX' (=female) or 'XY' (=male).}
+
+\item{genomeVersion}{Genome version, either 'hg19' or 'hg38'.}
 
 \item{nthreads}{The number of parallel processes for getting allele counts (optional, default=1).}
 
