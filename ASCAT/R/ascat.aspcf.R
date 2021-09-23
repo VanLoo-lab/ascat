@@ -6,6 +6,7 @@
 #' @param selectsamples a vector containing the sample number(s) to PCF. Default = all
 #' @param ascat.gg germline genotypes (NULL if germline data is available)
 #' @param penalty penalty of introducing an additional ASPCF breakpoint (expert parameter, don't adapt unless you know what you're doing)
+#' @param genomeVersion Genome version, either 'hg19' or 'hg38' (default=NULL). This is used to avoid discarding the nonPAR region on chrX for males.
 #' @param out.dir directory in which output files will be written
 #' @param out.prefix prefix for output file names
 #'
@@ -22,13 +23,20 @@
 #'
 #' @export
 #'
-ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), ascat.gg = NULL, penalty = 70, out.dir=".", out.prefix="") {
-  #first, set germline genotypes
+ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), ascat.gg = NULL, penalty = 70, genomeVersion=NULL, out.dir=".", out.prefix="") {
+  if (!is.null(genomeVersion)) {
+    stopifnot(genomeVersion %in% c('hg19','hg38'))
+    if (genomeVersion=='hg19') {
+      nonPAR=c(2699521,154931043)
+    } else if (genomeVersion=='hg38') {
+      nonPAR=c(2781480,155701382)
+    }
+  }
+  # first, set germline genotypes
   gg = NULL
   if(!is.null(ascat.gg)) {
     gg = ascat.gg$germlinegenotypes
-  }
-  else {
+  } else {
     gg = ASCATobj$Germline_BAF < 0.3 | ASCATobj$Germline_BAF > 0.7
   }
   # calculate germline homozygous stretches for later resegmentation
@@ -47,6 +55,21 @@ ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), asc
     baffilename = file.path(out.dir, paste(out.prefix, ASCATobj$samples[sample],".BAF.PCFed.txt",sep=""))
     logRPCFed = numeric(0)
     bafPCFed = numeric(0)
+    # specific process for nonPAR in males
+    if (!is.null(genomeVersion) && ASCATobj$gender[sample]=='XY') {
+      # select SNPs with non-NA BAF values in nonPAR region
+      nonPAR_index=which(ASCATobj$SNPpos$Chr=='X' & ASCATobj$SNPpos$Position>=nonPAR[1] & ASCATobj$SNPpos$Position<=nonPAR[2] & !is.na(gg[,sample]))
+      if (length(nonPAR_index)>5) {
+        # set all to hmz
+        gg[nonPAR_index,sample]=T
+        # compute distance to BAF=0/1
+        DIST=1-sapply(ASCATobj$Germline_BAF[nonPAR_index,sample],function(x) {if (x>0.5) return(x) else return(1-x)})
+        # select 20% of SNPs based on closest distance to BAF=0/1 and force those to be considered for ASPCF
+        gg[nonPAR_index[which(rank(DIST,ties.method='random')<round(length(DIST)/5))],sample]=F
+        rm(DIST)
+      }
+      rm(nonPAR_index)
+    }
     for (segmentlength in segmentlengths) {
       logRPCFed = numeric(0)
       bafPCFed = numeric(0)

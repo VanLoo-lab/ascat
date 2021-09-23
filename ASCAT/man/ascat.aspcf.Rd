@@ -9,6 +9,7 @@ ascat.aspcf(
   selectsamples = 1:length(ASCATobj$samples),
   ascat.gg = NULL,
   penalty = 70,
+  genomeVersion = NULL,
   out.dir = ".",
   out.prefix = ""
 )
@@ -21,6 +22,8 @@ ascat.aspcf(
 \item{ascat.gg}{germline genotypes (NULL if germline data is available)}
 
 \item{penalty}{penalty of introducing an additional ASPCF breakpoint (expert parameter, don't adapt unless you know what you're doing)}
+
+\item{genomeVersion}{Genome version, either 'hg19' or 'hg38' (default=NULL). This is used to avoid discarding the nonPAR region on chrX for males.}
 
 \item{out.dir}{directory in which output files will be written}
 
