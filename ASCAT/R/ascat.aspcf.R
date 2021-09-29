@@ -6,7 +6,6 @@
 #' @param selectsamples a vector containing the sample number(s) to PCF. Default = all
 #' @param ascat.gg germline genotypes (NULL if germline data is available)
 #' @param penalty penalty of introducing an additional ASPCF breakpoint (expert parameter, don't adapt unless you know what you're doing)
-#' @param genomeVersion Genome version, either 'hg19' or 'hg38' (default=NULL). This is used to avoid discarding the nonPAR region on chrX for males.
 #' @param out.dir directory in which output files will be written
 #' @param out.prefix prefix for output file names
 #'
@@ -23,15 +22,8 @@
 #'
 #' @export
 #'
-ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), ascat.gg = NULL, penalty = 70, genomeVersion=NULL, out.dir=".", out.prefix="") {
-  if (!is.null(genomeVersion)) {
-    stopifnot(genomeVersion %in% c('hg19','hg38'))
-    if (genomeVersion=='hg19') {
-      nonPAR=c(2699521,154931043)
-    } else if (genomeVersion=='hg38') {
-      nonPAR=c(2781480,155701382)
-    }
-  }
+ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), ascat.gg = NULL, penalty = 70, out.dir=".", out.prefix="") {
+
   # first, set germline genotypes
   gg = NULL
   if(!is.null(ascat.gg)) {
@@ -48,7 +40,7 @@ ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), asc
   Tumor_LogR_segmented = matrix(nrow = dim(ASCATobj$Tumor_LogR)[1], ncol = dim(ASCATobj$Tumor_LogR)[2])
   rownames(Tumor_LogR_segmented) = rownames(ASCATobj$Tumor_LogR)
   colnames(Tumor_LogR_segmented) = colnames(ASCATobj$Tumor_LogR)
-  Tumor_BAF_segmented = list();
+  Tumor_BAF_segmented = list()
   for (sample in selectsamples) {
     print.noquote(paste("Sample ", ASCATobj$samples[sample], " (",sample,"/",length(ASCATobj$samples),")",sep=""))
     logrfilename = file.path(out.dir, paste(out.prefix, ASCATobj$samples[sample],".LogR.PCFed.txt",sep=""))
@@ -56,19 +48,21 @@ ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), asc
     logRPCFed = numeric(0)
     bafPCFed = numeric(0)
     # specific process for nonPAR in males
-    if (!is.null(genomeVersion) && ASCATobj$gender[sample]=='XY') {
+    if (!is.null(ASCATobj$X_nonPAR) && ASCATobj$gender[sample]=='XY') {
       # select SNPs with non-NA BAF values in nonPAR region
-      nonPAR_index=which(ASCATobj$SNPpos$Chr=='X' & ASCATobj$SNPpos$Position>=nonPAR[1] & ASCATobj$SNPpos$Position<=nonPAR[2] & !is.na(gg[,sample]))
+      nonPAR_index=which(ASCATobj$SNPpos$Chr=='X' & ASCATobj$SNPpos$Position>=ASCATobj$X_nonPAR[1] & ASCATobj$SNPpos$Position<=ASCATobj$X_nonPAR[2] & !is.na(gg[,sample]))
+      # store hmz/htz information for autosomes
+      autosomes_info=table(gg[which(ASCATobj$SNPpos$Chr %in% setdiff(ASCATobj$chrs,ASCATobj$sexchromosomes)),sample])
       if (length(nonPAR_index)>5) {
         # set all to hmz
         gg[nonPAR_index,sample]=T
         # compute distance to BAF=0/1
         DIST=1-sapply(ASCATobj$Germline_BAF[nonPAR_index,sample],function(x) {if (x>0.5) return(x) else return(1-x)})
-        # select 20% of SNPs based on closest distance to BAF=0/1 and force those to be considered for ASPCF
-        gg[nonPAR_index[which(rank(DIST,ties.method='random')<round(length(DIST)/5))],sample]=F
+        # select X% (derived from autosomes) of SNPs based on closest distance to BAF=0/1 and force those to be considered for ASPCF
+        gg[nonPAR_index[which(rank(DIST,ties.method='random')<=round(length(DIST)*(autosomes_info['FALSE']/sum(autosomes_info))))],sample]=F
         rm(DIST)
       }
-      rm(nonPAR_index)
+      rm(nonPAR_index,autosomes_info)
     }
     for (segmentlength in segmentlengths) {
       logRPCFed = numeric(0)
