@@ -24,7 +24,8 @@ runASCAT(
   psi_manual = NA,
   pdfPlot = F,
   y_limit = 5,
-  circos = NA
+  circos = NA,
+  X_nonPAR = NULL
 )
 }
 \arguments{
@@ -67,6 +68,8 @@ runASCAT(
 \item{y_limit}{Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5}
 
 \item{circos}{Optional file to output the non-rounded values in Circos track format. Default=NA}
+
+\item{X_nonPAR}{Optional vector containing genomic coordinates (start & stop) of nonPAR region on X. Default=NULL}
 }
 \value{
 list containing optimal purity and ploidy

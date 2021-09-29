@@ -57,7 +57,7 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
     res[[arraynr]] = runASCAT(lrr,baf,lrrsegm,bafsegm,ASCATobj$gender[arraynr],ASCATobj$SNPpos,ASCATobj$ch,ASCATobj$chrs,ASCATobj$sexchromosomes, failedqualitycheck,
                               file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".sunrise.png",sep="")),file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".ASCATprofile.", ending,sep="")),
                               file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".rawprofile.", ending,sep="")),NA,
-                              gamma,rho_manual[arraynr],psi_manual[arraynr], pdfPlot, y_limit, circosName)
+                              gamma,rho_manual[arraynr],psi_manual[arraynr], pdfPlot, y_limit, circosName, ASCATobj$X_nonPAR)
     if(!is.na(res[[arraynr]]$rho)) {
       goodarrays[length(goodarrays)+1] = arraynr
     }
@@ -172,8 +172,9 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
 #' @param rho_manual optional argument to override ASCAT optimization and supply rho parameter (not recommended)
 #' @param psi_manual optional argument to override ASCAT optimization and supply psi parameter (not recommended)
 #' @param pdfPlot Optional flag if nonrounded plots and ASCAT profile in pdf format are desired. Default=F
-#' @param circos Optional file to output the non-rounded values in Circos track format. Default=NA
 #' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
+#' @param circos Optional file to output the non-rounded values in Circos track format. Default=NA
+#' @param X_nonPAR Optional vector containing genomic coordinates (start & stop) of nonPAR region on X. Default=NULL
 #'
 #' @keywords internal
 #'
@@ -184,7 +185,7 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
 #' @export
 runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromosomes, chrnames, sexchromosomes, failedqualitycheck = F,
                     distancepng = NA, copynumberprofilespng = NA, nonroundedprofilepng = NA, aberrationreliabilitypng = NA, gamma = 0.55,
-                    rho_manual = NA, psi_manual = NA, pdfPlot = F, y_limit = 5, circos=NA) {
+                    rho_manual = NA, psi_manual = NA, pdfPlot = F, y_limit = 5, circos=NA, X_nonPAR=NULL) {
   ch = chromosomes
   chrs = chrnames
   b = bafsegmented
@@ -435,6 +436,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
       haploidchrs = setdiff(haploidchrs,substring(gender,1,1))
     }
     diploidprobes = !(SNPposhet[,1]%in%haploidchrs)
+    if (!is.null(X_nonPAR)) diploidprobes[which(SNPposhet$Chr=='X' & (SNPposhet$Position<X_nonPAR[1] | SNPposhet$Position>X_nonPAR[2]))]=T
     nullchrs = setdiff(sexchromosomes,unique(c(substring(gender,1,1),substring(gender,2,2))))
     nullprobes = SNPposhet[,1]%in%nullchrs
     
@@ -490,6 +492,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     psi = psi_opt1
 
     diploidprobes = !(SNPpos[,1]%in%haploidchrs)
+    if (!is.null(X_nonPAR)) diploidprobes[which(SNPpos$Chr=='X' & (SNPpos$Position<X_nonPAR[1] | SNPpos$Position>X_nonPAR[2]))]=T
     nullprobes = SNPpos[,1]%in%nullchrs
     
     #this replaces an occurrence of unique that caused problems
