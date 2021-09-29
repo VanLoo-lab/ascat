@@ -436,7 +436,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
       haploidchrs = setdiff(haploidchrs,substring(gender,1,1))
     }
     diploidprobes = !(SNPposhet[,1]%in%haploidchrs)
-    if (!is.null(X_nonPAR)) diploidprobes[which(SNPposhet$Chr=='X' & (SNPposhet$Position<X_nonPAR[1] | SNPposhet$Position>X_nonPAR[2]))]=T
+    if (!is.null(X_nonPAR) && gender=='XY') diploidprobes[which(SNPposhet$Chr=='X' & (SNPposhet$Position<X_nonPAR[1] | SNPposhet$Position>X_nonPAR[2]))]=T
     nullchrs = setdiff(sexchromosomes,unique(c(substring(gender,1,1),substring(gender,2,2))))
     nullprobes = SNPposhet[,1]%in%nullchrs
     
@@ -492,7 +492,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     psi = psi_opt1
 
     diploidprobes = !(SNPpos[,1]%in%haploidchrs)
-    if (!is.null(X_nonPAR)) diploidprobes[which(SNPpos$Chr=='X' & (SNPpos$Position<X_nonPAR[1] | SNPpos$Position>X_nonPAR[2]))]=T
+    if (!is.null(X_nonPAR) && gender=='XY') diploidprobes[which(SNPpos$Chr=='X' & (SNPpos$Position<X_nonPAR[1] | SNPpos$Position>X_nonPAR[2]))]=T
     nullprobes = SNPpos[,1]%in%nullchrs
     
     #this replaces an occurrence of unique that caused problems
