@@ -11,7 +11,8 @@ ascat.loadData(
   Germline_BAF_file = NULL,
   chrs = c(1:22, "X", "Y"),
   gender = NULL,
-  sexchromosomes = c("X", "Y")
+  sexchromosomes = c("X", "Y"),
+  genomeVersion = NULL
 )
 }
 \arguments{
@@ -27,7 +28,9 @@ ascat.loadData(
 
 \item{gender}{a vector of gender for each cases ("XX" or "XY"). Default = all female ("XX")}
 
-\item{sexchromosomes}{a vector containing the names for the sex chromosomes}
+\item{sexchromosomes}{a vector containing the names for the sex chromosomes. Default = c("X","Y")}
+
+\item{genomeVersion}{a string (either 'hg19' or 'hg38') so nonPAR coordinates on X can be stored, NULL}
 }
 \value{
 ascat data structure containing:\cr
@@ -40,7 +43,12 @@ ascat data structure containing:\cr
 7. SNPpos: position of all SNPs\cr
 8. ch: a list containing vectors with the indices for each chromosome (e.g. Tumor_LogR[ch[[13]],] will output the Tumor_LogR data of chromosome 13\cr
 9. chr: a list containing vectors with the indices for each distinct part that can be segmented separately (e.g. chromosome arm, stretch of DNA between gaps in the array design)\cr
-10. gender: a vector of gender for each cases ("XX" or "XY"). Default = NULL: all female ("XX")\cr
+10. chrs: a vector containing chromosome names\cr
+11. samples: a vector containing sample name(s)\cr
+12. gender: a vector of gender for each cases ("XX" or "XY"). Default = NULL: all female ("XX")\cr
+13. sexchromosomes: a vector containingg names of sex chromosomes\cr
+14. X_nonPAR: a vector of two values (start and stop) to define where the nonPAR region is on X\cr
+15. failedarrays: placeholder, NULL\cr
 }
 \description{
 Function to read in SNP array data

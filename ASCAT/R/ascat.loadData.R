@@ -7,7 +7,8 @@
 #' @param Germline_BAF_file file containing BAF of germline sample(s), NULL
 #' @param chrs a vector containing the names for the chromosomes (e.g. c(1:22,"X"))
 #' @param gender a vector of gender for each cases ("XX" or "XY"). Default = all female ("XX")
-#' @param sexchromosomes a vector containing the names for the sex chromosomes
+#' @param sexchromosomes a vector containing the names for the sex chromosomes. Default = c("X","Y")
+#' @param genomeVersion a string (either 'hg19' or 'hg38') so nonPAR coordinates on X can be stored, NULL
 #'
 #' @return ascat data structure containing:\cr
 #' 1. Tumor_LogR data matrix\cr
@@ -19,11 +20,16 @@
 #' 7. SNPpos: position of all SNPs\cr
 #' 8. ch: a list containing vectors with the indices for each chromosome (e.g. Tumor_LogR[ch[[13]],] will output the Tumor_LogR data of chromosome 13\cr
 #' 9. chr: a list containing vectors with the indices for each distinct part that can be segmented separately (e.g. chromosome arm, stretch of DNA between gaps in the array design)\cr
-#' 10. gender: a vector of gender for each cases ("XX" or "XY"). Default = NULL: all female ("XX")\cr
+#' 10. chrs: a vector containing chromosome names\cr
+#' 11. samples: a vector containing sample name(s)\cr
+#' 12. gender: a vector of gender for each cases ("XX" or "XY"). Default = NULL: all female ("XX")\cr
+#' 13. sexchromosomes: a vector containingg names of sex chromosomes\cr
+#' 14. X_nonPAR: a vector of two values (start and stop) to define where the nonPAR region is on X\cr
+#' 15. failedarrays: placeholder, NULL\cr
 #'
 #' @export
 #'
-ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = NULL, Germline_BAF_file = NULL, chrs = c(1:22,"X","Y"), gender = NULL, sexchromosomes = c("X","Y")) {
+ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = NULL, Germline_BAF_file = NULL, chrs = c(1:22,"X","Y"), gender = NULL, sexchromosomes = c("X","Y"), genomeVersion=NULL) {
   
   # read in SNP array data files
   print.noquote("Reading Tumor LogR data...")
@@ -102,12 +108,25 @@ ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = 
   if (is.null(gender)) {
     gender = rep("XX",dim(Tumor_LogR)[2])
   }
+  
+  if (!is.null(genomeVersion)) {
+    if (genomeVersion=='hg19') {
+      X_nonPAR=c(2699521,154931043)
+    } else if (genomeVersion=='hg38') {
+      X_nonPar=c(2781480,155701382)
+    } else {
+      stop('genomeVersion must be either \'hg19\' or \'hg38\'.')
+    }
+  } else {
+    X_nonPAR=NULL
+  }
+  
   return(list(Tumor_LogR = Tumor_LogR, Tumor_BAF = Tumor_BAF,
               Tumor_LogR_segmented = NULL, Tumor_BAF_segmented = NULL,
               Germline_LogR = Germline_LogR, Germline_BAF = Germline_BAF,
               SNPpos = SNPpos, ch = ch, chr = chr, chrs = chrs,
               samples = colnames(Tumor_LogR), gender = gender,
-              sexchromosomes = sexchromosomes,
+              sexchromosomes = sexchromosomes, X_nonPAR = X_nonPAR,
               failedarrays = NULL))
 }
 
