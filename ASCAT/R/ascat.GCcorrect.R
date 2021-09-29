@@ -115,14 +115,22 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL, replictimingfile = NU
     names(GC_correction_after)=colnames(Tumor_LogR)
     names(RT_correction_before)=colnames(Tumor_LogR)
     names(RT_correction_after)=colnames(Tumor_LogR)
-    return(list(Tumor_LogR = Tumor_LogR, Tumor_BAF = Tumor_BAF,
-                Tumor_LogR_segmented = NULL, Tumor_BAF_segmented = NULL,
-                Germline_LogR = Germline_LogR, Germline_BAF = Germline_BAF,
-                SNPpos = SNPpos, ch = ch, chr = chr, chrs = chrs,
-                samples = colnames(Tumor_LogR), gender = ASCATobj$gender,
-                sexchromosomes = ASCATobj$sexchromosomes,
-                GC_correction_before=GC_correction_before, GC_correction_after=GC_correction_after,
-                RT_correction_before=RT_correction_before, RT_correction_after=RT_correction_after))
+    
+    ASCATobj$Tumor_LogR=Tumor_LogR
+    ASCATobj$Tumor_BAF=Tumor_BAF
+    ASCATobj$Germline_LogR=Germline_LogR
+    ASCATobj$Germline_BAF=Germline_BAF
+    ASCATobj$Tumor_LogR_segmented=NULL
+    ASCATobj$Tumor_BAF_segmented=NULL
+    ASCATobj$SNPpos=SNPpos
+    ASCATobj$ch=ch
+    ASCATobj$chr=chr
+    ASCATobj$chrs=chrs
+    ASCATobj$GC_correction_before=GC_correction_before
+    ASCATobj$GC_correction_after=GC_correction_after
+    ASCATobj$RT_correction_before=RT_correction_before
+    ASCATobj$RT_correction_after=RT_correction_after
+    return(ASCATobj)
   }
 }
 
