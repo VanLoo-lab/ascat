@@ -436,7 +436,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
       haploidchrs = setdiff(haploidchrs,substring(gender,1,1))
     }
     diploidprobes = !(SNPposhet[,1]%in%haploidchrs)
-    if (!is.null(X_nonPAR) && gender=='XY') diploidprobes[which(SNPposhet$Chr=='X' & (SNPposhet$Position<X_nonPAR[1] | SNPposhet$Position>X_nonPAR[2]))]=T
+    if (!is.null(X_nonPAR) && gender=='XY') diploidprobes=diploidprobes_fixnonPAR(diploidprobes,SNPposhet,ascat.bc$X_nonPAR,paste0(r,'/',b[,1]))
     nullchrs = setdiff(sexchromosomes,unique(c(substring(gender,1,1),substring(gender,2,2))))
     nullprobes = SNPposhet[,1]%in%nullchrs
     
@@ -492,7 +492,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     psi = psi_opt1
 
     diploidprobes = !(SNPpos[,1]%in%haploidchrs)
-    if (!is.null(X_nonPAR) && gender=='XY') diploidprobes[which(SNPpos$Chr=='X' & (SNPpos$Position<X_nonPAR[1] | SNPpos$Position>X_nonPAR[2]))]=T
+    if (!is.null(X_nonPAR) && gender=='XY') diploidprobes=diploidprobes_fixnonPAR(diploidprobes,SNPpos,ascat.bc$X_nonPAR,lrrsegmented)
     nullprobes = SNPpos[,1]%in%nullchrs
     
     #this replaces an occurrence of unique that caused problems
@@ -800,4 +800,47 @@ create_distance_matrix = function(segments, gamma) {
     }
   }
   return(d)
+}
+
+#' Function to fix diploidprobes for X based on nonPAR and segmentation (males only).
+#' Setting diploidprobes to TRUE for PAR regions would generate an issue whenever a segment spans both PAR and nonPAR regions.
+#' This is because probes, within the same segment (so with the same logR/BAF information) will use different CN equations (driven by diploidprobes).
+#' We use a conservative approach where we keep segments as they are and measure overlap with nonPAR.
+#' If the overlap is big enough (>50% of the segment), the whole segment is assigned to nonPAR and diploidprobes=F for all probes within that segment.
+#' @noRd
+diploidprobes_fixnonPAR=function(diploidprobes,SNP_data,nonPAR,seg_info) {
+  requireNamespace("GenomicRanges")
+  requireNamespace("IRanges")
+  stopifnot(length(diploidprobes)==nrow(SNP_data) && length(diploidprobes)==length(seg_info))
+  if (!'X' %in% SNP_data$Chr) return(diploidprobes)
+  # First, set all SNPs to diploidprobes=T for X
+  diploidprobes[which(SNP_data$Chr=='X')]=T
+  # Create a GRanges object with nonPAR information
+  nonPAR=GenomicRanges::GRanges(seqnames='X',ranges=IRanges::IRanges(start=nonPAR[1],end=nonPAR[2]))
+  # Create a DF with chr (X only), pos and seg_info (logR/BAF or logR only)
+  DATA=SNP_data
+  DATA$segment=seg_info
+  DATA=DATA[which(DATA$Chr=='X'),]
+  # Run rle on seg_info to get segments
+  RLE=cumsum(c(1,rle(DATA$segment)$lengths))
+  # Create a DF where each row corresponds to one segment
+  SEGMENTS=do.call(rbind,lapply(1:(length(RLE)-1),function(x) {
+    return(data.frame(Start=DATA$Position[RLE[x]],
+                      End=DATA$Position[RLE[x+1]-1],
+                      Segment=DATA$segment[RLE[x]]))
+  }))
+  # Convert DF to GRanges
+  SEGMENTS=GenomicRanges::GRanges(seqnames='X',ranges=IRanges::IRanges(start=SEGMENTS$Start,end=SEGMENTS$End),Segment=SEGMENTS$Segment)
+  # Identify segments mapping to nonPAR
+  FO=GenomicRanges::findOverlaps(nonPAR,SEGMENTS)
+  if (length(FO)==0) return(diploidprobes)
+  # For each segment, compute the size of the overlap relative to segment size. Only keep segments with high overlap (>50%) with nonPAR
+  FO=FO[width(GenomicRanges::pintersect(nonPAR[queryHits(FO)], SEGMENTS[subjectHits(FO)]))/width(SEGMENTS[subjectHits(FO)])>0.5]
+  if (length(FO)==0) return(diploidprobes)
+  SEGMENTS=data.frame(SEGMENTS[subjectHits(FO)])
+  # For each such segment, set all SNPs within that segment to diploidprobes=F
+  for (i in 1:nrow(SEGMENTS)) {
+    diploidprobes[which(SNP_data$Chr=='X' & SNP_data$Position>=SEGMENTS$start[i] & SNP_data$Position<=SEGMENTS$end[i])]=F
+  }; rm(i)
+  return(diploidprobes)
 }
