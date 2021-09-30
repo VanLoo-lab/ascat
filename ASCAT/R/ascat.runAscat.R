@@ -133,8 +133,7 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
     seg_raw[,7]=as.numeric(seg_raw[,7])
     seg_raw[,8]=as.numeric(seg_raw[,8])
     
-  }
-  else {
+  } else {
     n1 = NULL
     n2 = NULL
     tp = NULL
@@ -381,8 +380,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     nMinor = NULL
     if (sum(nA,na.rm=T) < sum(nB,na.rm=T)) {
       nMinor = nA
-    }
-    else {
+    } else {
       nMinor = nB
     }
     m = sum(abs(nMinor - pmax(round(nMinor),0))^2 * s[,"length"] * ifelse(s[,"b"]==0.5,0.05,1), na.rm=T)
@@ -465,20 +463,17 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
           write(c(paste("hs",frame[start,1],sep=""),frame[start,2],frame[(start+size-1),2],valB), file = paste(circos,"_minor",sep=""), ncolumns = 4, append = TRUE, sep = "\t")
           start=start+size
         }
-      }
-      else{
+      } else{
         print("Major and minor allele copy numbers are segmented differently.")
       }
     }
     
     if (is.na(nonroundedprofilepng)) {
       dev.new(10,5)
-    }
-    else {
+    } else {
       if(pdfPlot){
         pdf(file = nonroundedprofilepng, width = 20, height = y_limit, pointsize=20)
-      }
-      else{
+      } else{
         png(filename = nonroundedprofilepng, width = 2000, height = (y_limit*100), res = 200)
       }
     }
@@ -559,12 +554,10 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
       if (nAraw+nBraw<0) {
         nAraw = 0
         nBraw = 0
-      }
-      else if (nAraw<0) {
+      } else if (nAraw<0) {
         nBraw = nAraw+nBraw
         nAraw = 0
-      }
-      else if (nBraw<0) {
+      } else if (nBraw<0) {
         nAraw = nAraw+nBraw
         nBraw = 0
       }
@@ -587,8 +580,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
       if (is.null(seg)) {
         seg = t(as.matrix(c(start,end,nA,nB)))
         seg_raw = t(as.matrix(c(start,end,nA,nB,nAraw,nBraw)))
-      }
-      else {
+      } else {
         seg = rbind(seg,c(start,end,nA,nB))
         seg_raw = rbind(seg_raw,c(start,end,nA,nB,nAraw,nBraw))
       }
@@ -607,19 +599,16 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
              chrhelp[seg2[i,"end"]]==chrhelp[seg2[i+1,"start"]]) {
             segline = c(seg2[i,"start"],seg2[i+1,"end"],seg2[i,3:4])
             skipnext = T
-          }
-          else {
+          } else {
             segline = seg2[i,]
           }
           
           if (is.null(seg)) {
             seg = t(as.matrix(segline))
-          }
-          else {
+          } else {
             seg = rbind(seg,segline)
           }
-        }
-        else {
+        } else {
           skipnext = F
         }
       }
@@ -662,12 +651,10 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     # plot ASCAT profile
     if (is.na(copynumberprofilespng)) {
       dev.new(10,2.5)
-    }
-    else {
+    } else {
       if(pdfPlot){
         pdf(file = copynumberprofilespng, width = 20, height = y_limit, pointsize=20)
-      }
-      else{
+      } else{
         png(filename = copynumberprofilespng, width = 2000, height = (y_limit*100), res = 200)
       }
     }
@@ -720,9 +707,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     return(list(rho = rho_opt1, psi = psi_opt1, goodnessOfFit = goodnessOfFit_opt1, nonaberrant = nonaberrant,
                 nA = n1all, nB = n2all, seg = seg, seg_raw = seg_raw, distance_matrix = d))
     
-  }
-  
-  else {
+  } else {
     
     name=gsub(".sunrise.png","",basename(distancepng))
     
@@ -760,8 +745,7 @@ make_segments = function(r,b) {
       count=1;
       pcf_segments[index, "r"] = m[i,1];
       pcf_segments[index, "b"] = m[i,2];
-    }
-    else {
+    } else {
       count = count + 1;
     }
     pcf_segments[index, "length"] = count;
@@ -792,8 +776,7 @@ create_distance_matrix = function(segments, gamma) {
       nMinor = NULL
       if (sum(nA,na.rm=T) < sum(nB,na.rm=T)) {
         nMinor = nA
-      }
-      else {
+      } else {
         nMinor = nB
       }
       d[i,j] = sum(abs(nMinor - pmax(round(nMinor),0))^2 * s[,"length"] * ifelse(s[,"b"]==0.5,0.05,1), na.rm=T)

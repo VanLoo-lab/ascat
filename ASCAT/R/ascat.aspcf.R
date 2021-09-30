@@ -110,8 +110,7 @@ ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), asc
           if(length(logRaveraged)<6) {
             logRASPCF = rep(mean(logRaveraged),length(logRaveraged))
             bafASPCF = rep(mean(bafselwins),length(logRaveraged))
-          }
-          else {
+          } else {
             PCFed = fastAspcf(logRaveraged,bafselwins,6,segmentlength)
             logRASPCF = PCFed$yhat1
             bafASPCF = PCFed$yhat2
@@ -125,11 +124,9 @@ ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), asc
             # if probe is 1, set the beginning, and let the loop go:
             if(probe == length(logRASPCF)) {
               logRc = c(logRc,rep(logRASPCF[probe],length(lr)-indices[probe]))
-            }
-            else if(logRASPCF[probe]==logRASPCF[probe+1]) {
+            } else if(logRASPCF[probe]==logRASPCF[probe+1]) {
               logRc = c(logRc, rep(logRASPCF[probe],indices[probe+1]-indices[probe]))
-            }
-            else {
+            } else {
               #find best breakpoint
               d = numeric(0)
               totall = indices[probe+1]-indices[probe]
@@ -157,9 +154,7 @@ ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), asc
           }
           logRPCFed = c(logRPCFed,logRd)
           bafPCFed = c(bafPCFed,bafASPCF)
-        }
-        # add a LogR segment
-        else {
+        } else { # add a LogR segment
           level = mean(lr,na.rm=T)
           reps = length(lr)
           logRPCFed = c(logRPCFed,rep(level,reps))
@@ -217,8 +212,7 @@ ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), asc
         #making sure no NA's get filled in...
         if(is.nan(level)) {
           level=prevlevel
-        }
-        else {
+        } else {
           prevlevel=level
         }
         logRPCFed = c(logRPCFed, rep(level,seg[i]))
@@ -278,8 +272,7 @@ predictGermlineHomozygousStretches = function(chr, hom) {
         if(!is.na(hschr[probe])) {
           if(hschr[probe]) {
             hprobes = c(hprobes,probe)
-          }
-          else {
+          } else {
             if(length(hprobes)>=homthres) {
               allhprobes = rbind(allhprobes,c(chrke,chr[[chrke]][min(hprobes)],chr[[chrke]][max(hprobes)]))
             }

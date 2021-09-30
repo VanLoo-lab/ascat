@@ -45,64 +45,55 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6", img.d
     proportionHomo = 0.38
     proportionOpen = 0.02
     segmentLength = 20
-  }
-  else if (platform=="IlluminaASA") {
+  } else if (platform=="IlluminaASA") {
     maxHomozygous = 0.05
     proportionHetero = 0.15
     proportionHomo = 0.82
     proportionOpen = 0.01
     segmentLength = 100
-  }
-  else if (platform=="IlluminaGSAv3") {
+  } else if (platform=="IlluminaGSAv3") {
     maxHomozygous = 0.05
     proportionHetero = 0.16
     proportionHomo = 0.80
     proportionOpen = 0.01
     segmentLength = 100
-  }
-  else if (platform=="Illumina109k") {
+  } else if (platform=="Illumina109k") {
     maxHomozygous = 0.05
     proportionHetero = 0.35
     proportionHomo = 0.60
     proportionOpen = 0.02
     segmentLength = 20
-  }
-  else if (platform=="IlluminaCytoSNP") {
+  } else if (platform=="IlluminaCytoSNP") {
     maxHomozygous = 0.05
     proportionHetero = 0.28
     proportionHomo = 0.62
     proportionOpen = 0.03
     segmentLength = 100
-  }
-  else if (platform=="IlluminaCytoSNP850k") {
+  } else if (platform=="IlluminaCytoSNP850k") {
     maxHomozygous = 0.05
     proportionHetero = 0.23
     proportionHomo = 0.72
     proportionOpen = 0.01
     segmentLength = 60
-  }
-  else if (platform=="Illumina610k") {
+  } else if (platform=="Illumina610k") {
     maxHomozygous = 0.05
     proportionHetero = 0.295
     proportionHomo = 0.67
     proportionOpen = 0.015
     segmentLength = 30
-  }
-  else if (platform=="Illumina660k") {
+  } else if (platform=="Illumina660k") {
     maxHomozygous = 0.05
     proportionHetero = 0.295
     proportionHomo = 0.67
     proportionOpen = 0.015
     segmentLength = 30
-  }
-  else if (platform=="Illumina700k") {
+  } else if (platform=="Illumina700k") {
     maxHomozygous = 0.05
     proportionHetero = 0.295
     proportionHomo = 0.67
     proportionOpen = 0.015
     segmentLength = 30
-  }
-  else if (platform=="Illumina1M") {
+  } else if (platform=="Illumina1M") {
     maxHomozygous = 0.05
     proportionHetero = 0.22
     proportionHomo = 0.74
@@ -112,57 +103,49 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6", img.d
     #proportionHetero = 0.24
     #proportionOpen = 0.01
     #segmentLength = 60
-  }
-  else if (platform=="Illumina2.5M") {
+  } else if (platform=="Illumina2.5M") {
     maxHomozygous = 0.05
     proportionHetero = 0.21
     proportionHomo = 0.745
     proportionOpen = 0.03
     segmentLength = 100
-  }
-  else if (platform=="IlluminaOmni5") {
+  } else if (platform=="IlluminaOmni5") {
     maxHomozygous = 0.05
     proportionHetero = 0.13
     proportionHomo = 0.855
     proportionOpen = 0.01
     segmentLength = 100
-  }
-  else if (platform=="Affy10k") {
+  } else if (platform=="Affy10k") {
     maxHomozygous = 0.04
     proportionHetero = 0.355
     proportionHomo = 0.605
     proportionOpen = 0.025
     segmentLength = 20
-  }
-  else if (platform=="Affy100k") {
+  } else if (platform=="Affy100k") {
     maxHomozygous = 0.05
     proportionHetero = 0.27
     proportionHomo = 0.62
     proportionOpen = 0.09
     segmentLength = 30
-  }
-  else if (platform=="Affy250k_sty") {
+  } else if (platform=="Affy250k_sty") {
     maxHomozygous = 0.05
     proportionHetero = 0.26
     proportionHomo = 0.66
     proportionOpen = 0.05
     segmentLength = 50
-  }
-  else if (platform=="Affy250k_nsp") {
+  } else if (platform=="Affy250k_nsp") {
     maxHomozygous = 0.05
     proportionHetero = 0.26
     proportionHomo = 0.66
     proportionOpen = 0.05
     segmentLength = 50
-  }
-  else if (platform=="AffySNP6") {
+  } else if (platform=="AffySNP6") {
     maxHomozygous = 0.05
     proportionHetero = 0.25
     proportionHomo = 0.67
     proportionOpen = 0.04
     segmentLength = 100
-  }
-  else if (platform=="AffyOncoScan") {
+  } else if (platform=="AffyOncoScan") {
     maxHomozygous = 0.04
     proportionHetero = 0.355
     proportionHomo = 0.605
@@ -173,8 +156,7 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6", img.d
     # proportionHomo = 0.69
     # proportionOpen = 0.04
     # segmentLength = 30
-  }
-  else if (platform=="AffyCytoScanHD") {
+  } else if (platform=="AffyCytoScanHD") {
     # maxHomozygous = 0.05
     # proportionHetero = 0.26
     # proportionHomo = 0.69
@@ -185,41 +167,38 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6", img.d
     proportionHomo = 0.60
     proportionOpen = 0.03
     segmentLength = 100
-  }
-  else if (platform=="HumanCNV370quad") {
+  } else if (platform=="HumanCNV370quad") {
     maxHomozygous = 0.05
     proportionHetero = 0.295
     proportionHomo = 0.67
     proportionOpen = 0.015
     segmentLength = 20
-  } 
-  else if (platform=="HumanCore12") {
+  } else if (platform=="HumanCore12") {
     maxHomozygous = 0.05
     proportionHetero = 0.295
     proportionHomo = 0.67
     proportionOpen = 0.015
     segmentLength = 20
-  }
-  else if (platform=="HumanCoreExome24") {
+  } else if (platform=="HumanCoreExome24") {
     maxHomozygous = 0.05
     proportionHetero = 0.175
     proportionHomo = 0.79
     proportionOpen = 0.02
     segmentLength = 100
-  }
-  else if (platform=="HumanOmniExpress12") {
+  } else if (platform=="HumanOmniExpress12") {
     maxHomozygous = 0.05
     proportionHetero = 0.295
     proportionHomo = 0.67
     proportionOpen = 0.015
     segmentLength = 100
-  }
-  else if (platform=="IlluminaOmniExpressExome") {
+  } else if (platform=="IlluminaOmniExpressExome") {
     maxHomozygous = 0.05
     proportionHetero = 0.35
     proportionHomo = 0.60
     proportionOpen = 0.03
     segmentLength = 100
+  } else {
+    print("Error: platform unknown")
   }
   #   else if (platform=="OmniZhonghua8") {
   #     maxHomozygous = 0.05
@@ -228,9 +207,7 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6", img.d
   #     proportionOpen = 0.015
   #     segmentLength = 100
   #   }
-  else {
-    print("Error: platform unknown")
-  }
+
   
   failedarrays = NULL
   
@@ -312,31 +289,25 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6", img.d
             probe = chrNonHomoProbes[probeNr]
             if(!is.na(chrNonHomoProbesStartWindowLeft[probeNr])&!is.na(chrNonHomoProbesEndWindowLeft[probeNr])) {
               medianLeft = median(bsmHNA[chrNonHomoProbesStartWindowLeft[probeNr]:chrNonHomoProbesEndWindowLeft[probeNr]], na.rm=T)
-            }
-            else {
+            } else {
               medianLeft = NA
             }
             if(!is.na(chrNonHomoProbesStartWindowRight[probeNr])&!is.na(chrNonHomoProbesEndWindowRight[probeNr])) {
               medianRight = median(bsmHNA[chrNonHomoProbesStartWindowRight[probeNr]:chrNonHomoProbesEndWindowRight[probeNr]], na.rm=T)
-            }
-            else {
+            } else {
               medianRight = NA
             }
             
             if(!is.na(chrNonHomoProbesStartWindowMiddle[probeNr])&!is.na(chrNonHomoProbesEndWindowMiddle[probeNr])) {
               medianMiddle = median(c(bsmHNA[chrNonHomoProbesStartWindowMiddle[probeNr]:chrNonHomoProbesEndWindowLeft[probeNr]],
                                       bsmHNA[chrNonHomoProbesStartWindowRight[probeNr]:chrNonHomoProbesEndWindowMiddle[probeNr]]), na.rm=T)
-            }
-            else {
+            } else {
               medianMiddle = NA
             }
             
             chrLowestDist[probeNr] = min(abs(medianLeft-bsm[probe]),abs(medianRight-bsm[probe]),abs(medianMiddle-bsm[probe]),Inf,na.rm=T)
           }
-        }
-        
-        # if too few probes on the chromosome
-        else {
+        } else { # if too few probes on the chromosome
           chrLowestDist = NULL
           if (length(chrNonHomoProbes)>0) {
             # 1 is higher than any practical distance

@@ -425,8 +425,11 @@ ascat.plotAdjustedAscatProfile=function(ASCAT_output_object,REF,y_limit=5,plot_u
   REF$size=REF$end-REF$start+1
   REF$middle=0
   for (i in 1:nrow(REF)) {
-    if (i==1) REF$middle[i]=REF$size[i]/2
-    else REF$middle[i]=sum(as.numeric(REF$size[1:(i-1)]))+REF$size[i]/2
+    if (i==1) {
+      REF$middle[i]=REF$size[i]/2
+    } else {
+      REF$middle[i]=sum(as.numeric(REF$size[1:(i-1)]))+REF$size[i]/2
+    }
   }; rm(i)
   REF$cumul=cumsum(as.numeric(REF$size))
   REF$add=cumsum(as.numeric(c(0,REF$size[1:(nrow(REF)-1)])))
