@@ -37,6 +37,26 @@ ascat.asmultipcf <- function(ASCATobj, ascat.gg = NULL, penalty = 70, wsample=NU
     gg = ASCATobj$Germline_BAF < 0.3 | ASCATobj$Germline_BAF > 0.7
   }
   
+  # in asmultipcf, we're expecting one germline (could be multiple germlines but we're only using the first one)
+  if (ncol(gg)>1) gg=gg[,1]
+  # specific process for nonPAR in males
+  if (!is.null(ASCATobj$X_nonPAR) && ASCATobj$gender[1]=='XY') {
+    # select SNPs with non-NA BAF values in nonPAR region
+    nonPAR_index=which(ASCATobj$SNPpos$Chr=='X' & ASCATobj$SNPpos$Position>=ASCATobj$X_nonPAR[1] & ASCATobj$SNPpos$Position<=ASCATobj$X_nonPAR[2] & !is.na(gg))
+    # store hmz/htz information for autosomes
+    autosomes_info=table(gg[which(ASCATobj$SNPpos$Chr %in% setdiff(ASCATobj$chrs,ASCATobj$sexchromosomes))])
+    if (length(nonPAR_index)>5) {
+      # set all to hmz
+      gg[nonPAR_index]=T
+      # compute distance to BAF=0/1
+      DIST=1-sapply(ASCATobj$Germline_BAF[nonPAR_index,1],function(x) {if (x>0.5) return(x) else return(1-x)})
+      # select X% (derived from autosomes) of SNPs based on closest distance to BAF=0/1 and force those to be considered for ASPCF
+      gg[nonPAR_index[which(rank(DIST,ties.method='random')<=round(length(DIST)*(autosomes_info['FALSE']/sum(autosomes_info))))]]=F
+      rm(DIST)
+    }
+    rm(nonPAR_index,autosomes_info)
+  }
+  
   segmentlengths = unique(c(penalty,25,50,100,200,400,800))
   segmentlengths = segmentlengths[segmentlengths>=penalty]
   for (segmentlength in segmentlengths) {
