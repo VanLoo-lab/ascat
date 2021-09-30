@@ -113,7 +113,7 @@ ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = 
     if (genomeVersion=='hg19') {
       X_nonPAR=c(2699521,154931043)
     } else if (genomeVersion=='hg38') {
-      X_nonPar=c(2781480,155701382)
+      X_nonPAR=c(2781480,155701382)
     } else {
       stop('genomeVersion must be either \'hg19\' or \'hg38\'.')
     }
