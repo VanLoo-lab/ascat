@@ -289,6 +289,7 @@ ascat.prepareHTS = function(tumourseqfile, normalseqfile, tumourname, normalname
 readAlleleCountFiles=function(prefix,suffix,chrom_names,minCounts) {
   files=paste0(prefix,chrom_names,suffix)
   files=files[sapply(files,function(x) file.exists(x) && file.info(x)$size>0)]
+  stopifnot(length(files)>0)
   data=do.call(rbind,lapply(files,function(x) {
     tmp=data.frame(data.table::fread(x,sep='\t',showProgress=F,header=T),stringsAsFactors=F)
     tmp=tmp[tmp[,7]>=minCounts,]
@@ -296,6 +297,7 @@ readAlleleCountFiles=function(prefix,suffix,chrom_names,minCounts) {
     rownames(tmp)=paste0(tmp[,1],'_',tmp[,2])
     return(tmp)
   }))
+  stopifnot(nrow(data)>0)
   return(data)
 }
 
@@ -304,6 +306,7 @@ readAlleleCountFiles=function(prefix,suffix,chrom_names,minCounts) {
 readAllelesFiles=function(prefix,suffix,chrom_names) {
   files=paste0(prefix,chrom_names,suffix)
   files=files[sapply(files,function(x) file.exists(x) && file.info(x)$size>0)]
+  stopifnot(length(files)>0)
   data=do.call(rbind,lapply(files,function(x) {
     tmp=data.frame(data.table::fread(x,sep='\t',showProgress=F,header=T))
     tmp=tmp[!is.na(tmp[,2] & !is.na(tmp[,3])),]
@@ -313,6 +316,7 @@ readAllelesFiles=function(prefix,suffix,chrom_names) {
     rownames(tmp)=paste0(tmp[,1],'_',tmp[,2])
     return(tmp)
   }))
+  stopifnot(nrow(data)>0)
   return(data)
 }
 
@@ -321,11 +325,13 @@ readAllelesFiles=function(prefix,suffix,chrom_names) {
 readLociFiles=function(prefix,suffix,chrom_names) {
   files=paste0(prefix,chrom_names,suffix)
   files=files[sapply(files,function(x) file.exists(x) && file.info(x)$size>0)]
+  stopifnot(length(files)>0)
   data=do.call(rbind,lapply(files,function(x) {
     tmp=data.frame(data.table::fread(x,sep='\t',showProgress=F,header=F))
     tmp[,1]=gsub('^chr','',tmp[,1])
     rownames(tmp)=paste0(tmp[,1],'_',tmp[,2])
     return(tmp)
   }))
+  stopifnot(nrow(data)>0)
   return(data)
 }
