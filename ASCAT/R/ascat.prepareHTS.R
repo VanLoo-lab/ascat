@@ -44,13 +44,13 @@ ascat.getAlleleCounts = function(seq.file, output.file, loci.file, min.base.qual
 #' @param gender Gender information, either 'XX' (=female) or 'XY' (=male).
 #' @param genomeVersion Genome version, either 'hg19' or 'hg38'.
 #' @param chrom_names A vector with allowed chromosome names (optional, default=c(1:22,'X')).
-#' @param minCounts Minimum depth, in mormal, required for a SNP to be considered (optional, default=8).
+#' @param minCounts Minimum depth, in mormal, required for a SNP to be considered (optional, default=20).
 #' @param BED_file A BED file for only looking at SNPs within specific intervals (optional, default=NA).
 #' @param probloci_file A file (chromosome <tab> position; no header) containing specific loci to ignore (optional, default=NA).
 #' @param seed A seed to be set for when randomising the alleles (optional, default=as.integer(Sys.time())).
 #' @author dw9, sd11, tl
 #' @export
-ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, normalAlleleCountsFile.prefix, tumourLogR_file, tumourBAF_file, normalLogR_file, normalBAF_file, alleles.prefix, gender, genomeVersion, chrom_names=c(1:22,'X'), minCounts=8, BED_file=NA, probloci_file=NA, seed=as.integer(Sys.time())) {
+ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, normalAlleleCountsFile.prefix, tumourLogR_file, tumourBAF_file, normalLogR_file, normalBAF_file, alleles.prefix, gender, genomeVersion, chrom_names=c(1:22,'X'), minCounts=20, BED_file=NA, probloci_file=NA, seed=as.integer(Sys.time())) {
   set.seed(seed)
   stopifnot(gender %in% c('XX','XY'))
   stopifnot(genomeVersion %in% c('hg19','hg38'))
