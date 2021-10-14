@@ -3,6 +3,7 @@
 export(ascat.GCcorrect)
 export(ascat.asmultipcf)
 export(ascat.aspcf)
+export(ascat.correctLogR)
 export(ascat.getAlleleCounts)
 export(ascat.getBAFsAndLogRs)
 export(ascat.loadData)

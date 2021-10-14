@@ -1,4 +1,4 @@
-#' @title ascat.GCcorrect
+#' @title ascat.correctLogR
 #' @description Corrects logR of the tumour sample(s) with genomic GC content (replication timing is optional)
 #' @param ASCATobj an ASCAT object
 #' @param GCcontentfile File containing the GC content around every SNP for increasing window sizes
@@ -7,7 +7,7 @@
 #' @return ASCAT object with corrected tumour logR
 #'
 #' @export
-ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL, replictimingfile = NULL) {
+ascat.correctLogR = function(ASCATobj, GCcontentfile = NULL, replictimingfile = NULL) {
   if (is.null(GCcontentfile)) {
     stop("No GC content file given!")
   } else {
@@ -132,6 +132,16 @@ ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL, replictimingfile = NU
     ASCATobj$RT_correction_after=RT_correction_after
     return(ASCATobj)
   }
+}
+
+#' @title ascat.GCcorrect
+#' @description Function kept for backward compatibility, please use ascat.correctLogR instead
+#' @param ASCATobj an ASCAT object
+#' @param GCcontentfile File containing the GC content around every SNP for increasing window sizes
+#' @export
+ascat.GCcorrect = function(ASCATobj, GCcontentfile = NULL) {
+  warning('Please consider using ascat.correctLogR instead of ascat.GCcorrect.')
+  return(ascat.correctLogR(ASCATobj=ASCATobj, GCcontentfile=GCcontentfile, replictimingfile=NULL))
 }
 
 #' Function to read any type of correction file (should have very similar format: SNP ID, Chr, Position and then data)
