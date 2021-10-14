@@ -23,6 +23,7 @@ This repository also contains the code underlying additional publication:
 
 ### Minor changes:
 - *ascat.plotRawData* and *ascat.plotSegmentedData* have an extra parameter (*logr.y_values*) to change Y scale for the logR track. Default is: c(-2,2), whereas previous plot were: c(-1,1).
+- *Aberrant cell fraction* now refers to *purity*. For backward compatibility, *ascat.output$aberrantcellfraction* still exists but we encourage using *ascat.output$purity* instead.
 
 ### New features in v3.0:
 - New set of instructions, as part of the main *ascat.prepareHTS* function, to derive logR and BAF from high-throughput sequencing (HTS) data (WES, WGS & targeted sequencing). Briefly, [alleleCounter](https://github.com/cancerit/alleleCount) is used to get allele counts at specific loci on a pair of tumour/normal (either BAM or CRAM files). This information is then converted into logR and BAF values, based on a similar method than in the [Battenberg package](https://github.com/Wedge-lab/battenberg). Although this method allows running ASCAT on different HTS data:

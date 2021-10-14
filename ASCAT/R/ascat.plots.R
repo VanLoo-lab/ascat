@@ -138,7 +138,7 @@ ascat.plotSegmentedData = function(ASCATobj, img.dir=".", img.prefix="", logr.y_
 #'
 #' @param d distance matrix for a range of ploidy and tumour percentage values
 #' @param psi_opt1 optimal ploidy
-#' @param rho_opt1 optimal aberrant cell fraction
+#' @param rho_opt1 optimal purity
 #' @param minim when set to true, optimal regions in the sunrise plot are depicted in blue; if set to false, colours are inverted and red corresponds to optimal values (default: TRUE)
 #'
 #' @return plot visualising range of ploidy and tumour percentage values
@@ -152,7 +152,7 @@ ascat.plotSunrise<-function(d, psi_opt1, rho_opt1, minim=T){
   } else {
     hmcol = colorRampPalette(RColorBrewer::brewer.pal(10, "RdBu"))(256)
   } 
-  image(log(d), col = hmcol, axes = F, xlab = "Ploidy", ylab = "Aberrant cell fraction")
+  image(log(d), col = hmcol, axes = F, xlab = "Ploidy", ylab = "Purity")
   
   ploidy_min<-as.numeric(rownames(d)[1])
   ploidy_max<-as.numeric(rownames(d)[nrow(d)])
@@ -187,7 +187,7 @@ ascat.plotSunrise<-function(d, psi_opt1, rho_opt1, minim=T){
 #'
 #' @export
 ascat.plotNonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant, nAfull, nBfull,y_limit=5,bafsegmented,ch,lrr, chrs){
-  maintitle = paste("Ploidy: ",sprintf("%1.2f",ploidy),", aberrant cell fraction: ",sprintf("%2.0f",rho*100),"%, goodness of fit: ",sprintf("%2.1f",goodnessOfFit),"%", ifelse(nonaberrant,", non-aberrant",""),sep="")
+  maintitle = paste("Ploidy: ",sprintf("%1.2f",ploidy),", purity: ",sprintf("%2.0f",rho*100),"%, goodness of fit: ",sprintf("%2.1f",goodnessOfFit),"%", ifelse(nonaberrant,", non-aberrant",""),sep="")
   nBfullPlot<-ifelse(nBfull<y_limit, nBfull, y_limit+0.1)
   nAfullPlot<-ifelse((nAfull+nBfull)<y_limit, nAfull+nBfull, y_limit+0.1)
   colourTotal = "#c725e3" # purple
@@ -212,7 +212,7 @@ ascat.plotNonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant, nAfull
 #  @return plot showing Battenberg average copy number profile using base plotting function
 #
 # create.bb.plot.average = function(BAFvals, subclones, bafsegmented, ploidy, rho, goodnessOfFit, pos_min, pos_max, segment_states_min, segment_states_tot, chr.segs){
-#   maintitle = paste("Ploidy: ",sprintf("%1.2f",ploidy),", aberrant cell fraction: ",sprintf("%2.0f",rho*100),"%, goodness of fit: ",sprintf("%2.1f",goodnessOfFit*100),"%",sep="")
+#   maintitle = paste("Ploidy: ",sprintf("%1.2f",ploidy),", purity: ",sprintf("%2.0f",rho*100),"%, goodness of fit: ",sprintf("%2.1f",goodnessOfFit*100),"%",sep="")
 #   nTotal = array(NA, nrow(BAFvals))
 #   nMinor = array(NA, nrow(BAFvals))
 #   for (i in 1:nrow(subclones)) {
@@ -340,7 +340,7 @@ ascat.plotAscatProfile<-function(n1all, n2all, heteroprobes, ploidy, rho, goodne
   colourTotal="#e03546" # red
   colourMinor="#3557e0" # blue
   
-  maintitle = paste("Ploidy: ",sprintf("%1.2f",ploidy),", aberrant cell fraction: ",sprintf("%2.0f",rho*100),"%, goodness of fit: ",sprintf("%2.1f",goodnessOfFit),"%", ifelse(nonaberrant,", non-aberrant",""),sep="")
+  maintitle = paste("Ploidy: ",sprintf("%1.2f",ploidy),", purity: ",sprintf("%2.0f",rho*100),"%, goodness of fit: ",sprintf("%2.1f",goodnessOfFit),"%", ifelse(nonaberrant,", non-aberrant",""),sep="")
   base.gw.plot(bafsegmented,nAPlot,nBPlot,colourTotal,colourMinor,maintitle,ch,lrr,chrs,y_limit,twoColours=TRUE)
 }
 
@@ -449,7 +449,7 @@ ascat.plotAdjustedAscatProfile=function(ASCAT_output_object,REF,y_limit=5,plot_u
   for (SAMPLE in sort(unique(SEGMENTS$sample))) {
     SEGS=SEGMENTS[which(SEGMENTS$sample==SAMPLE),]
     if (nrow(SEGS)==0) warning(paste0('No segments for sample: ',SAMPLE))
-    maintitle = paste("Ploidy: ",sprintf("%1.2f",ASCAT_output_object$ploidy[SAMPLE]),", aberrant cell fraction: ",sprintf("%2.0f",ASCAT_output_object$aberrantcellfraction[SAMPLE]*100),"%, goodness of fit: ",sprintf("%2.1f",ASCAT_output_object$goodnessOfFit[SAMPLE]),"%", ifelse(isTRUE(ASCAT_output_object$nonaberrantarrays[SAMPLE]),", non-aberrant",""),sep="")
+    maintitle = paste("Ploidy: ",sprintf("%1.2f",ASCAT_output_object$ploidy[SAMPLE]),", purity: ",sprintf("%2.0f",ASCAT_output_object$purity[SAMPLE]*100),"%, goodness of fit: ",sprintf("%2.1f",ASCAT_output_object$goodnessOfFit[SAMPLE]),"%", ifelse(isTRUE(ASCAT_output_object$nonaberrantarrays[SAMPLE]),", non-aberrant",""),sep="")
     png(filename = paste0(png_prefix,SAMPLE,'.adjusted',ifelse(plot_unrounded,'rawprofile','ASCATprofile'),'.png'), width = 2000, height = (y_limit*100), res = 200)
     par(mar = c(0.5,5,5,0.5), cex = 0.4, cex.main=3, cex.axis = 2.5)
     ticks=seq(0, y_limit, 1)

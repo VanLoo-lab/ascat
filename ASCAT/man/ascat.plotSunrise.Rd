@@ -11,7 +11,7 @@ ascat.plotSunrise(d, psi_opt1, rho_opt1, minim = T)
 
 \item{psi_opt1}{optimal ploidy}
 
-\item{rho_opt1}{optimal aberrant cell fraction}
+\item{rho_opt1}{optimal purity}
 
 \item{minim}{when set to true, optimal regions in the sunrise plot are depicted in blue; if set to false, colours are inverted and red corresponds to optimal values (default: TRUE)}
 }

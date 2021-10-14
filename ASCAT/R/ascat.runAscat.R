@@ -14,13 +14,14 @@
 #' @return an ASCAT output object, containing:\cr
 #' 1. nA: copy number of the A allele\cr
 #' 2. nB: copy number of the B allele\cr
-#' 3. aberrantcellfraction: the aberrant cell fraction of all arrays\cr
-#' 4. ploidy: the ploidy of all arrays\cr
-#' 5. failedarrays: arrays on which ASCAT analysis failed\cr
-#' 6. nonaberrantarrays: arrays on which ASCAT analysis indicates that they show virtually no aberrations\cr
-#' 7. segments: an array containing the copy number segments of each sample (not including failed arrays)\cr
-#' 8. segments_raw: an array containing the copy number segments of each sample without any rounding applied\cr
-#' 9. distance_matrix: distances for a range of ploidy and tumor percentage values
+#' 3. purity: the tumour purity of all arrays\cr
+#' 4. aberrantcellfraction: the aberrant cell fraction (=tumour purity) of all arrays\cr
+#' 5. ploidy: the ploidy of all arrays\cr
+#' 6. failedarrays: arrays on which ASCAT analysis failed\cr
+#' 7. nonaberrantarrays: arrays on which ASCAT analysis indicates that they show virtually no aberrations\cr
+#' 8. segments: an array containing the copy number segments of each sample (not including failed arrays)\cr
+#' 9. segments_raw: an array containing the copy number segments of each sample without any rounding applied\cr
+#' 10. distance_matrix: distances for a range of ploidy and tumor percentage values
 #'
 #' @export
 #'
@@ -147,7 +148,7 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
     distance_matrix = NULL
   }
   
-  return(list(nA = n1, nB = n2, aberrantcellfraction = tp, ploidy = ploidy, psi = psi, goodnessOfFit = goodnessOfFit,
+  return(list(nA = n1, nB = n2, purity = tp, aberrantcellfraction = tp, ploidy = ploidy, psi = psi, goodnessOfFit = goodnessOfFit,
               failedarrays = fa, nonaberrantarrays = naarrays, segments = seg, segments_raw = seg_raw, distance_matrix = distance_matrix))
 }
 

@@ -64,7 +64,7 @@ ascat.metrics = function(ASCAT_input_object,ASCAT_output_object) {
       frac_homo=NA
     }
     if (!is.null(ASCAT_output_object$segments) && SAMPLE %in% ASCAT_output_object$segments$sample) {
-      purity=round(as.numeric(ASCAT_output_object$aberrantcellfraction[SAMPLE]),4)
+      purity=round(as.numeric(ASCAT_output_object$purity[SAMPLE]),4)
       ploidy=round(as.numeric(ASCAT_output_object$ploidy[SAMPLE]),4)
       goodness_of_fit=round(ASCAT_output_object$goodnessOfFit[SAMPLE],4)
       profile=ASCAT_output_object$segments[ASCAT_output_object$segments$sample==SAMPLE,]
