@@ -48,11 +48,15 @@ ascat.asmultipcf <- function(ASCATobj, ascat.gg = NULL, penalty = 70, wsample=NU
     if (length(nonPAR_index)>5) {
       # set all to hmz
       gg[nonPAR_index]=T
-      # compute distance to BAF=0/1
-      DIST=1-sapply(ASCATobj$Germline_BAF[nonPAR_index,1],function(x) {if (x>0.5) return(x) else return(1-x)})
-      # select X% (derived from autosomes) of SNPs based on closest distance to BAF=0/1 and force those to be considered for ASPCF
-      gg[nonPAR_index[which(rank(DIST,ties.method='random')<=round(length(DIST)*(autosomes_info['FALSE']/sum(autosomes_info))))]]=F
-      rm(DIST)
+      if (!is.null(ASCATobj$Germline_BAF)) {
+        # compute distance to BAF=0/1
+        DIST=1-sapply(ASCATobj$Germline_BAF[nonPAR_index,1],function(x) {if (x>0.5) return(x) else return(1-x)})
+        # select X% (derived from autosomes) of SNPs based on closest distance to BAF=0/1 and force those to be considered for ASPCF
+        gg[nonPAR_index[which(rank(DIST,ties.method='random')<=round(length(DIST)*(autosomes_info['FALSE']/sum(autosomes_info))))]]=F
+        rm(DIST)
+      } else {
+        gg[sample(nonPAR_index,round(length(nonPAR_index)*(autosomes_info['FALSE']/sum(autosomes_info))))]=F
+      }
     }
     rm(nonPAR_index,autosomes_info)
   }
