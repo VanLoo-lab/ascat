@@ -469,21 +469,6 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
       }
     }
     
-    if (is.na(nonroundedprofilepng)) {
-      dev.new(10,5)
-    } else {
-      if(pdfPlot){
-        pdf(file = nonroundedprofilepng, width = 20, height = y_limit, pointsize=20)
-      } else{
-        png(filename = nonroundedprofilepng, width = 2000, height = (y_limit*100), res = 200)
-      }
-    }
-    ascat.plotNonRounded(ploidy_opt1, rho_opt1, goodnessOfFit_opt1, nonaberrant, nAfull, nBfull, y_limit, bafsegmented, ch,lrr, chrnames)
-    
-    if (!is.na(nonroundedprofilepng)) {
-      dev.off()
-    }
-    
     rho = rho_opt1
     psi = psi_opt1
 
@@ -648,6 +633,21 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     n1all[homoprobes] = ifelse(baf[homoprobes]<=0.5,nMajor[homoprobes]+nMinor[homoprobes],0)
     n2all[homoprobes] = ifelse(baf[homoprobes]>0.5,nMajor[homoprobes]+nMinor[homoprobes],0)
     
+    # plot nonrounded ASCAT profile
+    if (is.na(nonroundedprofilepng)) {
+      dev.new(10,5)
+    } else {
+      if(pdfPlot){
+        pdf(file = nonroundedprofilepng, width = 20, height = y_limit, pointsize=20)
+      } else{
+        png(filename = nonroundedprofilepng, width = 2000, height = (y_limit*100), res = 200)
+      }
+    }
+    ascat.plotNonRounded(mean(n1all+n2all,na.rm=T), rho_opt1, goodnessOfFit_opt1, nonaberrant, nAfull, nBfull, y_limit, bafsegmented, ch,lrr, chrnames)
+    
+    if (!is.na(nonroundedprofilepng)) {
+      dev.off()
+    }
     
     # plot ASCAT profile
     if (is.na(copynumberprofilespng)) {
@@ -660,7 +660,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
       }
     }
     #plot ascat profile
-    ascat.plotAscatProfile(n1all, n2all, heteroprobes, ploidy_opt1, rho_opt1, goodnessOfFit_opt1, nonaberrant,y_limit, ch, lrr, bafsegmented, chrnames)
+    ascat.plotAscatProfile(n1all, n2all, heteroprobes, mean(n1all+n2all,na.rm=T), rho_opt1, goodnessOfFit_opt1, nonaberrant,y_limit, ch, lrr, bafsegmented, chrnames)
     
     
     if (!is.na(copynumberprofilespng)) {

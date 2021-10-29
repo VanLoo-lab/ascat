@@ -15,11 +15,12 @@ This repository also contains the code underlying additional publication:
 
 ## Changes since v2.5.2
 ### Major changes:
-- Default penalty for both ASPCF (*ascat.aspcf*) and ASmultiPCF (*ascat.asmultipcf*) is now 70 (was 25).
+- Default penalty for both ASPCF (*ascat.aspcf*) and ASmultiPCF (*ascat.asmultipcf*) is now 70 (was 25). It is suitable for SNP arrays, as well as WES and WGS data.
 - LogR correction can now be used to correct for both GC content (standard requirement) and replication timing (optional). Also, the correction method has been updated (it now uses autosomes to compute correlations with covariates and applies a linear model with *splines*). Please note that *ascat.correctLogR* should be used from now on (*ascat.GCcorrect* is still there for backward compatibility but is just a wrapper to *ascat.correctLogR*).
 - Color scheme has been changed for CNA profiles:
 	- Rounded profiles: TBD1 is the major allele and TBD2 is the minor allele.
 	- Unrounded profiles: TBD3 is the total CN and TBD4 is the minor allele.
+- Ploidy value displayed in CNA profiles no longers comes from the grid search and is now the final tumour ploidy (matching with `ascat.output$ploidy`).
 
 ### Minor changes:
 - *ascat.plotRawData* and *ascat.plotSegmentedData* have an extra parameter (*logr.y_values*) to change Y scale for the logR track. Default is: c(-2,2), whereas previous plot were: c(-1,1).
