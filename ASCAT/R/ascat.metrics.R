@@ -92,12 +92,14 @@ ascat.metrics = function(ASCAT_input_object,ASCAT_output_object) {
       } else {
         if (mode_majA==1) {
           WGD=0
+          GI=computeGIscore(WGD,profile)
         } else if (mode_majA==2) {
           WGD=1
+          GI=computeGIscore(WGD,profile)
         } else if (mode_majA %in% 3:5) {
-          WGD=2
+          WGD='1+'
+          GI=computeGIscore(1,profile)
         }
-        GI=computeGIscore(WGD,profile)
       }
       rm(profile)
     } else {
