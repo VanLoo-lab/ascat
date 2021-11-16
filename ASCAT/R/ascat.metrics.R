@@ -71,13 +71,13 @@ ascat.metrics = function(ASCAT_input_object,ASCAT_output_object) {
       profile$size=profile$endpos-profile$startpos+1
       n_segs=nrow(profile)
       segs_size=sum(profile$size)
-      n_segs_1kSNP=n_segs/(length(ascat.bc$Tumor_BAF_segmented[[nSAMPLE]])/1e3)
+      n_segs_1kSNP=round(n_segs/(length(ascat.bc$Tumor_BAF_segmented[[nSAMPLE]])/1e3),4)
       INDEX_HD=which(profile$nMajor==0 & profile$nMinor==0)
       if (length(INDEX_HD)>0) {
         homdel_segs=length(INDEX_HD)
         homdel_largest=max(profile$size[INDEX_HD])
         homdel_size=sum(profile$size[INDEX_HD])
-        homdel_fraction=homdel_size/sum(profile$size)
+        homdel_fraction=round(homdel_size/sum(profile$size),4)
       } else {
         homdel_segs=homdel_largest=homdel_size=homdel_fraction=0
       }
