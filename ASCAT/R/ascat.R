@@ -1563,7 +1563,8 @@ ascat.plotSunrise<-function(d, psi_opt1, rho_opt1, minim=T){
   purity_min<-as.numeric(colnames(d)[1])
   purity_max<-as.numeric(colnames(d)[ncol(d)])
   
-  axis(1, at = seq(0, 1, by = 1/(ploidy_max-1)), labels = seq(ploidy_min, ploidy_max, by = 1))
+  PLOIDY_LABELS=seq(ploidy_min, ploidy_max, by = 1)
+  axis(1, at = seq(0, 1, length.out=length(PLOIDY_LABELS)), labels = PLOIDY_LABELS)
   axis(2, at = seq(0, 1/purity_max, by = 1/3/purity_max), labels = seq(purity_min, purity_max, by = 3/10))
   
   if(psi_opt1>0 && rho_opt1>0){
