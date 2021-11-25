@@ -10,11 +10,11 @@ Briefly, such list was derived from 1000 Genomes Project SNPs ([hg19](http://ftp
 
 Since hg38 data for the non-PAR region of chrX is not available (as of September 2021), hg38 data for the whole chrX comes from a lift-over from hg19.
 
-GC content and replication timing correction files were then generated using scripts provided in the *LogRcorrection* folder.
+GC content and replication timing correction files were then generated using scripts provided in the *[LogRcorrection](../../LogRcorrection)* folder.
 
 Data availability:
 
-- Loci files: [hg19](https://www.dropbox.com/s/l3m0yvyca86lpwb/G1000_loci_hg19.zip) & [hg38](https://www.dropbox.com/s/80cq0qgao8l1inj/G1000_loci_hg38.zip) (*alleles.prefix* option in *ascat.prepareHTS*)
-- Allele files: [hg19](https://www.dropbox.com/s/3fzvir3uqe3073d/G1000_alleles_hg19.zip) & [hg38](https://www.dropbox.com/s/uouszfktzgoqfy7/G1000_alleles_hg38.zip) (*loci.prefix* option in *ascat.prepareHTS*)
-- GC correction file: [hg19](https://www.dropbox.com/s/v0tgr1esyoh1krw/GC_G1000_hg19.zip) & [hg38](https://www.dropbox.com/s/n7g5dh0ld1hcto8/GC_G1000_hg38.zip) (*GCcontentfile* option in *ascat.correctLogR*)
-- Replication timing correction file: [hg19](https://www.dropbox.com/s/50n7xb06x318tgl/RT_G1000_hg19.zip) & [hg38](https://www.dropbox.com/s/xlp99uneqh6nh6p/RT_G1000_hg38.zip) (*replictimingfile* option in *ascat.correctLogR*)
+- Loci files: [hg19](https://www.dropbox.com/s/l3m0yvyca86lpwb/G1000_loci_hg19.zip) & [hg38](https://www.dropbox.com/s/80cq0qgao8l1inj/G1000_loci_hg38.zip) (unzip and set `alleles.prefix="G1000_loci_hg19_chr"` option in `ascat.prepareHTS`)
+- Allele files: [hg19](https://www.dropbox.com/s/3fzvir3uqe3073d/G1000_alleles_hg19.zip) & [hg38](https://www.dropbox.com/s/uouszfktzgoqfy7/G1000_alleles_hg38.zip) (unzip and set `loci.prefix="G1000_alleles_hg19_chr"` option in `ascat.prepareHTS`)
+- GC correction file: [hg19](https://www.dropbox.com/s/v0tgr1esyoh1krw/GC_G1000_hg19.zip) & [hg38](https://www.dropbox.com/s/n7g5dh0ld1hcto8/GC_G1000_hg38.zip) (unzip and set `GCcontentfile="GC_G1000_hg19.txt"` option in `ascat.correctLogR`)
+- Replication timing correction file: [hg19](https://www.dropbox.com/s/50n7xb06x318tgl/RT_G1000_hg19.zip) & [hg38](https://www.dropbox.com/s/xlp99uneqh6nh6p/RT_G1000_hg38.zip) (unzip and set `replictimingfile="RT_G1000_hg19.txt"` in `ascat.correctLogR`)
