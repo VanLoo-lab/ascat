@@ -36,6 +36,7 @@ Standard ASCAT: `devtools::install_github('VanLoo-lab/ascat/ASCAT')`
   - **For HTS data, gamma must be set to 1 in `ascat.runASCAT`.**
 - A new function to collect metrics of interest has been added: `ascat.metrics`.
 - Boundaries can be defined for ploidy (min & max) when running `ascat.runAscat` (arguments: `min_ploidy` and `max_ploidy`).
+- New function, `ascat.plotAdjustedAscatProfile`, that plots an ASCAT profile in respect to chromosome length (instead of number of heterozygous SNPs).
 
 ## Testing
 We provide some scripts and input data in the *[ExampleData](ExampleData)* folder.
