@@ -25,6 +25,8 @@ runASCAT(
   pdfPlot = F,
   y_limit = 5,
   circos = NA,
+  min_ploidy = 1.5,
+  max_ploidy = 5.5,
   X_nonPAR = NULL
 )
 }
@@ -68,6 +70,10 @@ runASCAT(
 \item{y_limit}{Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5}
 
 \item{circos}{Optional file to output the non-rounded values in Circos track format. Default=NA}
+
+\item{min_ploidy}{a numerical parameter determining the minimum boundary of the ploidy solution search space. Default=1.5}
+
+\item{max_ploidy}{a numerical parameter determining the maximum boundary of the ploidy solution search space. Default=5.5}
 
 \item{X_nonPAR}{Optional vector containing genomic coordinates (start & stop) of nonPAR region on X. Default=NULL}
 }

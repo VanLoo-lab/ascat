@@ -6,6 +6,8 @@
 #' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
 #  @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
 #' @param circos Optional file to output the non-rounded values in Circos track format. Default=NA
+#' @param min_ploidy optional numerical parameter determining the minimum boundary of the ploidy solution search space. Default=1.5
+#' @param max_ploidy optional numerical parameter determining the maximum boundary of the ploidy solution search space. Default=5.5
 #' @param rho_manual optional argument to override ASCAT optimization and supply rho parameter (not recommended)
 #' @param psi_manual optional argument to override ASCAT optimization and supply psi parameter (not recommended)
 #' @param img.dir directory in which figures will be written
@@ -25,7 +27,7 @@
 #'
 #' @export
 #'
-ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circos=NA, rho_manual = NA, psi_manual = NA, img.dir=".", img.prefix="") {
+ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circos=NA, min_ploidy=1.5, max_ploidy=5.5, rho_manual = NA, psi_manual = NA, img.dir=".", img.prefix="") {
   goodarrays=NULL
   N_samples=dim(ASCATobj$Tumor_LogR)[2]
   res = vector("list",N_samples)
@@ -58,7 +60,7 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
     res[[arraynr]] = runASCAT(lrr,baf,lrrsegm,bafsegm,ASCATobj$gender[arraynr],ASCATobj$SNPpos,ASCATobj$ch,ASCATobj$chrs,ASCATobj$sexchromosomes, failedqualitycheck,
                               file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".sunrise.png",sep="")),file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".ASCATprofile.", ending,sep="")),
                               file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".rawprofile.", ending,sep="")),NA,
-                              gamma,rho_manual[arraynr],psi_manual[arraynr], pdfPlot, y_limit, circosName, ASCATobj$X_nonPAR)
+                              gamma,rho_manual[arraynr],psi_manual[arraynr], pdfPlot, y_limit, circosName, min_ploidy, max_ploidy, ASCATobj$X_nonPAR)
     if(!is.na(res[[arraynr]]$rho)) {
       goodarrays[length(goodarrays)+1] = arraynr
     }
@@ -174,6 +176,8 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
 #' @param pdfPlot Optional flag if nonrounded plots and ASCAT profile in pdf format are desired. Default=F
 #' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
 #' @param circos Optional file to output the non-rounded values in Circos track format. Default=NA
+#' @param min_ploidy a numerical parameter determining the minimum boundary of the ploidy solution search space. Default=1.5
+#' @param max_ploidy a numerical parameter determining the maximum boundary of the ploidy solution search space. Default=5.5
 #' @param X_nonPAR Optional vector containing genomic coordinates (start & stop) of nonPAR region on X. Default=NULL
 #'
 #' @keywords internal
@@ -185,7 +189,7 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
 #' @export
 runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromosomes, chrnames, sexchromosomes, failedqualitycheck = F,
                     distancepng = NA, copynumberprofilespng = NA, nonroundedprofilepng = NA, aberrationreliabilitypng = NA, gamma = 0.55,
-                    rho_manual = NA, psi_manual = NA, pdfPlot = F, y_limit = 5, circos=NA, X_nonPAR=NULL) {
+                    rho_manual = NA, psi_manual = NA, pdfPlot = F, y_limit = 5, circos=NA, min_ploidy=1.5, max_ploidy=5.5, X_nonPAR=NULL) {
   ch = chromosomes
   chrs = chrnames
   b = bafsegmented
@@ -198,7 +202,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
   r2 = r[autoprobes]
   
   s = make_segments(r2,b2)
-  d = create_distance_matrix(s, gamma)
+  d = create_distance_matrix(s, gamma, min_ploidy=min_ploidy, max_ploidy=max_ploidy)
   plot_d=d
   
   TheoretMaxdist = sum(rep(0.25,dim(s)[1]) * s[,"length"] * ifelse(s[,"b"]==0.5,0.05,1),na.rm=T)
@@ -215,8 +219,8 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
   }
   
   
-  MINPLOIDY = 1.5
-  MAXPLOIDY = 5.5
+  MINPLOIDY = min_ploidy
+  MAXPLOIDY = max_ploidy
   MINRHO = 0.2
   MINGOODNESSOFFIT = 80
   MINPERCZERO = 0.02
@@ -260,7 +264,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     }
     
     # if no solution, drop the percentzero > MINPERCZERO filter (allow non-aberrant solutions - but limit the ploidy options)
-    if (nropt == 0) {
+    if (nropt == 0  && MINPLOIDY < MAXPLOIDYSTRICT && MAXPLOIDY > MINPLOIDYSTRICT) {
       for (i in 4:(dim(d)[1]-3)) {
         for (j in 4:(dim(d)[2]-3)) {
           m = d[i,j]
@@ -333,7 +337,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     }
     
     # if still no solution, drop the percentzero > MINPERCENTZERO filter, but strict ploidy borders
-    if (nropt == 0) {
+    if (nropt == 0  && MINPLOIDY < MAXPLOIDYSTRICT && MAXPLOIDY > MINPLOIDYSTRICT) {
       for (i in 4:(dim(d)[1]-3)) {
         for (j in 4:(dim(d)[2]-3)) {
           m = d[i,j]
@@ -759,14 +763,22 @@ make_segments = function(r,b) {
 
 # function to create the distance matrix (distance for a range of ploidy and tumor percentage values)
 # input: segmented LRR and BAF and the value for gamma
-create_distance_matrix = function(segments, gamma) {
+create_distance_matrix = function(segments, gamma, min_ploidy=NULL, max_ploidy=NULL) {
   s = segments
-  psi_pos = seq(1,6,0.05)
+  # get ploidy boundaries
+  if(is.null(min_ploidy) | is.null(max_ploidy)) {
+    psi_pos = seq(1,6,0.05)
+  } else {
+    psi_pos = seq(min_ploidy-0.5,max_ploidy+0.5,0.05)
+  }
+  # get purity boundaries
   rho_pos = seq(0.1,1.05,0.01)
+  # set up distance matrix
   d = matrix(nrow = length(psi_pos), ncol = length(rho_pos))
   rownames(d) = psi_pos
   colnames(d) = rho_pos
-  dmin = 1E20;
+  dmin = 1E20
+  # get distances for each ploidy and purity combination
   for(i in 1:length(psi_pos)) {
     psi = psi_pos[i]
     for(j in 1:length(rho_pos)) {
