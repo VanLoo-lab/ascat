@@ -923,14 +923,22 @@ make_segments = function(r,b) {
 
 # function to create the distance matrix (distance for a range of ploidy and tumor percentage values)
 # input: segmented LRR and BAF and the value for gamma
-create_distance_matrix = function(segments, gamma) {
+create_distance_matrix = function(segments, gamma, min_ploidy = NULL, max_ploidy = NULL) {
   s = segments
-  psi_pos = seq(1,6,0.05)
+  # get ploidy boundaries 
+  if(is.null(min_ploidy)|is.null(max_ploidy)){
+  psi_pos = seq(1,6,0.05)	  
+	  } else {
+  psi_pos = seq(min_ploidy-0.5,max_ploidy+0.5,0.05)	  
+	  }
+  # get purity boundaries
   rho_pos = seq(0.1,1.05,0.01)
+  # set up distance matrix
   d = matrix(nrow = length(psi_pos), ncol = length(rho_pos))
   rownames(d) = psi_pos
   colnames(d) = rho_pos
   dmin = 1E20;
+  # get distances for each ploidy and purity combination
   for(i in 1:length(psi_pos)) {
     psi = psi_pos[i]
     for(j in 1:length(rho_pos)) {
@@ -999,9 +1007,12 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
   
   b2 = b[autoprobes]
   r2 = r[autoprobes]
-  
+ 
   s = make_segments(r2,b2)
-  d = create_distance_matrix(s, gamma)
+
+  MINPLOIDY = min_ploidy
+  MAXPLOIDY = max_ploidy
+  d = create_distance_matrix(s, gamma, MINPLOIDY, MAXPLOIDY)
   plot_d=d
   
   TheoretMaxdist = sum(rep(0.25,dim(s)[1]) * s[,"length"] * ifelse(s[,"b"]==0.5,0.05,1),na.rm=T)
@@ -1017,9 +1028,6 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     nonaberrant = T
   }
   
-  
-  MINPLOIDY = min_ploidy
-  MAXPLOIDY = max_ploidy
   MINRHO = 0.2
   MINGOODNESSOFFIT = 80
   MINPERCZERO = 0.02
