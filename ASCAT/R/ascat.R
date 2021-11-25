@@ -1071,7 +1071,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     }
     
     # if no solution, drop the percentzero > MINPERCZERO filter (allow non-aberrant solutions - but limit the ploidy options)
-    if (nropt == 0) {
+    if (nropt == 0 & MINPLOIDY < MAXPLOIDYSTRICT & MAXPLOIDY > MINPLOIDYSTRICT) {
       for (i in 4:(dim(d)[1]-3)) {
         for (j in 4:(dim(d)[2]-3)) {
           m = d[i,j]
@@ -1144,7 +1144,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     }
     
     # if still no solution, drop the percentzero > MINPERCENTZERO filter, but strict ploidy borders
-    if (nropt == 0) {
+    if (nropt == 0 & MINPLOIDY < MAXPLOIDYSTRICT & MAXPLOIDY > MINPLOIDYSTRICT) {
       for (i in 4:(dim(d)[1]-3)) {
         for (j in 4:(dim(d)[2]-3)) {
           m = d[i,j]
@@ -1776,6 +1776,7 @@ fastAspcf <- function(logR, allB, kmin, gamma){
   
   nseg = 0
   var2 = 0
+  var3 = 0
   breakpts = 0
   larger = TRUE
   repeat{
@@ -1788,6 +1789,7 @@ fastAspcf <- function(logR, allB, kmin, gamma){
     
     sd1 <- getMad(logRpart)
     sd2 <- getMad(allBflip)
+    sd3 <- getMad(allBpart) 
     
     #Must check that sd1 and sd2 are defined and != 0:
     sd.valid <- c(!is.na(sd1),!is.na(sd2),sd1!=0,sd2!=0)
@@ -1800,6 +1802,7 @@ fastAspcf <- function(logR, allB, kmin, gamma){
       larger = breakptspart>breakpts[length(breakpts)]
       breakpts <- c(breakpts, breakptspart[larger])
       var2 <- var2 + sd2^2
+      var3 <- var3 + sd3^2
       nseg = nseg+1
     }
     
@@ -1814,6 +1817,7 @@ fastAspcf <- function(logR, allB, kmin, gamma){
   breakpts <- unique(c(breakpts, N))
   if(nseg==0){nseg=1}  #just in case the sd-test never passes.
   sd2 <- sqrt(var2/nseg)
+  sd3 <- sqrt(var3/nseg)
   
   # On each segment calculate mean of unflipped B allele data
   frst <- breakpts[1:length(breakpts)-1] + 1
@@ -1822,7 +1826,7 @@ fastAspcf <- function(logR, allB, kmin, gamma){
   
   yhat1 <- rep(NA,N)
   yhat2 <- rep(NA,N)
-  
+
   for(i in 1:nseg){
     yhat1[frst[i]:last[i]] <- rep(mean(logR[frst[i]:last[i]]), last[i]-frst[i]+1)
     yi2 <- allB[frst[i]:last[i]]
@@ -1836,7 +1840,8 @@ fastAspcf <- function(logR, allB, kmin, gamma){
     # Make a (slightly arbitrary) decision concerning branches
     # This may be improved by a test of equal variances
     if(sqrt(sd2^2+mu^2) < 2*sd2){
-      mu <- 0
+    # if(sd3 < 1.8*sd2){
+       mu <- 0
     }
     yhat2[frst[i]:last[i]] <- rep(mu+0.5,last[i]-frst[i]+1)
   }
