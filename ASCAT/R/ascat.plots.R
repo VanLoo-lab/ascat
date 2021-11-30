@@ -191,8 +191,8 @@ ascat.plotNonRounded <- function(ploidy, rho, goodnessOfFit, nonaberrant, nAfull
   maintitle = paste("Ploidy: ",sprintf("%1.2f",ploidy),", purity: ",sprintf("%2.0f",rho*100),"%, goodness of fit: ",sprintf("%2.1f",goodnessOfFit),"%", ifelse(nonaberrant,", non-aberrant",""),sep="")
   nBfullPlot<-ifelse(nBfull<y_limit, nBfull, y_limit+0.1)
   nAfullPlot<-ifelse((nAfull+nBfull)<y_limit, nAfull+nBfull, y_limit+0.1)
-  colourTotal = "#c725e3" # purple
-  colourMinor = "#e37825" # orange
+  colourTotal = "#943CC3" # purple
+  colourMinor = "#60AF36" # green
   base.gw.plot(bafsegmented,nAfullPlot,nBfullPlot,colourTotal,colourMinor,maintitle,ch,lrr,chrs,y_limit,twoColours=TRUE)
 }
 
@@ -338,8 +338,8 @@ ascat.plotAscatProfile<-function(n1all, n2all, heteroprobes, ploidy, rho, goodne
   nBPlot<-ifelse(nB<=y_limit, nB+0.1, y_limit+0.1)
   nAPlot<-ifelse(nA<=y_limit, nA-0.1, y_limit+0.1)
   
-  colourTotal="#e03546" # red
-  colourMinor="#3557e0" # blue
+  colourTotal="#E03546" # red
+  colourMinor="#3557E0" # blue
   
   maintitle = paste("Ploidy: ",sprintf("%1.2f",ploidy),", purity: ",sprintf("%2.0f",rho*100),"%, goodness of fit: ",sprintf("%2.1f",goodnessOfFit),"%", ifelse(nonaberrant,", non-aberrant",""),sep="")
   base.gw.plot(bafsegmented,nAPlot,nBPlot,colourTotal,colourMinor,maintitle,ch,lrr,chrs,y_limit,twoColours=TRUE)
@@ -392,14 +392,14 @@ ascat.plotAdjustedAscatProfile=function(ASCAT_output_object,REF,y_limit=5,plot_u
     SEGMENTS=ASCAT_output_object$segments_raw[,c(1:4,7:8)]
     colnames(SEGMENTS)[5:6]=c('nMajor','nMinor')
     SEGMENTS$nMajor=SEGMENTS$nMajor+SEGMENTS$nMinor
-    colourA = "#c725e3" # purple
-    colourB = "#e37825" # orange
+    colourA = "#943CC3" # purple
+    colourB = "#60AF36" # green
   } else {
     SEGMENTS=ASCAT_output_object$segments
     SEGMENTS$nMajor=SEGMENTS$nMajor-0.1
     SEGMENTS$nMinor=SEGMENTS$nMinor+0.1
-    colourA = "#e03546" # red
-    colourB = "#3557e0" # blue
+    colourA = "#E03546" # red
+    colourB = "#3557E0" # blue
   }
   SEGMENTS$nMajor=ifelse(SEGMENTS$nMajor>y_limit,y_limit+0.1,SEGMENTS$nMajor)
   SEGMENTS$nMinor=ifelse(SEGMENTS$nMinor>y_limit,y_limit+0.1,SEGMENTS$nMinor)
@@ -445,7 +445,6 @@ ascat.plotAdjustedAscatProfile=function(ASCAT_output_object,REF,y_limit=5,plot_u
     }
     rm(INDEX)
   }; rm(CHR)
-  
   
   for (SAMPLE in sort(unique(SEGMENTS$sample))) {
     SEGS=SEGMENTS[which(SEGMENTS$sample==SAMPLE),]

@@ -18,9 +18,9 @@ Standard ASCAT: `devtools::install_github('VanLoo-lab/ascat/ASCAT')`
 ### Major changes:
 - Default penalty for both ASPCF (`ascat.aspcf`) and ASmultiPCF (`ascat.asmultipcf`) is now **70** (was 25). It is suitable for SNP arrays, as well as WES and WGS data.
 - LogR correction can now be used to correct for both GC content (standard requirement) and replication timing (optional). Also, the correction method has been updated (it now uses autosomes to compute correlations with covariates and applies a linear model with *splines* on all chromosomes). Please note that `ascat.correctLogR` should be used from now on (`ascat.GCcorrect` is still there for backward compatibility but is just a wrapper to `ascat.correctLogR`).
-- Color scheme has been changed for CNA profiles so it is colorblind-friendly:
-	- Rounded profiles: TBD1 (red for now) is the major allele and TBD2 (blue for now) is the minor allele.
-	- Unrounded profiles: TBD3 (purple for now) is the total CN and TBD4 (orange for now) is the minor allele.
+- Color scheme has been changed for CNA profiles so it is now colorblind-friendly:
+	- Rounded profiles: red the major allele and blue is the minor allele.
+	- Unrounded profiles: purple is the total CN and green is the minor allele.
 - Because ASCAT leverages genomic information from heterozygous SNPs, the nonPAR region in chromosome X for males is challenging as there are no such SNP, as opposed to PAR1 and PAR2 regions being present on chrX and chrY. We improved CNA calling in chrX by considering specificities between nonPAR and PAR1/PAR2. To this end, `ascat.loadData` has a new argument, `genomeVersion` (either `'hg19'` or `'hg38'`), that enables locating the nonPAR region on chrX. If provided, such information will be considered in the different ASCAT functions. We recommend always providing this information so CNA calling on chrX for males will be more accurate. Since PAR1 and PAR2 are present in both chrX and chrY, a 1+1 status in males refers to 1 copy in X and 1 copy in Y, but 1+0 could either be 1 copy in X (and no copy in Y) or 1 copy of Y (and no copy in X). Also, please note that most platforms have a limited resolution for PAR1 and PAR2 so results should carefully be interpreted in respect to available resolution.
 - Ploidy value displayed in CNA profiles no longers comes from the grid search and is now the final tumour ploidy (matching with `ascat.output$ploidy`).
 
