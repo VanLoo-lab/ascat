@@ -77,8 +77,8 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
     }
     rm(probloci)
   }
-  stopifnot(identical(allele_data[,1],tumour_input_data[,1]) && identical(allele_data[,1],normal_input_data[,1]))
-  stopifnot(identical(allele_data[,2],tumour_input_data[,2]) && identical(allele_data[,2],normal_input_data[,2]))
+  stopifnot(isTRUE(all.equal(allele_data[,1],tumour_input_data[,1])) && isTRUE(all.equal(allele_data[,1],normal_input_data[,1])))
+  stopifnot(isTRUE(all.equal(allele_data[,2],tumour_input_data[,2])) && isTRUE(all.equal(allele_data[,2],normal_input_data[,2])))
   tumour_input_data = tumour_input_data[,3:6]
   normal_input_data = normal_input_data[,3:6]
   # If a BED is provided, only look at SNPs within those intervals
