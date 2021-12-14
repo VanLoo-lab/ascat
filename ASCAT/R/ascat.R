@@ -634,8 +634,16 @@ ascat.plotSegmentedData = function(ASCATobj, img.dir=".", img.prefix="") {
 #'
 ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circos=NA, rho_manual = NA, psi_manual = NA, img.dir=".", img.prefix="") {
   goodarrays=NULL
-  res = vector("list",dim(ASCATobj$Tumor_LogR)[2])
-  for (arraynr in 1:dim(ASCATobj$Tumor_LogR)[2]) {
+  N_samples=dim(ASCATobj$Tumor_LogR)[2]
+  res = vector("list",N_samples)
+  stopifnot(length(rho_manual)==length(psi_manual)) # check consistency
+  if (length(rho_manual)==1 && is.na(rho_manual) && N_samples>1) {
+    rho_manual=rep(NA,N_samples)
+    psi_manual=rep(NA,N_samples)
+  } else {
+    stopifnot(length(rho_manual)==N_samples)
+  }
+  for (arraynr in 1:N_samples) {
     print.noquote(paste("Sample ", ASCATobj$samples[arraynr], " (",arraynr,"/",length(ASCATobj$samples),")",sep=""))
     lrr=ASCATobj$Tumor_LogR[,arraynr]
     names(lrr)=rownames(ASCATobj$Tumor_LogR)
@@ -654,17 +662,10 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
     if(!is.na(circos)){
       circosName=paste(circos,"_",ASCATobj$samples[arraynr],sep="")
     }
-    if(is.na(rho_manual)) {
-      res[[arraynr]] = runASCAT(lrr,baf,lrrsegm,bafsegm,ASCATobj$gender[arraynr],ASCATobj$SNPpos,ASCATobj$ch,ASCATobj$chrs,ASCATobj$sexchromosomes, failedqualitycheck,
-                                file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".sunrise.png",sep="")),file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".ASCATprofile.", ending ,sep="")),
-                                file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".rawprofile.", ending ,sep="")),NA,
-                                gamma,NA,NA,pdfPlot, y_limit, circosName)
-    } else {
-      res[[arraynr]] = runASCAT(lrr,baf,lrrsegm,bafsegm,ASCATobj$gender[arraynr],ASCATobj$SNPpos,ASCATobj$ch,ASCATobj$chrs,ASCATobj$sexchromosomes, failedqualitycheck,
-                                file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".sunrise.png",sep="")),file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".ASCATprofile.", ending,sep="")),
-                                file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".rawprofile.", ending,sep="")),NA,
-                                gamma,rho_manual[arraynr],psi_manual[arraynr], pdfPlot, y_limit, circosName)
-    }
+    res[[arraynr]] = runASCAT(lrr,baf,lrrsegm,bafsegm,ASCATobj$gender[arraynr],ASCATobj$SNPpos,ASCATobj$ch,ASCATobj$chrs,ASCATobj$sexchromosomes, failedqualitycheck,
+                              file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".sunrise.png",sep="")),file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".ASCATprofile.", ending,sep="")),
+                              file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".rawprofile.", ending,sep="")),NA,
+                              gamma,rho_manual[arraynr],psi_manual[arraynr], pdfPlot, y_limit, circosName)
     if(!is.na(res[[arraynr]]$rho)) {
       goodarrays[length(goodarrays)+1] = arraynr
     }
