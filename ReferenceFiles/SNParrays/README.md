@@ -13,4 +13,4 @@
 	- [GC% correction file](https://www.dropbox.com/s/by0wz0xzz6mn8st/GC_IlluminaOmniexpress.txt.zip)
 	- [Replication timing correction file](https://www.dropbox.com/s/ugnqnztojjpyn1u/RT_IlluminaOmniexpress.txt.zip)
 
-For other platforms, please use [our scripts](../../LogRcorrection/) to generate such correction files.
+For other platforms, please use [our scripts](../../LogRcorrection/) to generate adequate correction files.
