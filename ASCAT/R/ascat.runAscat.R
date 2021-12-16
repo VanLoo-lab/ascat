@@ -720,7 +720,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     ascat.plotSunrise(plot_d,0,0)
     dev.off()
     
-    warning(paste("ASCAT could not find an optimal ploidy and cellularity value for sample ", name, ".\n", sep=""))
+    warning(paste("ASCAT could not find an optimal ploidy and purity value for sample ", name, ".\n", sep=""))
     return(list(rho = NA, psi = NA, goodnessOfFit = NA, nonaberrant = F, nA = NA, nB = NA, seg = NA, seg_raw = NA, distance_matrix = NA))
   }
   
