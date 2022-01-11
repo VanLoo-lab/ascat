@@ -1,4 +1,4 @@
-# CNA profiles of TCGA cases obtained with ASCAT v3
+# CNA profiles of TCGA cases (SNP6) obtained with ASCAT v3
 
 `summary.ascatv3.TCGA.SNP6.penalty70.hg19.tsv` compiles both sample (from TCGA) and genomic (from `ascat.metrics`) information for all high-quality and representative cases.
 
@@ -8,12 +8,12 @@ QC was determined as follows:
 - **Noisy logR**: logR track (either tumour or normal) is noisy. Filter: tumour_mapd>=0.75 | normal_mapd>=0.75.
 - **Likely wrong germline**: matched normal is likely to come from another patient. Filter: tumour_mapd>0.4 & normal_mapd>0.4 & frac_homo>0.1.
 - **Oversegmented**: difference in segmentation between logR and BAF tracks. Filter: n_segs_logRBAF_diff>250.
-- **Wrong fit**: CNA profile is incorrect, with extreme losses. FIlter: mode_majA=0.
+- **Wrong fit**: CNA profile is incorrect, with extreme losses. Filter: mode_majA=0.
 - **HD size**: CNA profile contains large segments with homozygous deletion. Filter: homdel_largest>=20e6 | homdel_size>=40e6.
-- **Contamination or swap** and **Large CNV**: germline data contains copy-number changes. Filter: we ran aspcf on all germline samples and manually reviewed cases where events were spotted. Cases with large stretches of homozygosity were considered as valid and were not dicaded.
+- **Contamination or swap** and **Large CNV**: germline data contains copy-number changes. Filter: we ran aspcf on all germline samples and manually reviewed cases where events were spotted. Cases with large stretches of homozygosity were considered as valid and were not discarded.
 - **Pass**: sample has correct metrics.
 
-Only samples defined as **Likely normal** and **Pass** have been included in this data release as the other categories should be discarded from further analyses. Profiles being flagged as **Likely normal** should carefully be interpreted as those does not show evidence of copy-number changes and have a high purity. They could therefore either be true CNA profiles from pure tumours (*e.g.* flat profile for AML) or tumour purity is so low (*e.g.* <20%) that ASCAT fitted his CNA profile on the gernmine.
+Only samples defined as **Likely normal** and **Pass** have been included in this data release as the other categories should be discarded from further analyses. Profiles being flagged as **Likely normal** should carefully be interpreted as those do not show evidence of copy-number changes and have a high purity. They could therefore either be true CNA profiles from pure tumours (*e.g.* flat profile for AML) or tumour purity is so low (*e.g.* <20%) that ASCAT fitted the CNA profile on the germline.
 
 After QC, we applied the following strategy to pick one representative sample per case:
 - **Pass** were prioritised over **Likely normal** samples.
