@@ -9,11 +9,6 @@ ASCAT is described in detail in: [Allele-specific copy number analysis of tumors
 This repository also contains the code underlying additional publication:
 [Allele-specific multi-sample copy number segmentation. Ross EM, Haase K, Van Loo P & Markowetz F. *Bioinformatics* (2020)](https://pubmed.ncbi.nlm.nih.gov/32449758).
 
-## Future v3 release (beta-test version)
-We are pleased to announce that an early version of the future v3 release is available here: [https://github.com/VanLoo-lab/ascat/tree/v3.0](https://github.com/VanLoo-lab/ascat/tree/v3.0).
-
-This beta version comes with major improvements and new features. Therefore, we recommend users to give it a try, as early adopters, before it becomes the latest (and default) version of ASCAT.
-
 ## Installation
 `devtools::install_github('VanLoo-lab/ascat/ASCAT')`
 
