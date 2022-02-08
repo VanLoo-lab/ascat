@@ -4,8 +4,12 @@
 \alias{ascat.predictGermlineGenotypes}
 \title{ascat.predictGermlineGenotypes}
 \usage{
-ascat.predictGermlineGenotypes(ASCATobj, platform = "AffySNP6",
-  img.dir = ".", img.prefix = "")
+ascat.predictGermlineGenotypes(
+  ASCATobj,
+  platform = "AffySNP6",
+  img.dir = ".",
+  img.prefix = ""
+)
 }
 \arguments{
 \item{ASCATobj}{an ASCAT object}
@@ -27,8 +31,11 @@ is available
 Currently possible values for platform:\cr
 AffySNP6 (default)\cr
 Custom10k\cr
+IlluminaASA\cr
+IlluminaGSAv3\cr
 Illumina109k\cr
 IlluminaCytoSNP\cr
+IlluminaCytoSNP850k\cr
 Illumina610k\cr
 Illumina660k\cr
 Illumina700k\cr

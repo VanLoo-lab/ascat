@@ -4,8 +4,14 @@
 \alias{ascat.asmultipcf}
 \title{Allele-specific segmentation of multiple samples}
 \usage{
-ascat.asmultipcf(ASCATobj, ascat.gg = NULL, penalty = 25,
-  wsample = NULL, selectAlg = "exact", refine = TRUE)
+ascat.asmultipcf(
+  ASCATobj,
+  ascat.gg = NULL,
+  penalty = 25,
+  wsample = NULL,
+  selectAlg = "exact",
+  refine = TRUE
+)
 }
 \arguments{
 \item{ASCATobj}{an ASCAT object}

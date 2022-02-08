@@ -4,8 +4,19 @@
 \alias{ascat.plotNonRounded}
 \title{ascat.plotNonRounded}
 \usage{
-ascat.plotNonRounded(ploidy, rho, goodnessOfFit, nonaberrant, nAfull,
-  nBfull, y_limit = 5, bafsegmented, ch, lrr, chrs)
+ascat.plotNonRounded(
+  ploidy,
+  rho,
+  goodnessOfFit,
+  nonaberrant,
+  nAfull,
+  nBfull,
+  y_limit = 5,
+  bafsegmented,
+  ch,
+  lrr,
+  chrs
+)
 }
 \arguments{
 \item{ploidy}{ploidy of the sample}

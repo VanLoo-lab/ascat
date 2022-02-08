@@ -4,9 +4,15 @@
 \alias{ascat.loadData}
 \title{ascat.loadData}
 \usage{
-ascat.loadData(Tumor_LogR_file, Tumor_BAF_file,
-  Germline_LogR_file = NULL, Germline_BAF_file = NULL, chrs = c(1:22,
-  "X", "Y"), gender = NULL, sexchromosomes = c("X", "Y"))
+ascat.loadData(
+  Tumor_LogR_file,
+  Tumor_BAF_file,
+  Germline_LogR_file = NULL,
+  Germline_BAF_file = NULL,
+  chrs = c(1:22, "X", "Y"),
+  gender = NULL,
+  sexchromosomes = c("X", "Y")
+)
 }
 \arguments{
 \item{Tumor_LogR_file}{file containing logR of tumour sample(s)}

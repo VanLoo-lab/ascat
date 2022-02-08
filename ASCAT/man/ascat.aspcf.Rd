@@ -4,8 +4,14 @@
 \alias{ascat.aspcf}
 \title{ascat.aspcf}
 \usage{
-ascat.aspcf(ASCATobj, selectsamples = 1:length(ASCATobj$samples),
-  ascat.gg = NULL, penalty = 25, out.dir = ".", out.prefix = "")
+ascat.aspcf(
+  ASCATobj,
+  selectsamples = 1:length(ASCATobj$samples),
+  ascat.gg = NULL,
+  penalty = 25,
+  out.dir = ".",
+  out.prefix = ""
+)
 }
 \arguments{
 \item{ASCATobj}{an ASCAT object}
@@ -25,7 +31,7 @@ output: ascat data structure containing:\cr
 1. Tumor_LogR data matrix\cr
 2. Tumor_BAF data matrix\cr
 3. Tumor_LogR_segmented: matrix of LogR segmented values\cr
-4. Tumor_BAF_segmented: list of BAF segmented values; each element in the list is a matrix containing the segmented values for one sample (only for probes that are germline homozygous)\cr
+4. Tumor_BAF_segmented: list of BAF segmented values; each element in the list is a matrix containing the segmented values for one sample (only for probes that are not germline homozygous)\cr
 5. Germline_LogR data matrix\cr
 6. Germline_BAF data matrix\cr
 7. SNPpos: position of all SNPs\cr

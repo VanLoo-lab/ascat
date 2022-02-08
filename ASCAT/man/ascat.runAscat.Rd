@@ -4,9 +4,17 @@
 \alias{ascat.runAscat}
 \title{ascat.runAscat}
 \usage{
-ascat.runAscat(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5,
-  circos = NA, rho_manual = NA, psi_manual = NA, img.dir = ".",
-  img.prefix = "")
+ascat.runAscat(
+  ASCATobj,
+  gamma = 0.55,
+  pdfPlot = F,
+  y_limit = 5,
+  circos = NA,
+  rho_manual = NA,
+  psi_manual = NA,
+  img.dir = ".",
+  img.prefix = ""
+)
 }
 \arguments{
 \item{ASCATobj}{an ASCAT object from ascat.aspcf}

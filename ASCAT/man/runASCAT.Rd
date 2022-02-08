@@ -4,11 +4,28 @@
 \alias{runASCAT}
 \title{runASCAT}
 \usage{
-runASCAT(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromosomes,
-  chrnames, sexchromosomes, failedqualitycheck = F, distancepng = NA,
-  copynumberprofilespng = NA, nonroundedprofilepng = NA,
-  aberrationreliabilitypng = NA, gamma = 0.55, rho_manual = NA,
-  psi_manual = NA, pdfPlot = F, y_limit = 5, circos = NA)
+runASCAT(
+  lrr,
+  baf,
+  lrrsegmented,
+  bafsegmented,
+  gender,
+  SNPpos,
+  chromosomes,
+  chrnames,
+  sexchromosomes,
+  failedqualitycheck = F,
+  distancepng = NA,
+  copynumberprofilespng = NA,
+  nonroundedprofilepng = NA,
+  aberrationreliabilitypng = NA,
+  gamma = 0.55,
+  rho_manual = NA,
+  psi_manual = NA,
+  pdfPlot = F,
+  y_limit = 5,
+  circos = NA
+)
 }
 \arguments{
 \item{lrr}{(unsegmented) log R, in genomic sequence (all probes), with probe IDs}
