@@ -2,17 +2,15 @@
 
 ## Description
 
-This repository provides the ASCAT R package that can be used to infer tumour purity, ploidy and allele-specific copy number profiles.
+This repository provides the ASCAT R package (v3.0) that can be used to infer tumour purity, ploidy and allele-specific copy number profiles.
 
 ASCAT is described in detail in: [Allele-specific copy number analysis of tumors. Van Loo P *et al*. *PNAS* (2010)](http://www.ncbi.nlm.nih.gov/pubmed/20837533).
 
 This repository also contains the code underlying additional publication:
 [Allele-specific multi-sample copy number segmentation. Ross EM, Haase K, Van Loo P & Markowetz F. *Bioinformatics* (2020)](https://pubmed.ncbi.nlm.nih.gov/32449758).
 
-## Installation
-This pre-v3 version: `devtools::install_github('VanLoo-lab/ascat/ASCAT',ref='v3.0')`
-
-Standard ASCAT: `devtools::install_github('VanLoo-lab/ascat/ASCAT')`
+## Installation (v3.0 version)
+`devtools::install_github('VanLoo-lab/ascat/ASCAT')`
 
 ## Changes since v2.5.2
 ### Major changes:
