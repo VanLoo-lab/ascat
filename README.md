@@ -2,19 +2,17 @@
 
 ## Description
 
-This repository provides the ASCAT R package that can be used to infer tumour purity, ploidy and allele-specific copy number profiles.
+This repository provides the ASCAT R package (v3.0) that can be used to infer tumour purity, ploidy and allele-specific copy number profiles.
 
 ASCAT is described in detail in: [Allele-specific copy number analysis of tumors. Van Loo P *et al*. *PNAS* (2010)](http://www.ncbi.nlm.nih.gov/pubmed/20837533).
 
 This repository also contains the code underlying additional publication:
 [Allele-specific multi-sample copy number segmentation. Ross EM, Haase K, Van Loo P & Markowetz F. *Bioinformatics* (2020)](https://pubmed.ncbi.nlm.nih.gov/32449758).
 
-## Installation
-This pre-v3 version: `devtools::install_github('VanLoo-lab/ascat/ASCAT',ref='v3.0')`
+## Installation (v3.0 version)
+`devtools::install_github('VanLoo-lab/ascat/ASCAT')`
 
-Standard ASCAT: `devtools::install_github('VanLoo-lab/ascat/ASCAT')`
-
-## Changes since v2.5.2
+## Changes since v2.5.3
 ### Major changes:
 - Default penalty for both ASPCF (`ascat.aspcf`) and ASmultiPCF (`ascat.asmultipcf`) is now **70** (was 25). It is suitable for SNP arrays, as well as WES and WGS data.
 - LogR correction can now be used to correct for both GC content (standard requirement) and replication timing (optional). Also, the correction method has been updated (it now uses autosomes to compute correlations with covariates and applies a linear model with *splines* on all chromosomes). Please note that `ascat.correctLogR` should be used from now on (`ascat.GCcorrect` is still there for backward compatibility but is just a wrapper to `ascat.correctLogR`).
