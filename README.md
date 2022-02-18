@@ -12,7 +12,7 @@ This repository also contains the code underlying additional publication:
 ## Installation (v3.0 version)
 `devtools::install_github('VanLoo-lab/ascat/ASCAT')`
 
-## Changes since v2.5.2
+## Changes since v2.5.3
 ### Major changes:
 - Default penalty for both ASPCF (`ascat.aspcf`) and ASmultiPCF (`ascat.asmultipcf`) is now **70** (was 25). It is suitable for SNP arrays, as well as WES and WGS data.
 - LogR correction can now be used to correct for both GC content (standard requirement) and replication timing (optional). Also, the correction method has been updated (it now uses autosomes to compute correlations with covariates and applies a linear model with *splines* on all chromosomes). Please note that `ascat.correctLogR` should be used from now on (`ascat.GCcorrect` is still there for backward compatibility but is just a wrapper to `ascat.correctLogR`).
