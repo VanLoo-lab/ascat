@@ -293,6 +293,7 @@ predictGermlineHomozygousStretches = function(chr, hom) {
       
     }
     
+    if (is.null(allhprobes)) allhprobes=rbind(NULL,c(0,0,0))
     HomoStretches[[sam]]=allhprobes
     
   }
