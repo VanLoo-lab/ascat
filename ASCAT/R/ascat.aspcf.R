@@ -113,7 +113,7 @@ ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), asc
           bafASPCF = NULL
           if(length(logRaveraged)<6) {
             logRASPCF = rep(mean(logRaveraged),length(logRaveraged))
-            bafASPCF = rep(mean(bafselwins),length(logRaveraged))
+            bafASPCF = rep(ifelse(mean(bafselwins)>=0.5,mean(bafselwins),1-mean(bafselwins)),length(logRaveraged))
           } else {
             PCFed = fastAspcf(logRaveraged,bafselwins,6,segmentlength)
             logRASPCF = PCFed$yhat1
