@@ -293,8 +293,10 @@ readAlleleCountFiles=function(prefix,suffix,chrom_names,minCounts) {
   data=do.call(rbind,lapply(files,function(x) {
     tmp=data.frame(data.table::fread(x,sep='\t',showProgress=F,header=T),stringsAsFactors=F)
     tmp=tmp[tmp[,7]>=minCounts,]
-    tmp[,1]=gsub('^chr','',tmp[,1])
-    rownames(tmp)=paste0(tmp[,1],'_',tmp[,2])
+    if (nrow(tmp)>0) {
+      tmp[,1]=gsub('^chr','',tmp[,1])
+      rownames(tmp)=paste0(tmp[,1],'_',tmp[,2])
+    }
     return(tmp)
   }))
   stopifnot(nrow(data)>0)

@@ -139,7 +139,7 @@ ascat.asmultipcf <- function(ASCATobj, ascat.gg = NULL, penalty = 70, wsample=NU
             bafASPCF = bafwins
           } else {
             logRASPCF = apply(logRaveraged,2,function(x) rep(mean(x,na.rm=TRUE),length(x)))
-            bafASPCF = apply(bafwins,2,function(x) rep(mean(x,na.rm=TRUE),length(x)))
+            bafASPCF = apply(bafwins,2,function(x) rep(ifelse(mean(x,na.rm=TRUE)>=0.5,mean(x,na.rm=TRUE),1-mean(x,na.rm=TRUE)),length(x)))
           }
         } else {
           # combine logR and BAF data into one matrix for joint segmentation
