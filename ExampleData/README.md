@@ -8,21 +8,21 @@ ascat.bc = ascat.correctLogR(ascat.bc, GCcontentfile = "GC_example.txt", replict
 ascat.plotRawData(ascat.bc, img.prefix = "After_correction_")
 ascat.bc = ascat.aspcf(ascat.bc)
 ascat.plotSegmentedData(ascat.bc)
-ascat.output = ascat.runAscat(ascat.bc) # gamma=1 for HTS data
+ascat.output = ascat.runAscat(ascat.bc, write_segments=T) # gamma=1 for HTS data
 QC = ascat.metrics(ascat.bc,ascat.output)
 ```
 
-## Minimal ASCAT run (adapted from standard run: no logR correction, no intermediate plot, no QC)
+## Minimal ASCAT run (adapted from the standard run: no logR correction, no intermediate plot, no QC)
 
 ```R
 library(ASCAT)
 ascat.bc = ascat.loadData(Tumor_LogR_file = "Tumor_LogR.txt", Tumor_BAF_file = "Tumor_BAF.txt", Germline_LogR_file = "Germline_LogR.txt", Germline_BAF_file = "Germline_BAF.txt", gender = rep('XX',100), genomeVersion = "hg19")
-ascat.bc = ascat.aspcf(ascat.bc)
+ascat.bc = ascat.aspcf(ascat.bc, out.dir = NA)
 ascat.output = ascat.runAscat(ascat.bc) # gamma=1 for HTS data
 ```
 
 
-## ASCAT run without matched normal data (`platform` needs to be adapted)
+## ASCAT run without matched normal data (`platform` needs to be adapted, see `?ascat.predictGermlineGenotypes`)
 
 ```R
 library(ASCAT)

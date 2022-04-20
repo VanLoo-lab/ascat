@@ -20,7 +20,7 @@ This repository also contains the code underlying additional publication:
 	- Rounded profiles: red is the major allele and blue is the minor allele.
 	- Unrounded profiles: purple is the total CN and green is the minor allele.
 - Because ASCAT leverages genomic information from heterozygous SNPs, the nonPAR region in chromosome X for males is challenging as there are no such SNP, as opposed to PAR1 and PAR2 regions being present on chrX and chrY. We improved CNA calling in chrX by considering specificities between nonPAR and PAR1/PAR2. To this end, `ascat.loadData` has a new argument, `genomeVersion` (either `'hg19'` or `'hg38'`), that enables locating the nonPAR region on chrX. If provided, such information will be considered in the different ASCAT functions. We recommend always providing this information so CNA calling on chrX for males will be more accurate. Since PAR1 and PAR2 are present in both chrX and chrY, a 1+1 status in males refers to 1 copy in X and 1 copy in Y, but 1+0 could either be 1 copy in X (and no copy in Y) or 1 copy of Y (and no copy in X). Also, please note that most platforms have a limited resolution for PAR1 and PAR2 so results should carefully be interpreted in respect to available resolution.
-- Ploidy value displayed in CNA profiles no longers comes from the grid search and is now the final tumour ploidy (matching with `ascat.output$ploidy`).
+- Ploidy value displayed in CNA profiles no longer comes from the grid search and is now the final tumour ploidy (matching with `ascat.output$ploidy`).
 
 ### Minor changes:
 - `ascat.plotRawData` and `ascat.plotSegmentedData` have an extra argument, `logr.y_values`, to change Y scale for the logR track. Default is: `c(-2,2)`, whereas previous plots were: `c(-1,1)`.
@@ -34,7 +34,7 @@ This repository also contains the code underlying additional publication:
   - **For HTS data, gamma must be set to 1 in `ascat.runASCAT`.**
 - A new function to collect metrics of interest has been added: `ascat.metrics`.
 - Boundaries can be defined for ploidy (min & max) when running `ascat.runAscat` (arguments: `min_ploidy` and `max_ploidy`).
-- New function, `ascat.plotAdjustedAscatProfile`, that plots an ASCAT profile in respect to chromosome length (instead of number of heterozygous SNPs).
+- New function, `ascat.plotAdjustedAscatProfile`, that plots an ASCAT profile with respect to chromosome length (instead of the number of heterozygous SNPs).
 
 ## Testing
 We provide some scripts and input data in the *[ExampleData](ExampleData)* folder.
