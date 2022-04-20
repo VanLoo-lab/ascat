@@ -42,12 +42,12 @@ We provide some scripts and input data in the *[ExampleData](ExampleData)* folde
 ## Reference files
 - LogR correction files (`ascat.correctLogR`) for standard platforms (Affymetrix SNP 6.0, Affymetrix 250k STY, Illumina 660k and Illumina OmniExpress) can be found in the *[ReferenceFiles/SNParrays](ReferenceFiles/SNParrays)* folder. For other platforms, please use our scripts (in *[LogRcorrection](LogRcorrection)*) to generate such correction files.
 - For WGS, we provide logR correction files as well as loci and allele files in *[ReferenceFiles/WGS](ReferenceFiles/WGS)*.
-- For WES, we recommend using all biallelic SNPs from the 1,000 Genomes Project. One could reproduce the process described in *[ReferenceFiles/WGS](ReferenceFiles/WGS)*, relaxing allele frequency to increase resolution.
+- For WES, we recommend using all biallelic SNPs from the 1,000 Genomes Project. One could reproduce the process described in *[ReferenceFiles/WGS](ReferenceFiles/WGS)*, relaxing allele frequency to increase resolution. Our reference files for WGS are not suitable for WES.
 
 ## Supported arrays without matched germline
 *Custom10k*, *IlluminaASA*, *IlluminaGSAv3*, *Illumina109k*, *IlluminaCytoSNP*, *IlluminaCytoSNP850k*, *Illumina610k*, *Illumina660k*, *Illumina700k*, *Illumina1M*, *Illumina2.5M*, *IlluminaOmni5*, *Affy10k*, *Affy100k*, *Affy250k_sty*, *Affy250k_nsp*, *AffyOncoScan*, *AffyCytoScanHD*, *AffySNP6*, *HumanCNV370quad*, *HumanCore12*, *HumanCoreExome24*, *HumanOmniExpress12* and *IlluminaOmniExpressExome*.
 
-Because arrays have a defined set of SNP probes, with a fairly constant rate of heterozygous probes accross individuals, useful metrics in `ascat.predictGermlineGenotypes` can be inferred from some cases (with no or very few CN changes). However, sequencing data is subjected to massive variations because of design, coverage and/or artefacts. Therefore, we are not able to provide pre-defined metrics for unmatched sequencing data.
+Because arrays have a defined set of SNP probes, with a fairly constant rate of heterozygous probes across individuals, useful metrics in `ascat.predictGermlineGenotypes` can be inferred from some cases (with no or very few CN changes). However, sequencing data is subjected to massive variations because of design, coverage and/or artefacts. Therefore, we are not able to provide pre-defined metrics for unmatched sequencing data.
 
 ## Misc
 For more information about ASCAT and other projects of our group, please visit our [website](https://www.crick.ac.uk/research/a-z-researchers/researchers-v-y/peter-van-loo/software/).
