@@ -8,6 +8,7 @@ ascat.asmultipcf(
   ASCATobj,
   ascat.gg = NULL,
   penalty = 70,
+  out.dir = ".",
   wsample = NULL,
   selectAlg = "exact",
   refine = TRUE
@@ -19,6 +20,8 @@ ascat.asmultipcf(
 \item{ascat.gg}{germline genotypes (NULL if germline data is available)}
 
 \item{penalty}{penalty of introducing an additional ASPCF breakpoint (expert parameter, don't adapt unless you know what you are doing)}
+
+\item{out.dir}{directory in which output files will be written. Can be set to NA to not write PCFed files.}
 
 \item{wsample}{Vector of length length(ASCATobj$samples). Can be used to assign different weights to samples, for example to account for differences in sequencing quality. (Default = NULL)}
 

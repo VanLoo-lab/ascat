@@ -15,7 +15,8 @@ ascat.runAscat(
   rho_manual = NA,
   psi_manual = NA,
   img.dir = ".",
-  img.prefix = ""
+  img.prefix = "",
+  write_segments = F
 )
 }
 \arguments{
@@ -40,6 +41,8 @@ ascat.runAscat(
 \item{img.dir}{directory in which figures will be written}
 
 \item{img.prefix}{prefix for figure names}
+
+\item{write_segments}{Optional flag to output segments in text files (.segments_raw.txt and .segments.txt). Default=F}
 }
 \value{
 an ASCAT output object, containing:\cr
