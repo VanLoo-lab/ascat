@@ -62,7 +62,7 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
     res[[arraynr]] = runASCAT(lrr,baf,lrrsegm,bafsegm,ASCATobj$gender[arraynr],ASCATobj$SNPpos,ASCATobj$ch,ASCATobj$chrs,ASCATobj$sexchromosomes, failedqualitycheck,
                               file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".sunrise.png",sep="")),file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".ASCATprofile.", ending,sep="")),
                               file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".rawprofile.", ending,sep="")),NA,
-                              gamma,rho_manual[arraynr],psi_manual[arraynr], pdfPlot, y_limit, circosName, min_ploidy, max_ploidy, ASCATobj$X_nonPAR)
+                              gamma,rho_manual[arraynr],psi_manual[arraynr], pdfPlot, y_limit, circosName, min_ploidy, max_ploidy, min_purity, max_purity, ASCATobj$X_nonPAR)
     if(!is.na(res[[arraynr]]$rho)) {
       goodarrays[length(goodarrays)+1] = arraynr
     }
