@@ -6,12 +6,12 @@
 #' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
 #  @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
 #' @param circos Optional file to output the non-rounded values in Circos track format. Default=NA
-#' @param min_ploidy optional numerical parameter determining the minimum boundary of the ploidy solution search space. Default=1.5
-#' @param max_ploidy optional numerical parameter determining the maximum boundary of the ploidy solution search space. Default=5.5
-#' @param min_purity optional numerical parameter determining the minimum boundary of the purity solution search space. Default=0.1
-#' @param max_purity optional numerical parameter determining the maximum boundary of the purity solution search space. Default=1.05
-#' @param rho_manual optional argument to override ASCAT optimization and supply rho parameter (not recommended)
-#' @param psi_manual optional argument to override ASCAT optimization and supply psi parameter (not recommended)
+#' @param min_ploidy optional numerical parameter determining the minimum boundary of the ploidy solution search space (expert parameter, don't adapt unless you know what you're doing). Default=1.5
+#' @param max_ploidy optional numerical parameter determining the maximum boundary of the ploidy solution search space (expert parameter, don't adapt unless you know what you're doing). Default=5.5
+#' @param min_purity optional numerical parameter determining the minimum boundary of the purity solution search space (expert parameter, don't adapt unless you know what you're doing). Default=0.1
+#' @param max_purity optional numerical parameter determining the maximum boundary of the purity solution search space (expert parameter, don't adapt unless you know what you're doing). Default=1.05
+#' @param rho_manual optional argument to override ASCAT optimization and supply rho parameter (expert parameter, don't adapt unless you know what you're doing).
+#' @param psi_manual optional argument to override ASCAT optimization and supply psi parameter (expert parameter, don't adapt unless you know what you're doing).
 #' @param img.dir directory in which figures will be written
 #' @param img.prefix prefix for figure names
 #' @details Note: for copy number only probes, nA contains the copy number value and nB = 0.

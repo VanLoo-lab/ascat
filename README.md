@@ -33,7 +33,7 @@ This repository also contains the code underlying additional publication:
   - Targeted sequencing: a bespoke method will be implemented soon. We do not recommend using `ascat.prepareHTS` on targeted sequencing data for now.
   - **For HTS data, gamma must be set to 1 in `ascat.runASCAT`.**
 - A new function to collect metrics of interest has been added: `ascat.metrics`.
-- Boundaries can be defined for ploidy (min & max) when running `ascat.runAscat` (arguments: `min_ploidy` and `max_ploidy`).
+- Boundaries can be defined for purity and ploidy (min & max) when running `ascat.runAscat` (arguments: `min_purity`/`max_purity` and `min_ploidy`/`max_ploidy`).
 - New function, `ascat.plotAdjustedAscatProfile`, that plots an ASCAT profile in respect to chromosome length (instead of number of heterozygous SNPs).
 
 ## Testing
