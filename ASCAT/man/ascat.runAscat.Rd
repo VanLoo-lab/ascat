@@ -12,6 +12,8 @@ ascat.runAscat(
   circos = NA,
   min_ploidy = 1.5,
   max_ploidy = 5.5,
+  min_purity = 0.1,
+  max_purity = 1.05,
   rho_manual = NA,
   psi_manual = NA,
   img.dir = ".",
@@ -29,13 +31,17 @@ ascat.runAscat(
 
 \item{circos}{Optional file to output the non-rounded values in Circos track format. Default=NA}
 
-\item{min_ploidy}{optional numerical parameter determining the minimum boundary of the ploidy solution search space. Default=1.5}
+\item{min_ploidy}{optional numerical parameter determining the minimum boundary of the ploidy solution search space (expert parameter, don't adapt unless you know what you're doing). Default=1.5}
 
-\item{max_ploidy}{optional numerical parameter determining the maximum boundary of the ploidy solution search space. Default=5.5}
+\item{max_ploidy}{optional numerical parameter determining the maximum boundary of the ploidy solution search space (expert parameter, don't adapt unless you know what you're doing). Default=5.5}
 
-\item{rho_manual}{optional argument to override ASCAT optimization and supply rho parameter (not recommended)}
+\item{min_purity}{optional numerical parameter determining the minimum boundary of the purity solution search space (expert parameter, don't adapt unless you know what you're doing). Default=0.1}
 
-\item{psi_manual}{optional argument to override ASCAT optimization and supply psi parameter (not recommended)}
+\item{max_purity}{optional numerical parameter determining the maximum boundary of the purity solution search space (expert parameter, don't adapt unless you know what you're doing). Default=1.05}
+
+\item{rho_manual}{optional argument to override ASCAT optimization and supply rho parameter (expert parameter, don't adapt unless you know what you're doing).}
+
+\item{psi_manual}{optional argument to override ASCAT optimization and supply psi parameter (expert parameter, don't adapt unless you know what you're doing).}
 
 \item{img.dir}{directory in which figures will be written}
 
