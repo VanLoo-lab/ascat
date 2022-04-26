@@ -6,10 +6,12 @@
 #' @param y_limit Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5
 #  @param textFlag Optional flag to add the positions of fragments located outside of the plotting area to the plots. Default=F
 #' @param circos Optional file to output the non-rounded values in Circos track format. Default=NA
-#' @param min_ploidy optional numerical parameter determining the minimum boundary of the ploidy solution search space. Default=1.5
-#' @param max_ploidy optional numerical parameter determining the maximum boundary of the ploidy solution search space. Default=5.5
-#' @param rho_manual optional argument to override ASCAT optimization and supply rho parameter (not recommended)
-#' @param psi_manual optional argument to override ASCAT optimization and supply psi parameter (not recommended)
+#' @param min_ploidy optional numerical parameter determining the minimum boundary of the ploidy solution search space (expert parameter, don't adapt unless you know what you're doing). Default=1.5
+#' @param max_ploidy optional numerical parameter determining the maximum boundary of the ploidy solution search space (expert parameter, don't adapt unless you know what you're doing). Default=5.5
+#' @param min_purity optional numerical parameter determining the minimum boundary of the purity solution search space (expert parameter, don't adapt unless you know what you're doing). Default=0.1
+#' @param max_purity optional numerical parameter determining the maximum boundary of the purity solution search space (expert parameter, don't adapt unless you know what you're doing). Default=1.05
+#' @param rho_manual optional argument to override ASCAT optimization and supply rho parameter (expert parameter, don't adapt unless you know what you're doing).
+#' @param psi_manual optional argument to override ASCAT optimization and supply psi parameter (expert parameter, don't adapt unless you know what you're doing).
 #' @param img.dir directory in which figures will be written
 #' @param img.prefix prefix for figure names
 #' @param write_segments Optional flag to output segments in text files (.segments_raw.txt and .segments.txt). Default=F
@@ -28,7 +30,7 @@
 #'
 #' @export
 #'
-ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circos=NA, min_ploidy=1.5, max_ploidy=5.5, rho_manual = NA, psi_manual = NA, img.dir=".", img.prefix="", write_segments=F) {
+ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circos=NA, min_ploidy=1.5, max_ploidy=5.5, min_purity=0.1, max_purity=1.05, rho_manual = NA, psi_manual = NA, img.dir=".", img.prefix="", write_segments=F) {
   goodarrays=NULL
   N_samples=dim(ASCATobj$Tumor_LogR)[2]
   res = vector("list",N_samples)
@@ -61,7 +63,7 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
     res[[arraynr]] = runASCAT(lrr,baf,lrrsegm,bafsegm,ASCATobj$gender[arraynr],ASCATobj$SNPpos,ASCATobj$ch,ASCATobj$chrs,ASCATobj$sexchromosomes, failedqualitycheck,
                               file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".sunrise.png",sep="")),file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".ASCATprofile.", ending,sep="")),
                               file.path(img.dir, paste(img.prefix, ASCATobj$samples[arraynr],".rawprofile.", ending,sep="")),NA,
-                              gamma,rho_manual[arraynr],psi_manual[arraynr], pdfPlot, y_limit, circosName, min_ploidy, max_ploidy, ASCATobj$X_nonPAR)
+                              gamma,rho_manual[arraynr],psi_manual[arraynr], pdfPlot, y_limit, circosName, min_ploidy, max_ploidy, min_purity, max_purity, ASCATobj$X_nonPAR)
     if(!is.na(res[[arraynr]]$rho)) {
       goodarrays[length(goodarrays)+1] = arraynr
     }
@@ -184,6 +186,8 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
 #' @param circos Optional file to output the non-rounded values in Circos track format. Default=NA
 #' @param min_ploidy a numerical parameter determining the minimum boundary of the ploidy solution search space. Default=1.5
 #' @param max_ploidy a numerical parameter determining the maximum boundary of the ploidy solution search space. Default=5.5
+#' @param min_purity a numerical parameter determining the minimum boundary of the purity solution search space. Default=0.1
+#' @param max_purity a numerical parameter determining the maximum boundary of the purity solution search space. Default=1.05
 #' @param X_nonPAR Optional vector containing genomic coordinates (start & stop) of nonPAR region on X. Default=NULL
 #'
 #' @keywords internal
@@ -195,7 +199,8 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
 #' @export
 runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromosomes, chrnames, sexchromosomes, failedqualitycheck = F,
                     distancepng = NA, copynumberprofilespng = NA, nonroundedprofilepng = NA, aberrationreliabilitypng = NA, gamma = 0.55,
-                    rho_manual = NA, psi_manual = NA, pdfPlot = F, y_limit = 5, circos=NA, min_ploidy=1.5, max_ploidy=5.5, X_nonPAR=NULL) {
+                    rho_manual = NA, psi_manual = NA, pdfPlot = F, y_limit = 5, circos=NA, min_ploidy=1.5, max_ploidy=5.5, min_purity=0.1,
+                    max_purity=1.05, X_nonPAR=NULL) {
   ch = chromosomes
   chrs = chrnames
   b = bafsegmented
@@ -208,7 +213,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
   r2 = r[autoprobes]
   
   s = make_segments(r2,b2)
-  d = create_distance_matrix(s, gamma, min_ploidy=min_ploidy, max_ploidy=max_ploidy)
+  d = create_distance_matrix(s, gamma, min_ploidy=min_ploidy, max_ploidy=max_ploidy, min_purity=min_purity, max_purity=max_purity)
   plot_d=d
   
   TheoretMaxdist = sum(rep(0.25,dim(s)[1]) * s[,"length"] * ifelse(s[,"b"]==0.5,0.05,1),na.rm=T)
@@ -769,7 +774,7 @@ make_segments = function(r,b) {
 
 # function to create the distance matrix (distance for a range of ploidy and tumor percentage values)
 # input: segmented LRR and BAF and the value for gamma
-create_distance_matrix = function(segments, gamma, min_ploidy=NULL, max_ploidy=NULL) {
+create_distance_matrix = function(segments, gamma, min_ploidy=NULL, max_ploidy=NULL, min_purity=NULL, max_purity=NULL) {
   s = segments
   # get ploidy boundaries
   if(is.null(min_ploidy) | is.null(max_ploidy)) {
@@ -778,7 +783,12 @@ create_distance_matrix = function(segments, gamma, min_ploidy=NULL, max_ploidy=N
     psi_pos = seq(min_ploidy-0.5,max_ploidy+0.5,0.05)
   }
   # get purity boundaries
-  rho_pos = seq(0.1,1.05,0.01)
+  if(is.null(min_purity) | is.null(max_purity)) {
+    rho_pos = seq(0.1,1.05,0.01)
+  } else {
+    rho_pos = seq(round(min_purity,2),round(max_purity,2),0.01)
+  }
+
   # set up distance matrix
   d = matrix(nrow = length(psi_pos), ncol = length(rho_pos))
   rownames(d) = psi_pos

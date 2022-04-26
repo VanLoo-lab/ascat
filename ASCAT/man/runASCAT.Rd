@@ -27,6 +27,8 @@ runASCAT(
   circos = NA,
   min_ploidy = 1.5,
   max_ploidy = 5.5,
+  min_purity = 0.1,
+  max_purity = 1.05,
   X_nonPAR = NULL
 )
 }
@@ -74,6 +76,10 @@ runASCAT(
 \item{min_ploidy}{a numerical parameter determining the minimum boundary of the ploidy solution search space. Default=1.5}
 
 \item{max_ploidy}{a numerical parameter determining the maximum boundary of the ploidy solution search space. Default=5.5}
+
+\item{min_purity}{a numerical parameter determining the minimum boundary of the purity solution search space. Default=0.1}
+
+\item{max_purity}{a numerical parameter determining the maximum boundary of the purity solution search space. Default=1.05}
 
 \item{X_nonPAR}{Optional vector containing genomic coordinates (start & stop) of nonPAR region on X. Default=NULL}
 }
