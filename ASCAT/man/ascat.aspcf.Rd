@@ -22,7 +22,7 @@ ascat.aspcf(
 
 \item{penalty}{penalty of introducing an additional ASPCF breakpoint (expert parameter, don't adapt unless you know what you're doing)}
 
-\item{out.dir}{directory in which output files will be written}
+\item{out.dir}{directory in which output files will be written. Can be set to NA to not write PCFed files.}
 
 \item{out.prefix}{prefix for output file names}
 }

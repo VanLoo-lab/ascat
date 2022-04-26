@@ -6,7 +6,7 @@
 #' @param selectsamples a vector containing the sample number(s) to PCF. Default = all
 #' @param ascat.gg germline genotypes (NULL if germline data is available)
 #' @param penalty penalty of introducing an additional ASPCF breakpoint (expert parameter, don't adapt unless you know what you're doing)
-#' @param out.dir directory in which output files will be written
+#' @param out.dir directory in which output files will be written. Can be set to NA to not write PCFed files.
 #' @param out.prefix prefix for output file names
 #'
 #' @return output: ascat data structure containing:\cr
@@ -231,8 +231,8 @@ ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), asc
       }
     }
     
-    write.table(logRPCFed,logrfilename,sep="\t",col.names=F)
-    write.table(bafPCFed,baffilename,sep="\t",col.names=F)
+    if (!is.na(out.dir)) write.table(logRPCFed,logrfilename,sep="\t",col.names=F)
+    if (!is.na(out.dir)) write.table(bafPCFed,baffilename,sep="\t",col.names=F)
     bafPCFed = as.matrix(bafPCFed)
     Tumor_LogR_segmented[,sample] = logRPCFed
     Tumor_BAF_segmented[[sample]] = 1-bafPCFed

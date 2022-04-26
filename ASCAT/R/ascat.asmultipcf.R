@@ -6,6 +6,7 @@
 #' @param ASCATobj an ASCAT object
 #' @param ascat.gg germline genotypes (NULL if germline data is available)
 #' @param penalty penalty of introducing an additional ASPCF breakpoint (expert parameter, don't adapt unless you know what you are doing)
+#' @param out.dir directory in which output files will be written. Can be set to NA to not write PCFed files.
 #' @param wsample Vector of length length(ASCATobj$samples). Can be used to assign different weights to samples, for example to account for differences in sequencing quality. (Default = NULL)
 #' @param selectAlg Set to "exact" to run the exact algorithm, or "fast" to run the heuristic algorithm. (Default = "exact")
 #' @param refine Logical. Should breakpoints be refined on a per sample base? Otherwise each breakpoint is assumed to be present in each sample. (Default = TRUE)
@@ -25,7 +26,7 @@
 #' 
 #' @export
 #'
-ascat.asmultipcf <- function(ASCATobj, ascat.gg = NULL, penalty = 70, wsample=NULL,
+ascat.asmultipcf <- function(ASCATobj, ascat.gg = NULL, penalty = 70, out.dir = ".", wsample=NULL,
                        selectAlg="exact",refine=TRUE) {
   
   useLogRonlySites=TRUE
@@ -331,15 +332,15 @@ ascat.asmultipcf <- function(ASCATobj, ascat.gg = NULL, penalty = 70, wsample=NU
   Tumor_BAF_segmented <- list()
   
   for (sample in 1:length(ASCATobj$samples)) { 
-    logrfilename = paste(ASCATobj$samples[sample],".LogR.PCFed.txt",sep="")
-    baffilename = paste(ASCATobj$samples[sample],".BAF.PCFed.txt",sep="")
+    logrfilename = paste(out.dir,'/',ASCATobj$samples[sample],".LogR.PCFed.txt",sep="")
+    baffilename = paste(out.dir,'/',ASCATobj$samples[sample],".BAF.PCFed.txt",sep="")
     
     ## remove NAs from BAF data
     bafPCFed_sample <- bafPCFed[!is.na(bafPCFed[,sample]),sample,drop=FALSE]
     Tumor_BAF_segmented[[sample]] <- 1-bafPCFed_sample
     
-    write.table(logRPCFed[,sample],logrfilename,sep="\t",col.names=F,quote=F)
-    write.table(bafPCFed_sample,baffilename,sep="\t",col.names=F,quote=F)
+    if (!is.na(out.dir)) write.table(logRPCFed[,sample],logrfilename,sep="\t",col.names=F,quote=F)
+    if (!is.na(out.dir)) write.table(bafPCFed_sample,baffilename,sep="\t",col.names=F,quote=F)
   }
   
   ASCATobj$Tumor_LogR_segmented=logRPCFed
