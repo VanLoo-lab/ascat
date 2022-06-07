@@ -15,7 +15,6 @@ ascat.plotRawData = function(ASCATobj, img.dir=".", img.prefix="", logr.y_values
     par(mar = c(0.5,5,5,0.5), mfrow = c(2,1), cex = 0.4, cex.main=3, cex.axis = 2, pch = ifelse(dim(ASCATobj$Tumor_LogR)[1]>100000,".",20))
     plot(c(1,dim(ASCATobj$Tumor_LogR)[1]), logr.y_values, type = "n", xaxt = "n", main = paste(ASCATobj$samples[i], ", tumor data, LogR", sep = ""), xlab = "", ylab = "")
     points(ASCATobj$Tumor_LogR[,i],col="red")
-    #points(ASCATobj$Tumor_LogR[,i],col=rainbow(24)[ASCATobj$SNPpos$Chr])
     abline(v=0.5,lty=1,col="lightgrey")
     chrk_tot_len = 0
     for (j in 1:length(ASCATobj$ch)) {
