@@ -10,7 +10,11 @@ This repository also contains the code underlying additional publication:
 [Allele-specific multi-sample copy number segmentation. Ross EM, Haase K, Van Loo P & Markowetz F. *Bioinformatics* (2020)](https://pubmed.ncbi.nlm.nih.gov/32449758).
 
 ## Installation (v3.0 version)
-`devtools::install_github('VanLoo-lab/ascat/ASCAT')`
+Bioconductor package dependencies: [GenomicRanges](https://bioconductor.org/packages/release/bioc/html/GenomicRanges.html) & [IRanges](https://bioconductor.org/packages/release/bioc/html/IRanges.html) (`BiocManager::install(c('GenomicRanges','IRanges'))` with a recent R/BiocManager version).
+
+Processing high-throughput sequencing data: [alleleCounter](https://github.com/cancerit/alleleCount) (C version)
+
+Installing ASCAT using R: `devtools::install_github('VanLoo-lab/ascat/ASCAT')`
 
 ## Changes since v2.5.3
 ### Major changes:
@@ -42,7 +46,7 @@ We provide some scripts and input data in the *[ExampleData](ExampleData)* folde
 ## Reference files
 - LogR correction files (`ascat.correctLogR`) for standard platforms (Affymetrix SNP 6.0, Affymetrix 250k STY, Illumina 660k and Illumina OmniExpress) can be found in the *[ReferenceFiles/SNParrays](ReferenceFiles/SNParrays)* folder. For other platforms, please use our scripts (in *[LogRcorrection](LogRcorrection)*) to generate such correction files.
 - For WGS, we provide logR correction files as well as loci and allele files in *[ReferenceFiles/WGS](ReferenceFiles/WGS)*.
-- For WES, we recommend using all biallelic SNPs from the 1,000 Genomes Project. One could reproduce the process described in *[ReferenceFiles/WGS](ReferenceFiles/WGS)*, relaxing allele frequency to increase resolution. Our reference files for WGS are not suitable for WES.
+- For WES, we recommend using the references files (loci, allele and logR correction files) as part of the [Battenberg package](https://github.com/Wedge-lab/battenberg). Because WES requires a high-resolution input, our reference files for WGS are not suitable for WES.
 
 ## Supported arrays without matched germline
 *Custom10k*, *IlluminaASA*, *IlluminaGSAv3*, *Illumina109k*, *IlluminaCytoSNP*, *IlluminaCytoSNP850k*, *Illumina610k*, *Illumina660k*, *Illumina700k*, *Illumina1M*, *Illumina2.5M*, *IlluminaOmni5*, *Affy10k*, *Affy100k*, *Affy250k_sty*, *Affy250k_nsp*, *AffyOncoScan*, *AffyCytoScanHD*, *AffySNP6*, *HumanCNV370quad*, *HumanCore12*, *HumanCoreExome24*, *HumanOmniExpress12* and *IlluminaOmniExpressExome*.
