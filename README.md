@@ -10,7 +10,11 @@ This repository also contains the code underlying additional publication:
 [Allele-specific multi-sample copy number segmentation. Ross EM, Haase K, Van Loo P & Markowetz F. *Bioinformatics* (2020)](https://pubmed.ncbi.nlm.nih.gov/32449758).
 
 ## Installation (v3.0 version)
-`devtools::install_github('VanLoo-lab/ascat/ASCAT')`
+Bioconductor package dependencies: [GenomicRanges](https://bioconductor.org/packages/release/bioc/html/GenomicRanges.html) & [IRanges](https://bioconductor.org/packages/release/bioc/html/IRanges.html) (`BiocManager::install(c('GenomicRanges','IRanges'))` with a recent R/BiocManager version).
+
+Processing high-throughput sequencing data: [alleleCounter](https://github.com/cancerit/alleleCount) (C version)
+
+Installing ASCAT using R: `devtools::install_github('VanLoo-lab/ascat/ASCAT')`
 
 ## Changes since v2.5.3
 ### Major changes:
