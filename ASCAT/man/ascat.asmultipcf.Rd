@@ -11,7 +11,8 @@ ascat.asmultipcf(
   out.dir = ".",
   wsample = NULL,
   selectAlg = "exact",
-  refine = TRUE
+  refine = TRUE,
+  seed = as.integer(Sys.time())
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ ascat.asmultipcf(
 \item{selectAlg}{Set to "exact" to run the exact algorithm, or "fast" to run the heuristic algorithm. (Default = "exact")}
 
 \item{refine}{Logical. Should breakpoints be refined on a per sample base? Otherwise each breakpoint is assumed to be present in each sample. (Default = TRUE)}
+
+\item{seed}{A seed to be set when subsampling SNPs for X in males (optional, default=as.integer(Sys.time())).}
 }
 \value{
 output: ascat data structure containing:\cr

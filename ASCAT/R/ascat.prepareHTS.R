@@ -47,7 +47,7 @@ ascat.getAlleleCounts = function(seq.file, output.file, loci.file, min.base.qual
 #' @param minCounts Minimum depth, in mormal, required for a SNP to be considered (optional, default=20).
 #' @param BED_file A BED file for only looking at SNPs within specific intervals (optional, default=NA).
 #' @param probloci_file A file (chromosome <tab> position; no header) containing specific loci to ignore (optional, default=NA).
-#' @param seed A seed to be set for when randomising the alleles (optional, default=as.integer(Sys.time())).
+#' @param seed A seed to be set when randomising the alleles (optional, default=as.integer(Sys.time())).
 #' @author dw9, sd11, tl
 #' @export
 ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, normalAlleleCountsFile.prefix, tumourLogR_file, tumourBAF_file, normalLogR_file, normalBAF_file, alleles.prefix, gender, genomeVersion, chrom_names=c(1:22,'X'), minCounts=20, BED_file=NA, probloci_file=NA, seed=as.integer(Sys.time())) {
@@ -144,7 +144,7 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
     } else if (genomeVersion=='hg38') {
       nonPAR=c(2781480,155701382)
     }
-    nonPAR=which(allele_data$chromosome=='X' & allele_data$position>=nonPAR[1] & allele_data$position<=nonPAR[2])
+    nonPAR=which(allele_data$chromosome %in% c('X','chrX') & allele_data$position>=nonPAR[1] & allele_data$position<=nonPAR[2])
     tumourLogR[nonPAR]=tumourLogR[nonPAR]-1
   }
   # Create the output data.frames

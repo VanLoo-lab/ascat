@@ -10,6 +10,7 @@
 #' @param wsample Vector of length length(ASCATobj$samples). Can be used to assign different weights to samples, for example to account for differences in sequencing quality. (Default = NULL)
 #' @param selectAlg Set to "exact" to run the exact algorithm, or "fast" to run the heuristic algorithm. (Default = "exact")
 #' @param refine Logical. Should breakpoints be refined on a per sample base? Otherwise each breakpoint is assumed to be present in each sample. (Default = TRUE)
+#' @param seed A seed to be set when subsampling SNPs for X in males (optional, default=as.integer(Sys.time())).
 #' 
 #' @details This function saves the results in in [sample].LogR.PCFed.txt and [sample].BAF.PCFed.txt
 #' 
@@ -26,9 +27,8 @@
 #' 
 #' @export
 #'
-ascat.asmultipcf <- function(ASCATobj, ascat.gg = NULL, penalty = 70, out.dir = ".", wsample=NULL,
-                       selectAlg="exact",refine=TRUE) {
-  
+ascat.asmultipcf <- function(ASCATobj, ascat.gg = NULL, penalty = 70, out.dir = ".", wsample=NULL, selectAlg="exact",refine=TRUE, seed=as.integer(Sys.time())) {
+  set.seed(seed)
   useLogRonlySites=TRUE
   #first, set germline genotypes
   gg = NULL

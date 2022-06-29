@@ -10,7 +10,8 @@ ascat.aspcf(
   ascat.gg = NULL,
   penalty = 70,
   out.dir = ".",
-  out.prefix = ""
+  out.prefix = "",
+  seed = as.integer(Sys.time())
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ ascat.aspcf(
 \item{out.dir}{directory in which output files will be written. Can be set to NA to not write PCFed files.}
 
 \item{out.prefix}{prefix for output file names}
+
+\item{seed}{A seed to be set when subsampling SNPs for X in males (optional, default=as.integer(Sys.time())).}
 }
 \value{
 output: ascat data structure containing:\cr
