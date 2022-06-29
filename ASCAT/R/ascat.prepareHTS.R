@@ -144,7 +144,7 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
     } else if (genomeVersion=='hg38') {
       nonPAR=c(2781480,155701382)
     }
-    nonPAR=which(allele_data$chromosome=='X' & allele_data$position>=nonPAR[1] & allele_data$position<=nonPAR[2])
+    nonPAR=which(allele_data$chromosome %in% c('X','chrX') & allele_data$position>=nonPAR[1] & allele_data$position<=nonPAR[2])
     tumourLogR[nonPAR]=tumourLogR[nonPAR]-1
   }
   # Create the output data.frames

@@ -824,6 +824,7 @@ diploidprobes_fixnonPAR=function(diploidprobes,SNP_data,nonPAR,seg_info) {
   requireNamespace("GenomicRanges")
   requireNamespace("IRanges")
   stopifnot(length(diploidprobes)==nrow(SNP_data) && length(diploidprobes)==length(seg_info))
+  SNP_data$Chr=gsub('^chr','',SNP_data$Chr) # remove 'chr'
   if (!'X' %in% SNP_data$Chr) return(diploidprobes)
   # First, set all SNPs to diploidprobes=T for X
   diploidprobes[which(SNP_data$Chr=='X')]=T
