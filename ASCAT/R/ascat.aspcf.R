@@ -8,6 +8,7 @@
 #' @param penalty penalty of introducing an additional ASPCF breakpoint (expert parameter, don't adapt unless you know what you're doing)
 #' @param out.dir directory in which output files will be written. Can be set to NA to not write PCFed files.
 #' @param out.prefix prefix for output file names
+#' @param seed A seed to be set when subsampling SNPs for X in males (optional, default=as.integer(Sys.time())).
 #'
 #' @return output: ascat data structure containing:\cr
 #' 1. Tumor_LogR data matrix\cr
@@ -22,8 +23,8 @@
 #'
 #' @export
 #'
-ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), ascat.gg = NULL, penalty = 70, out.dir=".", out.prefix="") {
-
+ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), ascat.gg = NULL, penalty = 70, out.dir=".", out.prefix="", seed=as.integer(Sys.time())) {
+  set.seed(seed)
   # first, set germline genotypes
   gg = NULL
   if(!is.null(ascat.gg)) {

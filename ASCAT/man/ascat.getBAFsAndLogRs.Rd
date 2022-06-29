@@ -51,7 +51,7 @@ ascat.getBAFsAndLogRs(
 
 \item{probloci_file}{A file (chromosome <tab> position; no header) containing specific loci to ignore (optional, default=NA).}
 
-\item{seed}{A seed to be set for when randomising the alleles (optional, default=as.integer(Sys.time())).}
+\item{seed}{A seed to be set when randomising the alleles (optional, default=as.integer(Sys.time())).}
 }
 \description{
 Obtain BAF and LogR from the allele counts.
