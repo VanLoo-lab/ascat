@@ -104,7 +104,11 @@ ascat.correctLogR = function(ASCATobj, GCcontentfile = NULL, replictimingfile = 
         RT_correction_after=c(RT_correction_after,NA)
       }
       
-      chr = ASCAT:::split_genome(SNPpos)
+      if (!ASCATobj$isTargetedSeq) {
+        chr=split_genome(SNPpos)
+      } else {
+        chr=ch
+      }
       
       GC_correction_before=c(GC_correction_before,paste0(maxGCcol_insert,"=",round(corr[maxGCcol_insert],4),' / ',maxGCcol_amplic,'=',round(corr[maxGCcol_amplic],4)))
       corr_after=abs(cor(GC_newlist[, which(colnames(GC_newlist) %in% c(maxGCcol_insert,maxGCcol_amplic))], Tumor_LogR[,s], use="complete.obs")[,1])

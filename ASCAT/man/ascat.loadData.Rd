@@ -12,7 +12,8 @@ ascat.loadData(
   chrs = c(1:22, "X", "Y"),
   gender = NULL,
   sexchromosomes = c("X", "Y"),
-  genomeVersion = NULL
+  genomeVersion = NULL,
+  isTargetedSeq = F
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ ascat.loadData(
 \item{sexchromosomes}{a vector containing the names for the sex chromosomes. Default = c("X","Y")}
 
 \item{genomeVersion}{a string (either 'hg19' or 'hg38') so nonPAR coordinates on X can be stored, NULL}
+
+\item{isTargetedSeq}{a boolean indicating whether data come from a targeted sequencing experiment. Default = F}
 }
 \value{
 ascat data structure containing:\cr
@@ -48,7 +51,8 @@ ascat data structure containing:\cr
 12. gender: a vector of gender for each cases ("XX" or "XY"). Default = NULL: all female ("XX")\cr
 13. sexchromosomes: a vector containingg names of sex chromosomes\cr
 14. X_nonPAR: a vector of two values (start and stop) to define where the nonPAR region is on X\cr
-15. failedarrays: placeholder, NULL\cr
+15. isTargetedSeq:  boolean indicating whether data come from a targeted sequencing experiment\cr
+16. failedarrays: placeholder, NULL\cr
 }
 \description{
 Function to read in SNP array data
