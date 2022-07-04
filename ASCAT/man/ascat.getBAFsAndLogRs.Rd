@@ -45,7 +45,7 @@ ascat.getBAFsAndLogRs(
 
 \item{chrom_names}{A vector with allowed chromosome names (optional, default=c(1:22,'X')).}
 
-\item{minCounts}{Minimum depth, in mormal, required for a SNP to be considered (optional, default=20).}
+\item{minCounts}{Minimum depth, in normal samples, required for a SNP to be considered (optional, default=20).}
 
 \item{BED_file}{A BED file for only looking at SNPs within specific intervals (optional, default=NA).}
 

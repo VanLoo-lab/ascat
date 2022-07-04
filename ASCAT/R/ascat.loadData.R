@@ -9,6 +9,7 @@
 #' @param gender a vector of gender for each cases ("XX" or "XY"). Default = all female ("XX")
 #' @param sexchromosomes a vector containing the names for the sex chromosomes. Default = c("X","Y")
 #' @param genomeVersion a string (either 'hg19' or 'hg38') so nonPAR coordinates on X can be stored, NULL
+#' @param isTargetedSeq a boolean indicating whether data come from a targeted sequencing experiment. Default = F
 #'
 #' @return ascat data structure containing:\cr
 #' 1. Tumor_LogR data matrix\cr
@@ -25,12 +26,14 @@
 #' 12. gender: a vector of gender for each cases ("XX" or "XY"). Default = NULL: all female ("XX")\cr
 #' 13. sexchromosomes: a vector containingg names of sex chromosomes\cr
 #' 14. X_nonPAR: a vector of two values (start and stop) to define where the nonPAR region is on X\cr
-#' 15. failedarrays: placeholder, NULL\cr
+#' 15. isTargetedSeq:  boolean indicating whether data come from a targeted sequencing experiment\cr
+#' 16. failedarrays: placeholder, NULL\cr
 #'
 #' @export
 #'
-ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = NULL, Germline_BAF_file = NULL, chrs = c(1:22,"X","Y"), gender = NULL, sexchromosomes = c("X","Y"), genomeVersion=NULL) {
+ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = NULL, Germline_BAF_file = NULL, chrs = c(1:22,"X","Y"), gender = NULL, sexchromosomes = c("X","Y"), genomeVersion=NULL, isTargetedSeq=F) {
   
+  stopifnot(length(isTargetedSeq)==1 && isTargetedSeq %in% c(T,F))
   # read in SNP array data files
   print.noquote("Reading Tumor LogR data...")
   Tumor_LogR <- read.table(Tumor_LogR_file, header=T, row.names=1, comment.char="", sep = "\t", check.names=F)
@@ -102,8 +105,12 @@ ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = 
   }
   
   # split the genome into distinct parts to be used for segmentation (e.g. chromosome arms, parts of genome between gaps in array design)
-  print.noquote("Splitting genome in distinct chunks...")
-  chr = split_genome(SNPpos)
+  if (!isTargetedSeq) {
+    print.noquote("Splitting genome in distinct chunks...")
+    chr = split_genome(SNPpos)
+  } else {
+    chr=ch
+  }
   
   if (is.null(gender)) {
     gender = rep("XX",dim(Tumor_LogR)[2])
@@ -127,7 +134,7 @@ ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = 
               SNPpos = SNPpos, ch = ch, chr = chr, chrs = chrs,
               samples = colnames(Tumor_LogR), gender = gender,
               sexchromosomes = sexchromosomes, X_nonPAR = X_nonPAR,
-              failedarrays = NULL))
+              isTargetedSeq = isTargetedSeq, failedarrays = NULL))
 }
 
 # helper function to split the genome into parts

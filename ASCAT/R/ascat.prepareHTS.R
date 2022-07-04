@@ -44,7 +44,7 @@ ascat.getAlleleCounts = function(seq.file, output.file, loci.file, min.base.qual
 #' @param gender Gender information, either 'XX' (=female) or 'XY' (=male).
 #' @param genomeVersion Genome version, either 'hg19' or 'hg38'.
 #' @param chrom_names A vector with allowed chromosome names (optional, default=c(1:22,'X')).
-#' @param minCounts Minimum depth, in mormal, required for a SNP to be considered (optional, default=20).
+#' @param minCounts Minimum depth, in normal samples, required for a SNP to be considered (optional, default=20).
 #' @param BED_file A BED file for only looking at SNPs within specific intervals (optional, default=NA).
 #' @param probloci_file A file (chromosome <tab> position; no header) containing specific loci to ignore (optional, default=NA).
 #' @param seed A seed to be set when randomising the alleles (optional, default=as.integer(Sys.time())).
