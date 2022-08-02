@@ -50,8 +50,8 @@ ascat.metrics = function(ASCAT_input_object,ASCAT_output_object) {
     if ('RT_correction_after' %in% names(ASCAT_input_object)) {RT_correction_after=ASCAT_input_object$RT_correction_after[SAMPLE]} else {RT_correction_after=NA}
     if (!is.null(ASCAT_input_object$Tumor_LogR_segmented) && !is.null(ASCAT_input_object$Tumor_BAF_segmented[[nSAMPLE]])) {
       n_het_SNP=length(ASCAT_input_object$Tumor_BAF_segmented[[nSAMPLE]])
-      n_segs_logR=length(rle(ASCAT_input_object$Tumor_LogR_segmented[,SAMPLE])$values)
-      n_segs_BAF=length(rle(ASCAT_input_object$Tumor_BAF_segmented[[nSAMPLE]][,1])$values)
+      n_segs_logR=length(rle(paste0(as.character(ASCAT_input_object$SNPpos[names(ASCAT_input_object$Tumor_LogR_segmented[,SAMPLE]),1]),'_',ASCAT_input_object$Tumor_LogR_segmented[,SAMPLE]))$values)
+      n_segs_BA=length(rle(paste0(as.character(ASCAT_input_object$SNPpos[names(ASCAT_input_object$Tumor_BAF_segmented[[nSAMPLE]][,1]),1]),'_',ASCAT_input_object$Tumor_BAF_segmented[[nSAMPLE]][,1]))$values)
       n_segs_logRBAF_diff=abs(n_segs_logR-n_segs_BAF)
       segm_baf=ASCAT_input_object$Tumor_BAF[rownames(ASCAT_input_object$Tumor_BAF_segmented[[nSAMPLE]]),SAMPLE]
       frac_homo=round(length(which(segm_baf<0.1 | segm_baf>0.9))/length(segm_baf),4)
