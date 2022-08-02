@@ -32,5 +32,6 @@ Depends:
     foreach,
     utils
 License: GPL-3
+Encoding: UTF-8
 LazyLoad: yes
 RoxygenNote: 7.2.0
