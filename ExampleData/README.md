@@ -8,8 +8,9 @@ ascat.bc = ascat.correctLogR(ascat.bc, GCcontentfile = "GC_example.txt", replict
 ascat.plotRawData(ascat.bc, img.prefix = "After_correction_")
 ascat.bc = ascat.aspcf(ascat.bc) # penalty=25 for targeted sequencing data
 ascat.plotSegmentedData(ascat.bc)
-ascat.output = ascat.runAscat(ascat.bc, write_segments=T) # gamma=1 for HTS data
+ascat.output = ascat.runAscat(ascat.bc, write_segments = T) # gamma=1 for HTS data
 QC = ascat.metrics(ascat.bc,ascat.output)
+save(ascat.bc, ascat.output, QC, file = 'ASCAT_objects.Rdata')
 ```
 
 ## Minimal ASCAT run (adapted from the standard run: no logR correction, no intermediate plot, no QC)
@@ -17,8 +18,9 @@ QC = ascat.metrics(ascat.bc,ascat.output)
 ```R
 library(ASCAT)
 ascat.bc = ascat.loadData(Tumor_LogR_file = "Tumor_LogR.txt", Tumor_BAF_file = "Tumor_BAF.txt", Germline_LogR_file = "Germline_LogR.txt", Germline_BAF_file = "Germline_BAF.txt", gender = rep('XX',100), genomeVersion = "hg19")
-ascat.bc = ascat.aspcf(ascat.bc, out.dir = NA)
+ascat.bc = ascat.aspcf(ascat.bc, out.dir = NA) # penalty=25 for targeted sequencing data
 ascat.output = ascat.runAscat(ascat.bc) # gamma=1 for HTS data
+save(ascat.bc,ascat.output,file='ASCAT_objects.Rdata')
 ```
 
 
@@ -33,8 +35,9 @@ ascat.plotRawData(ascat.bc, img.prefix = "After_correction_")
 gg = ascat.predictGermlineGenotypes(ascat.bc, platform = "AffySNP6")
 ascat.bc = ascat.aspcf(ascat.bc, ascat.gg=gg)
 ascat.plotSegmentedData(ascat.bc)
-ascat.output = ascat.runAscat(ascat.bc, write_segments=T) # gamma=1 for HTS data
+ascat.output = ascat.runAscat(ascat.bc, write_segments = T)
 QC = ascat.metrics(ascat.bc,ascat.output)
+save(ascat.bc, ascat.output, QC, file = 'ASCAT_objects.Rdata')
 ```
 
 ## ASCAT run with multi-sample segmentation (when shared breakpoints are expected)
@@ -47,8 +50,9 @@ ascat.bc = ascat.correctLogR(ascat.bc, GCcontentfile = "GC_example.txt", replict
 ascat.plotRawData(ascat.bc, img.prefix = "After_correction_")
 ascat.bc = ascat.asmultipcf(ascat.bc)
 ascat.plotSegmentedData(ascat.bc)
-ascat.output = ascat.runAscat(ascat.bc, write_segments=T) # gamma=1 for HTS data
+ascat.output = ascat.runAscat(ascat.bc, write_segments = T) # gamma=1 for HTS data
 QC = ascat.metrics(ascat.bc,ascat.output)
+save(ascat.bc, ascat.output, QC, file = 'ASCAT_objects.Rdata')
 ```
 
 ## Getting CNA profiles from CEL files using ASCAT
@@ -82,8 +86,9 @@ ascat.bc = ascat.correctLogR(ascat.bc, GCcontentfile = "GC_file.txt", replictimi
 ascat.plotRawData(ascat.bc, img.prefix = "After_correction_")
 ascat.bc = ascat.aspcf(ascat.bc)
 ascat.plotSegmentedData(ascat.bc)
-ascat.output = ascat.runAscat(ascat.bc, gamma=1, write_segments=T)
+ascat.output = ascat.runAscat(ascat.bc, gamma=1, write_segments = T)
 QC = ascat.metrics(ascat.bc,ascat.output)
+save(ascat.bc, ascat.output, QC, file = 'ASCAT_objects.Rdata')
 ```
 
 ## Processing targeted sequencing data
@@ -121,6 +126,7 @@ ascat.bc = ascat.correctLogR(ascat.bc, GCcontentfile = "GC_file.txt", replictimi
 ascat.plotRawData(ascat.bc, img.prefix = "After_correction_")
 ascat.bc = ascat.aspcf(ascat.bc, penalty=25)
 ascat.plotSegmentedData(ascat.bc)
-ascat.output = ascat.runAscat(ascat.bc, gamma=1, write_segments=T)
+ascat.output = ascat.runAscat(ascat.bc, gamma=1, write_segments = T)
 QC = ascat.metrics(ascat.bc,ascat.output)
+save(ascat.bc, ascat.output, QC, file = 'ASCAT_objects.Rdata')
 ```

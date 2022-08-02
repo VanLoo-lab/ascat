@@ -14,7 +14,7 @@
 #' @param psi_manual optional argument to override ASCAT optimization and supply psi parameter (expert parameter, don't adapt unless you know what you're doing).
 #' @param img.dir directory in which figures will be written
 #' @param img.prefix prefix for figure names
-#' @param write_segments Optional flag to output segments in text files (.segments_raw.txt and .segments.txt). Default=F
+#' @param write_segments Optional flag to output segments in text files (.segments_raw.txt and .segments.txt under img.dir). Default=F
 #' @details Note: for copy number only probes, nA contains the copy number value and nB = 0.
 #' @return an ASCAT output object, containing:\cr
 #' 1. nA: copy number of the A allele\cr
@@ -140,8 +140,8 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
     seg_raw[,8]=as.numeric(seg_raw[,8])
     
     if (write_segments) {
-      write.table(seg_raw,file=paste0(ASCATobj$samples[goodarrays[i]],'.segments_raw.txt'),sep='\t',row.names=F,col.names=T,quote=F)
-      write.table(seg,file=paste0(ASCATobj$samples[goodarrays[i]],'.segments.txt'),sep='\t',row.names=F,col.names=T,quote=F)
+      write.table(seg_raw,file=file.path(img.dir,paste0(ASCATobj$samples[goodarrays[i]],'.segments_raw.txt')),sep='\t',row.names=F,col.names=T,quote=F)
+      write.table(seg,file=file.path(img.dir,paste0(ASCATobj$samples[goodarrays[i]],'.segments.txt')),sep='\t',row.names=F,col.names=T,quote=F)
     }
     
   } else {

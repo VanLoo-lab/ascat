@@ -6,7 +6,7 @@ Briefly, such list was derived from 1000 Genomes Project SNPs ([hg19](http://ftp
 - Biallelic SNPs with allele frequency higher than 0.35 and lower than 0.65 in any population were selected using *BCFtools*.
 - Duplicated entries were removed using *R*.
 - SNPs located in the [ENCODE blacklisted regions](https://github.com/Boyle-Lab/Blacklist/) were discared.
-- SNPs with noisy BAF (distant from 0/0.5/1) in normal samples (a.k.a probloci) as part of the [Battenberg](https://github.com/Wedge-lab/battenberg) package were discarded.
+- SNPs with noisy BAF (distant from 0/0.5/1) in normal samples (a.k.a probloci) as part of the [Battenberg](https://github.com/Wedge-lab/battenberg) package were discarded (*probloci_270415.txt.gz* for hg19 and *probloci.zip* for hg38).
 
 Since hg38 data for the non-PAR region of chrX is not available (as of September 2021), hg38 data for the whole chrX comes from a lift-over from hg19.
 

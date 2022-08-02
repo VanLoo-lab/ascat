@@ -45,3 +45,6 @@ The created output file (*ReplicationTiming_SNPloci.txt*) should start like this
 | rs2980314 | 1 | 781258 | 56.79295 | 62.546955 | 60.079067 | 60.68153 | 61.683388 | 59.267509 | 61.892082 | 64.298447 | 68.724228 | 59.908783 | 68.960464 | 69.863716 | 65.745972 | 59.575733 | 58.227413 |
 
 Please note that replication timing information comes from [ENCODE](http://hgdownload.cse.ucsc.edu/goldenpath/hg19/encodeDCC/wgEncodeUwRepliSeq/) and is based on hg19. Therefore, script will only works on hg19/GRCh37 SNPs due to the lack of publicly available replication data on other genomes like hg38. However, one may lift-over hg38/GRCh38 loci to hg19/GRCh37 coordinates, extract replication timing information and reset coordinates back to hg38/GRCh38.
+
+# Additional information
+Please note that row names in the `SNPpos` file need to be unique but don't need to be SNP IDs (*e.g.* from dbSNP). One can define row names as `${chromosome}_${position}` as long as they are unique and match with row names in logR/BAF files. See our GC correction file for WGS (under [ReferenceFiles/WGS](../ReferenceFiles/WGS)).

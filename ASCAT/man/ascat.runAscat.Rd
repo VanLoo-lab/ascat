@@ -48,7 +48,7 @@ ascat.runAscat(
 
 \item{img.prefix}{prefix for figure names}
 
-\item{write_segments}{Optional flag to output segments in text files (.segments_raw.txt and .segments.txt). Default=F}
+\item{write_segments}{Optional flag to output segments in text files (.segments_raw.txt and .segments.txt under img.dir). Default=F}
 }
 \value{
 an ASCAT output object, containing:\cr
