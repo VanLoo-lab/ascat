@@ -13,33 +13,35 @@ ascat.metrics(ASCAT_input_object, ASCAT_output_object)
 }
 \value{
 A dataframe (one sample per line) with the following metrics (as columns):\cr
-1. sex - Sex information as provided.\cr
-2. tumour_mapd - Median Absolute Pairwise Difference (MAPD) in tumour logR track.\cr
-3. normal_mapd - Median Absolute Pairwise Difference (MAPD) in normal logR track (should be NA without matched normals and 0 for sequencing data).\cr
-4. GC_correction_before - logR/GC correlation before correction.\cr
-5. GC_correction_after - logR/GC correlation after correction.\cr
-6. RT_correction_before - logR/RT correlation before correction.\cr
-7. RT_correction_after - logR/RT correlation after correction.\cr
-8. n_het_SNP - Number of heterozygous SNPs.\cr
-9. n_segs_logR - Number of segments in the logR track.\cr
-10. n_segs_BAF - Number of segments in the BAF track.\cr
-11. n_segs_logRBAF_diff - Difference between number of segments in the logR versus BAF track.\cr
-12. frac_homo - Fraction of homozygous (<0.1 | >0.9) probes in tumour.\cr
-13. purity - Purity estimate.\cr
-14. ploidy - Ploidy estimate.\cr
-15. goodness_of_fit - Goodness of fit.\cr
-16. n_segs - Number of copy-number segments.\cr
-17. segs_size - Total size of all segments.\cr
-18. n_segs_1kSNP - Number of segments per 1k heterozygous SNPs.\cr
-19. homdel_segs - Number of segments with homozygous deletion.\cr
-20. homdel_largest - largest segment with homozygous deletion.\cr
-21. homdel_size - Total size of segments with homozygous deletion.\cr
-22. homdel_fraction - Fraction of the genome with homozygous deletion.\cr
-23. LOH - Fraction of the genome with LOH (ignoring sex chromosomes).\cr
-24. mode_minA - Mode of the minor allele (ignoring sex chromosomes).\cr
-25. mode_majA - Mode of the major allele (ignoring sex chromosomes).\cr
-26. WGD - Whole genome doubling event (ignoring sex chromosomes).\cr
-27. GI - Genomic instability score (ignoring sex chromosomes).\cr
+sex - Sex information as provided.\cr
+tumour_mapd - Median Absolute Pairwise Difference (MAPD) in tumour logR track.\cr
+normal_mapd - Median Absolute Pairwise Difference (MAPD) in normal logR track (should be NA without matched normals and 0 for sequencing data).\cr
+GC_correction_before - logR/GC correlation before correction.\cr
+GC_correction_after - logR/GC correlation after correction.\cr
+RT_correction_before - logR/RT correlation before correction.\cr
+RT_correction_after - logR/RT correlation after correction.\cr
+n_het_SNP - Number of heterozygous SNPs.\cr
+n_segs_logR - Number of segments in the logR track.\cr
+n_segs_BAF - Number of segments in the BAF track.\cr
+n_segs_logRBAF_diff - Difference between number of segments in the logR versus BAF track.\cr
+frac_homo - Fraction of homozygous (<0.1 | >0.9) probes in tumour.\cr
+purity - Purity estimate.\cr
+ploidy - Ploidy estimate.\cr
+goodness_of_fit - Goodness of fit.\cr
+size_intermediate_segments - Total size of (unrounded) segments in the X.45-X.55 range.\cr
+size_odd_segments - Total size of segments with an odd (1/3/5/+) CN (either nMajor or nMinor).\cr
+n_segs - Number of copy-number segments.\cr
+segs_size - Total size of all segments.\cr
+n_segs_1kSNP - Number of segments per 1k heterozygous SNPs.\cr
+homdel_segs - Number of segments with homozygous deletion.\cr
+homdel_largest - largest segment with homozygous deletion.\cr
+homdel_size - Total size of segments with homozygous deletion.\cr
+homdel_fraction - Fraction of the genome with homozygous deletion.\cr
+LOH - Fraction of the genome with LOH (ignoring sex chromosomes).\cr
+mode_minA - Mode of the minor allele (ignoring sex chromosomes).\cr
+mode_majA - Mode of the major allele (ignoring sex chromosomes).\cr
+WGD - Whole genome doubling event (ignoring sex chromosomes).\cr
+GI - Genomic instability score (ignoring sex chromosomes).\cr
 }
 \description{
 Function to extract different metrics from ASCAT profiles.

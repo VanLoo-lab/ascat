@@ -140,8 +140,29 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = F, y_limit = 5, circ
     seg_raw[,8]=as.numeric(seg_raw[,8])
     
     if (write_segments) {
-      write.table(seg_raw,file=file.path(img.dir,paste0(ASCATobj$samples[goodarrays[i]],'.segments_raw.txt')),sep='\t',row.names=F,col.names=T,quote=F)
-      write.table(seg,file=file.path(img.dir,paste0(ASCATobj$samples[goodarrays[i]],'.segments.txt')),sep='\t',row.names=F,col.names=T,quote=F)
+      for (i in 1:length(goodarrays)) {
+        # Write rounded segments
+        mySeg=data.frame(sample=rep(ASCATobj$samples[goodarrays[i]],nrow(res[[goodarrays[i]]]$seg)),
+                         chr=ASCATobj$SNPpos[res[[goodarrays[i]]]$seg[, 1], 1],
+                         startpos=ASCATobj$SNPpos[res[[goodarrays[i]]]$seg[, 1], 2],
+                         endpos=ASCATobj$SNPpos[res[[goodarrays[i]]]$seg[, 2], 2],
+                         nMajor=res[[goodarrays[i]]]$seg[, 3],
+                         nMinor=res[[goodarrays[i]]]$seg[, 4],
+                         stringsAsFactors=F)
+        write.table(mySeg,file=file.path(img.dir,paste0(ASCATobj$samples[goodarrays[i]],'.segments.txt')),sep='\t',row.names=F,col.names=T,quote=F)
+        # Write unrounded segments
+        mySeg=data.frame(sample=rep(ASCATobj$samples[goodarrays[i]],nrow(res[[goodarrays[i]]]$seg_raw)),
+                         chr=ASCATobj$SNPpos[res[[goodarrays[i]]]$seg_raw[, 1], 1],
+                         startpos=ASCATobj$SNPpos[res[[goodarrays[i]]]$seg_raw[, 1], 2],
+                         endpos=ASCATobj$SNPpos[res[[goodarrays[i]]]$seg_raw[, 2], 2],
+                         nMajor=res[[goodarrays[i]]]$seg_raw[, 3],
+                         nMinor=res[[goodarrays[i]]]$seg_raw[, 4],
+                         nAraw=res[[goodarrays[i]]]$seg_raw[, 5],
+                         nBraw=res[[goodarrays[i]]]$seg_raw[, 6],
+                         stringsAsFactors=F)
+        write.table(mySeg,file=file.path(img.dir,paste0(ASCATobj$samples[goodarrays[i]],'.segments_raw.txt')),sep='\t',row.names=F,col.names=T,quote=F)
+        rm(mySeg)
+      }; rm(i)
     }
     
   } else {
