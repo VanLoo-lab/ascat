@@ -174,11 +174,11 @@ getLociFromNormals=function(Worksheet, Workdir, alleles.prefix, minCounts, is_ch
   } else {
     FEMALES=which(Worksheet$Gender=='XX')
     # Here, autosomes are 1:22 and PAR1/PAR2 regions in X. These regions should be 1+1
-    INDEX_autosomes=which(allele_data$chromosome %in% 1:22 | (allele_data$chromosome=='X' & (allele_data$position<X_nonPAR[1] | allele_data$position>X_nonPAR[2])))
+    INDEX_autosomes=which(allele_data$chromosome %in% paste0(ifelse(is_chr_based,'chr',''),1:22) | (allele_data$chromosome==paste0(ifelse(is_chr_based,'chr',''),'X') & (allele_data$position<X_nonPAR[1] | allele_data$position>X_nonPAR[2])))
     # For autosomes, consider all samples since SNPs will be located in 1+1 regions
     TO_KEEP_autosomes=rowSums(NORMAL_COUNTS_tot[INDEX_autosomes,]>=minCounts&(NORMAL_COUNTS_vaf[INDEX_autosomes,]<0.9&NORMAL_COUNTS_vaf[INDEX_autosomes,]>0.68|NORMAL_COUNTS_vaf[INDEX_autosomes,]>0.1&NORMAL_COUNTS_vaf[INDEX_autosomes,]<0.32))<2.5*0.053876*rowSums(NORMAL_COUNTS_tot[INDEX_autosomes,]>=minCounts&NORMAL_COUNTS_vaf[INDEX_autosomes,]<0.9&NORMAL_COUNTS_vaf[INDEX_autosomes,]>0.1)
     # Here, X is only nonPAR (1+1 for females and 1+0 for males)
-    INDEX_X=which(allele_data$chromosome=='X' & allele_data$position>=X_nonPAR[1] & allele_data$position<=X_nonPAR[2])
+    INDEX_X=which(allele_data$chromosome==paste0(ifelse(is_chr_based,'chr',''),'X') & allele_data$position>=X_nonPAR[1] & allele_data$position<=X_nonPAR[2])
     if (length(INDEX_X)>0) {
       # For X, only consider females (1+1)
       TO_KEEP_X=rowSums(NORMAL_COUNTS_tot[INDEX_X,FEMALES]>=minCounts&(NORMAL_COUNTS_vaf[INDEX_X,FEMALES]<0.9&NORMAL_COUNTS_vaf[INDEX_X,FEMALES]>0.68|NORMAL_COUNTS_vaf[INDEX_X,FEMALES]>0.1&NORMAL_COUNTS_vaf[INDEX_X,FEMALES]<0.32))<2.5*0.053876*rowSums(NORMAL_COUNTS_tot[INDEX_X,FEMALES]>=minCounts&NORMAL_COUNTS_vaf[INDEX_X,FEMALES]<0.9&NORMAL_COUNTS_vaf[INDEX_X,FEMALES]>0.1)
