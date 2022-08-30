@@ -220,12 +220,13 @@ ascat.synchroniseFiles=function(samplename,tumourLogR_file,tumourBAF_file,normal
 #' @param ref.fasta FASTA file used for generating CRAMs (optional, default=NA).
 #' @param skip_allele_counting_tumour Flag, set to TRUE if tumour allele counting is already complete (files are expected in the working directory on disk; optional, default=FALSE).
 #' @param skip_allele_counting_normal Flag, set to TRUE if normal allele counting is already complete (files are expected in the working directory on disk; optional, default=FALSE).
+#' @param seed A seed to be set when randomising the alleles (optional, default=as.integer(Sys.time())).
 #' @author sd11, tl
 #' @export
 ascat.prepareHTS = function(tumourseqfile, normalseqfile, tumourname, normalname, allelecounter_exe, alleles.prefix, loci.prefix, gender, genomeVersion,
                             nthreads=1, tumourLogR_file=NA, tumourBAF_file=NA, normalLogR_file=NA, normalBAF_file=NA, minCounts=10, BED_file=NA,
                             probloci_file=NA, chrom_names=c(1:22,'X'), min_base_qual=20, min_map_qual=35, ref.fasta=NA,
-                            skip_allele_counting_tumour=F, skip_allele_counting_normal=F) {
+                            skip_allele_counting_tumour=F, skip_allele_counting_normal=F, seed=as.integer(Sys.time())) {
   requireNamespace("foreach")
   requireNamespace("doParallel")
   requireNamespace("parallel")
@@ -274,7 +275,8 @@ ascat.prepareHTS = function(tumourseqfile, normalseqfile, tumourname, normalname
                         chrom_names=chrom_names,
                         minCounts=minCounts,
                         BED_file=BED_file,
-                        probloci_file=probloci_file)
+                        probloci_file=probloci_file,
+                        seed=seed)
 
   # Synchronise all information
   ascat.synchroniseFiles(samplename=tumourname,

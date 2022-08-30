@@ -27,7 +27,8 @@ ascat.prepareHTS(
   min_map_qual = 35,
   ref.fasta = NA,
   skip_allele_counting_tumour = F,
-  skip_allele_counting_normal = F
+  skip_allele_counting_normal = F,
+  seed = as.integer(Sys.time())
 )
 }
 \arguments{
@@ -76,6 +77,8 @@ ascat.prepareHTS(
 \item{skip_allele_counting_tumour}{Flag, set to TRUE if tumour allele counting is already complete (files are expected in the working directory on disk; optional, default=FALSE).}
 
 \item{skip_allele_counting_normal}{Flag, set to TRUE if normal allele counting is already complete (files are expected in the working directory on disk; optional, default=FALSE).}
+
+\item{seed}{A seed to be set when randomising the alleles (optional, default=as.integer(Sys.time())).}
 }
 \description{
 Method derived from the Battenberg package (https://github.com/Wedge-lab/battenberg).
