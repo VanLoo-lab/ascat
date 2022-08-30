@@ -13,6 +13,7 @@ ascat.prepareTargetedSeq(
   genomeVersion,
   nthreads = 1,
   minCounts = 10,
+  is_chr_based = F,
   chrom_names = c(1:22, "X"),
   min_base_qual = 20,
   min_map_qual = 35,
@@ -37,7 +38,9 @@ ascat.prepareTargetedSeq(
 
 \item{minCounts}{Minimum depth required in the normal for a SNP to be considered (optional, default=10).}
 
-\item{chrom_names}{A vector containing the names of chromosomes to be considered (optional, default=c(1:22,'X')).}
+\item{is_chr_based}{A boolean indicating whether data is 'chr'-based (e.g. 'chr1' instead of '1'; optional, default=F).}
+
+\item{chrom_names}{A vector containing the names of chromosomes to be considered (optional, default=c(1:22,'X')). Do not set it to paste0('chr',c(1:22,'X')) if data is 'chr'-based.}
 
 \item{min_base_qual}{Minimum base quality required for a read to be counted (optional, default=20).}
 

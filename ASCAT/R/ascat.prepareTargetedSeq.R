@@ -72,21 +72,22 @@ computeLogR=function(NORMAL_COUNTS_tot) {
 #' @param Workdir The folder where output should go.
 #' @param alleles.prefix Prefix path to the allele data (e.g. "G1000_alleles_chr").
 #' @param minCounts Minimum depth, in normal samples, required for a SNP to be considered.
-#' @param X_nonPAR Vector containing genomic coordinates (start & stop) of nonPAR region on X. Default=NULL
+#' @param is_chr_based A boolean indicating whether data is 'chr'-based (e.g. 'chr1' instead of '1'). Default=F.
+#' @param X_nonPAR Vector containing genomic coordinates (start & stop) of nonPAR region on X. Default=NULL.
 #' @param chrom_names A vector containing the names of chromosomes to be considered (optional, default=c(1:22,'X')).
 #' @param plotQC A boolean to generate QC reports as PNGs (optional, default=T).
 #' @noRd
-getLociFromNormals=function(Worksheet, Workdir, alleles.prefix, minCounts, X_nonPAR=NULL, chrom_names=c(1:22,'X'), plotQC=T) {
+getLociFromNormals=function(Worksheet, Workdir, alleles.prefix, minCounts, is_chr_based=F, X_nonPAR=NULL, chrom_names=c(1:22,'X'), plotQC=T) {
   stopifnot((is.null(X_nonPAR)) || (length(X_nonPAR)==2 && all(is.numeric(X_nonPAR))))
   # Read all alleleCount files (counts>=0)
   print('      Getting allele counts...')
   NORMAL_COUNTS=foreach(INDEX=1:nrow(Worksheet)) %dopar% {
-    return(readAlleleCountFiles(paste0(Workdir,'/alleleCounts/',Worksheet$Patient_ID[INDEX],'/',Worksheet$Normal_ID[INDEX],'/',Worksheet$Normal_ID[INDEX],'_unfiltered_chr'),'.txt',chrom_names,0))
+    return(readAlleleCountFiles(paste0(Workdir,'/alleleCounts/',Worksheet$Patient_ID[INDEX],'/',Worksheet$Normal_ID[INDEX],'/',Worksheet$Normal_ID[INDEX],'_unfiltered_chr'),'.txt',chrom_names,0,keep_chr_string=is_chr_based))
   }
   names(NORMAL_COUNTS)=Worksheet$Normal_ID
   stopifnot(all(sapply(2:length(NORMAL_COUNTS), function(x) identical(rownames(NORMAL_COUNTS[[1]]),rownames(NORMAL_COUNTS[[x]])))))
   print('      Getting allelic information...')
-  allele_data=readAllelesFiles(alleles.prefix,'.txt',chrom_names)
+  allele_data=readAllelesFiles(alleles.prefix,'.txt',chrom_names,add_chr_string=is_chr_based)
   stopifnot(identical(rownames(NORMAL_COUNTS[[1]]),rownames(allele_data)))
   # Get ref/alt/tot information for all cases based on alleleCounts and allele data
   NORMAL_COUNTS=lapply(NORMAL_COUNTS,function(x) {
@@ -173,11 +174,11 @@ getLociFromNormals=function(Worksheet, Workdir, alleles.prefix, minCounts, X_non
   } else {
     FEMALES=which(Worksheet$Gender=='XX')
     # Here, autosomes are 1:22 and PAR1/PAR2 regions in X. These regions should be 1+1
-    INDEX_autosomes=which(allele_data$chromosome %in% 1:22 | (allele_data$chromosome=='X' & (allele_data$position<X_nonPAR[1] | allele_data$position>X_nonPAR[2])))
+    INDEX_autosomes=which(allele_data$chromosome %in% paste0(ifelse(is_chr_based,'chr',''),1:22) | (allele_data$chromosome==paste0(ifelse(is_chr_based,'chr',''),'X') & (allele_data$position<X_nonPAR[1] | allele_data$position>X_nonPAR[2])))
     # For autosomes, consider all samples since SNPs will be located in 1+1 regions
     TO_KEEP_autosomes=rowSums(NORMAL_COUNTS_tot[INDEX_autosomes,]>=minCounts&(NORMAL_COUNTS_vaf[INDEX_autosomes,]<0.9&NORMAL_COUNTS_vaf[INDEX_autosomes,]>0.68|NORMAL_COUNTS_vaf[INDEX_autosomes,]>0.1&NORMAL_COUNTS_vaf[INDEX_autosomes,]<0.32))<2.5*0.053876*rowSums(NORMAL_COUNTS_tot[INDEX_autosomes,]>=minCounts&NORMAL_COUNTS_vaf[INDEX_autosomes,]<0.9&NORMAL_COUNTS_vaf[INDEX_autosomes,]>0.1)
     # Here, X is only nonPAR (1+1 for females and 1+0 for males)
-    INDEX_X=which(allele_data$chromosome=='X' & allele_data$position>=X_nonPAR[1] & allele_data$position<=X_nonPAR[2])
+    INDEX_X=which(allele_data$chromosome==paste0(ifelse(is_chr_based,'chr',''),'X') & allele_data$position>=X_nonPAR[1] & allele_data$position<=X_nonPAR[2])
     if (length(INDEX_X)>0) {
       # For X, only consider females (1+1)
       TO_KEEP_X=rowSums(NORMAL_COUNTS_tot[INDEX_X,FEMALES]>=minCounts&(NORMAL_COUNTS_vaf[INDEX_X,FEMALES]<0.9&NORMAL_COUNTS_vaf[INDEX_X,FEMALES]>0.68|NORMAL_COUNTS_vaf[INDEX_X,FEMALES]>0.1&NORMAL_COUNTS_vaf[INDEX_X,FEMALES]<0.32))<2.5*0.053876*rowSums(NORMAL_COUNTS_tot[INDEX_X,FEMALES]>=minCounts&NORMAL_COUNTS_vaf[INDEX_X,FEMALES]<0.9&NORMAL_COUNTS_vaf[INDEX_X,FEMALES]>0.1)
@@ -263,7 +264,7 @@ getLociFromNormals=function(Worksheet, Workdir, alleles.prefix, minCounts, X_non
   # Write output
   if (!dir.exists(paste0(Workdir,'/alleleData/Cleaned'))) dir.create(paste0(Workdir,'/alleleData/Cleaned'))
   for (CHR in chrom_names) {
-    tmp=allele_data[which(allele_data[,1]==CHR),]
+    tmp=allele_data[which(allele_data[,1]==paste0(ifelse(is_chr_based,'chr',''),CHR)),]
     write.table(tmp[,1:2],paste0(Workdir,'/alleleData/Cleaned/loci_chr',CHR,'.txt'),row.names=F,col.names=F,sep='\t',quote=F)
     write.table(tmp[,2:4],paste0(Workdir,'/alleleData/Cleaned/alleleData_chr',CHR,'.txt'),row.names=F,col.names=T,sep='\t',quote=F)
   }; rm(CHR,tmp)
@@ -281,14 +282,15 @@ getLociFromNormals=function(Worksheet, Workdir, alleles.prefix, minCounts, X_non
 #' @param genomeVersion Genome version, either 'hg19' or 'hg38'.
 #' @param nthreads The number of parallel processes to speed up the process (optional, default=1).
 #' @param minCounts Minimum depth required in the normal for a SNP to be considered (optional, default=10).
-#' @param chrom_names A vector containing the names of chromosomes to be considered (optional, default=c(1:22,'X')).
+#' @param is_chr_based A boolean indicating whether data is 'chr'-based (e.g. 'chr1' instead of '1'; optional, default=F).
+#' @param chrom_names A vector containing the names of chromosomes to be considered (optional, default=c(1:22,'X')). Do not set it to paste0('chr',c(1:22,'X')) if data is 'chr'-based.
 #' @param min_base_qual Minimum base quality required for a read to be counted (optional, default=20).
 #' @param min_map_qual Minimum mapping quality required for a read to be counted (optional, default=35).
 #' @param ref.fasta FASTA file used for generating CRAMs (optional, default=NA).
 #' @param plotQC A boolean to generate QC reports as PNGs (optional, default=T).
 #' @export
 ascat.prepareTargetedSeq=function(Worksheet, Workdir, alleles.prefix, BED_file, allelecounter_exe, genomeVersion, nthreads=1,
-                                  minCounts=10, chrom_names=c(1:22,'X'), min_base_qual=20, min_map_qual=35, ref.fasta=NA, plotQC=T) {
+                                  minCounts=10, is_chr_based=F, chrom_names=c(1:22,'X'), min_base_qual=20, min_map_qual=35, ref.fasta=NA, plotQC=T) {
   requireNamespace("GenomicRanges")
   requireNamespace("IRanges")
   requireNamespace("foreach")
@@ -333,18 +335,17 @@ ascat.prepareTargetedSeq=function(Worksheet, Workdir, alleles.prefix, BED_file, 
   
   # subset SNPs based on BED
   print('Subsetting SNPs based on BED')
-  allele_data=readAllelesFiles(alleles.prefix,'.txt',chrom_names)
+  allele_data=readAllelesFiles(alleles.prefix,'.txt',chrom_names,add_chr_string=is_chr_based)
   BED=read.table(BED_file,sep='\t',header=F,stringsAsFactors=F)[,1:3]
   colnames(BED)=c('chr','start','end')
-  BED$chr=gsub('^chr','',BED$chr)
   BED$start=BED$start+1 # Start is 0-based in BED files
-  BED=BED[BED$chr %in% chrom_names,]
+  BED=BED[BED$chr %in% paste0(ifelse(is_chr_based,'chr',''),chrom_names),]
   if (nrow(BED)==0) stop('Major issue with BED file, please double-check its content')
   overlaps=GenomicRanges::findOverlaps(GenomicRanges::GRanges(seqnames=BED$chr,ranges=IRanges::IRanges(start=BED$start,end=BED$end)),
                                        GenomicRanges::GRanges(seqnames=allele_data$chromosome,ranges=IRanges::IRanges(start=allele_data$position,end=allele_data$position)))
   allele_data=allele_data[unique(overlaps@to),]
   for (chr in chrom_names) {
-    tmp=allele_data[allele_data$chromosome==chr,]
+    tmp=allele_data[allele_data$chromosome==paste0(ifelse(is_chr_based,'chr',''),chr),]
     tmp=tmp[order(tmp$position),]
     write.table(tmp[,-1],file=paste0(Workdir,'/alleleData/Raw/alleleData_chr',chr,'.txt'),sep='\t',row.names=F,col.names=T,quote=F)
     write.table(tmp[,1:2],file=paste0(Workdir,'/alleleData/Raw/loci_chr',chr,'.txt'),sep='\t',row.names=F,col.names=F,quote=F)
@@ -352,9 +353,9 @@ ascat.prepareTargetedSeq=function(Worksheet, Workdir, alleles.prefix, BED_file, 
   }; rm(chr,allele_data,BED,overlaps)
   
   if (Process_AC_file) {
-    allele_data=readAllelesFiles(paste0(Workdir,'/alleleData/Raw/alleleData_chr'),'.txt',chrom_names)
-    allele_data=lapply(chrom_names,function(x) rownames(allele_data[allele_data$chromosome==x,]))
-    names(allele_data)=chrom_names
+    allele_data=readAllelesFiles(paste0(Workdir,'/alleleData/Raw/alleleData_chr'),'.txt',chrom_names,add_chr_string=is_chr_based)
+    allele_data=lapply(paste0(ifelse(is_chr_based,'chr',''),chrom_names),function(x) rownames(allele_data[allele_data$chromosome==x,]))
+    names(allele_data)=paste0(ifelse(is_chr_based,'chr',''),chrom_names)
   }
   
   for (INDEX in 1:nrow(Worksheet)) {
@@ -375,8 +376,8 @@ ascat.prepareTargetedSeq=function(Worksheet, Workdir, alleles.prefix, BED_file, 
       foreach(CHR=chrom_names) %dopar% {
         LOCI=fread(paste0(Worksheet$Normal_file[INDEX],CHR,SUFFIX),sep='\t',data.table=F,showProgress=F,quote='')
         rownames(LOCI)=paste0(LOCI[,1],'_',LOCI[,2])
-        stopifnot(all(allele_data[[as.character(CHR)]] %in% rownames(LOCI)))
-        LOCI=LOCI[allele_data[[as.character(CHR)]],]
+        stopifnot(all(allele_data[[paste0(ifelse(is_chr_based,'chr',''),CHR)]] %in% rownames(LOCI)))
+        LOCI=LOCI[allele_data[[paste0(ifelse(is_chr_based,'chr',''),CHR)]],]
         write.table(LOCI,file=paste0(Workdir,'/alleleCounts/',Worksheet$Patient_ID[INDEX],'/',Worksheet$Normal_ID[INDEX],'/',Worksheet$Normal_ID[INDEX],'_unfiltered_chr',CHR,'.txt'),sep='\t',row.names=F,col.names=T,quote=F)
       }
     }
@@ -391,6 +392,7 @@ ascat.prepareTargetedSeq=function(Worksheet, Workdir, alleles.prefix, BED_file, 
                      alleles.prefix=paste0(Workdir,'/alleleData/Raw/alleleData_chr'),
                      chrom_names=chrom_names,
                      minCounts=minCounts,
+                     is_chr_based=is_chr_based,
                      X_nonPAR=X_nonPAR,
                      plotQC=plotQC)
 }

@@ -43,7 +43,7 @@ ascat.getBAFsAndLogRs(
 
 \item{genomeVersion}{Genome version, either 'hg19' or 'hg38'.}
 
-\item{chrom_names}{A vector with allowed chromosome names (optional, default=c(1:22,'X')).}
+\item{chrom_names}{A vector with allowed chromosome names (optional, default=c(1:22,'X')). Do not set it to paste0('chr',c(1:22,'X')) if data is 'chr'-based.}
 
 \item{minCounts}{Minimum depth, in normal samples, required for a SNP to be considered (optional, default=20).}
 

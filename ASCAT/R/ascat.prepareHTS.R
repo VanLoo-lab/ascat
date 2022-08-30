@@ -43,7 +43,7 @@ ascat.getAlleleCounts = function(seq.file, output.file, loci.file, min.base.qual
 #' @param alleles.prefix Prefix path to the allele data (e.g. "G1000_alleles_chr")
 #' @param gender Gender information, either 'XX' (=female) or 'XY' (=male).
 #' @param genomeVersion Genome version, either 'hg19' or 'hg38'.
-#' @param chrom_names A vector with allowed chromosome names (optional, default=c(1:22,'X')).
+#' @param chrom_names A vector with allowed chromosome names (optional, default=c(1:22,'X')). Do not set it to paste0('chr',c(1:22,'X')) if data is 'chr'-based.
 #' @param minCounts Minimum depth, in normal samples, required for a SNP to be considered (optional, default=20).
 #' @param BED_file A BED file for only looking at SNPs within specific intervals (optional, default=NA).
 #' @param probloci_file A file (chromosome <tab> position; no header) containing specific loci to ignore (optional, default=NA).
@@ -68,7 +68,7 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
   if (!is.na(probloci_file)) {
     stopifnot(file.exists(probloci_file) && file.info(probloci_file)$size>0)
     probloci=data.frame(data.table::fread(probloci_file,sep='\t',showProgress=F,header=T),stringsAsFactors=F)
-    probloci=paste0(probloci[,1],'_',probloci[,2])
+    probloci=paste0(gsub('^chr','',probloci[,1]),'_',probloci[,2])
     probloci=which(rownames(tumour_input_data) %in% probloci)
     if (length(probloci>0)) {
       tumour_input_data = tumour_input_data[-probloci,]
@@ -286,7 +286,7 @@ ascat.prepareHTS = function(tumourseqfile, normalseqfile, tumourname, normalname
 
 #' Function to concatenate allele counter output
 #' @noRd
-readAlleleCountFiles=function(prefix,suffix,chrom_names,minCounts) {
+readAlleleCountFiles=function(prefix,suffix,chrom_names,minCounts,keep_chr_string=F) {
   files=paste0(prefix,chrom_names,suffix)
   files=files[sapply(files,function(x) file.exists(x) && file.info(x)$size>0)]
   stopifnot(length(files)>0)
@@ -294,7 +294,7 @@ readAlleleCountFiles=function(prefix,suffix,chrom_names,minCounts) {
     tmp=data.frame(data.table::fread(x,sep='\t',showProgress=F,header=T),stringsAsFactors=F)
     tmp=tmp[tmp[,7]>=minCounts,]
     if (nrow(tmp)>0) {
-      tmp[,1]=gsub('^chr','',tmp[,1])
+      if (!keep_chr_string) tmp[,1]=gsub('^chr','',tmp[,1])
       rownames(tmp)=paste0(tmp[,1],'_',tmp[,2])
     }
     return(tmp)
@@ -305,7 +305,7 @@ readAlleleCountFiles=function(prefix,suffix,chrom_names,minCounts) {
 
 #' Function to concatenate all alleles files
 #' @noRd
-readAllelesFiles=function(prefix,suffix,chrom_names) {
+readAllelesFiles=function(prefix,suffix,chrom_names,add_chr_string=F) {
   files=paste0(prefix,chrom_names,suffix)
   files=files[sapply(files,function(x) file.exists(x) && file.info(x)$size>0)]
   stopifnot(length(files)>0)
@@ -314,6 +314,7 @@ readAllelesFiles=function(prefix,suffix,chrom_names) {
     tmp=tmp[!is.na(tmp[,2] & !is.na(tmp[,3])),]
     tmp=tmp[!duplicated(tmp[,1]),]
     tmp$chromosome=gsub(paste0(prefix,'(',paste(chrom_names,collapse='|'),')',suffix),'\\1',x)
+    if (add_chr_string) tmp$chromosome=paste0('chr',tmp$chromosome)
     tmp=tmp[,c(4,1:3)]
     rownames(tmp)=paste0(tmp[,1],'_',tmp[,2])
     return(tmp)
@@ -324,13 +325,13 @@ readAllelesFiles=function(prefix,suffix,chrom_names) {
 
 #' Function to concatenate all loci files
 #' @noRd
-readLociFiles=function(prefix,suffix,chrom_names) {
+readLociFiles=function(prefix,suffix,chrom_names,keep_chr_string=F) {
   files=paste0(prefix,chrom_names,suffix)
   files=files[sapply(files,function(x) file.exists(x) && file.info(x)$size>0)]
   stopifnot(length(files)>0)
   data=do.call(rbind,lapply(files,function(x) {
     tmp=data.frame(data.table::fread(x,sep='\t',showProgress=F,header=F))
-    tmp[,1]=gsub('^chr','',tmp[,1])
+    if (!keep_chr_string) tmp[,1]=gsub('^chr','',tmp[,1])
     rownames(tmp)=paste0(tmp[,1],'_',tmp[,2])
     return(tmp)
   }))
