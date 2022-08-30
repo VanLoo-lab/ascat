@@ -845,22 +845,22 @@ diploidprobes_fixnonPAR=function(diploidprobes,SNP_data,nonPAR,seg_info) {
   requireNamespace("GenomicRanges")
   requireNamespace("IRanges")
   stopifnot(length(diploidprobes)==nrow(SNP_data) && length(diploidprobes)==length(seg_info))
-  SNP_data$Chr=gsub('^chr','',SNP_data$Chr) # remove 'chr'
-  if (!'X' %in% SNP_data$Chr) return(diploidprobes)
+  SNP_data[,1]=gsub('^chr','',SNP_data[,1]) # remove 'chr'
+  if (!'X' %in% SNP_data[,1]) return(diploidprobes)
   # First, set all SNPs to diploidprobes=T for X
-  diploidprobes[which(SNP_data$Chr=='X')]=T
+  diploidprobes[which(SNP_data[,1]=='X')]=T
   # Create a GRanges object with nonPAR information
   nonPAR=GenomicRanges::GRanges(seqnames='X',ranges=IRanges::IRanges(start=nonPAR[1],end=nonPAR[2]))
   # Create a DF with chr (X only), pos and seg_info (logR/BAF or logR only)
   DATA=SNP_data
   DATA$segment=seg_info
-  DATA=DATA[which(DATA$Chr=='X'),]
+  DATA=DATA[which(DATA[,1]=='X'),]
   # Run rle on seg_info to get segments
   RLE=cumsum(c(1,rle(DATA$segment)$lengths))
   # Create a DF where each row corresponds to one segment
   SEGMENTS=do.call(rbind,lapply(1:(length(RLE)-1),function(x) {
-    return(data.frame(Start=DATA$Position[RLE[x]],
-                      End=DATA$Position[RLE[x+1]-1],
+    return(data.frame(Start=DATA[,2][RLE[x]],
+                      End=DATA[,2][RLE[x+1]-1],
                       Segment=DATA$segment[RLE[x]]))
   }))
   # Convert DF to GRanges
@@ -874,7 +874,7 @@ diploidprobes_fixnonPAR=function(diploidprobes,SNP_data,nonPAR,seg_info) {
   SEGMENTS=data.frame(SEGMENTS[subjectHits(FO)])
   # For each such segment, set all SNPs within that segment to diploidprobes=F
   for (i in 1:nrow(SEGMENTS)) {
-    diploidprobes[which(SNP_data$Chr=='X' & SNP_data$Position>=SEGMENTS$start[i] & SNP_data$Position<=SEGMENTS$end[i])]=F
+    diploidprobes[which(SNP_data[,1]=='X' & SNP_data[,2]>=SEGMENTS$start[i] & SNP_data[,2]<=SEGMENTS$end[i])]=F
   }; rm(i)
   return(diploidprobes)
 }
