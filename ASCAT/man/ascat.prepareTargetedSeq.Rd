@@ -22,7 +22,7 @@ ascat.prepareTargetedSeq(
 )
 }
 \arguments{
-\item{Worksheet}{A table with the following columns: Patient_ID, Normal_ID, Normal_file and Gender. Must contain one single normal per patient. Normal_file can either be BAMs/CRAMs or paths to pre-computed (zipped) alleleCounts (e.g. "sample_alleleCounts_chr"). Gender must either be XX (females) or XY (males).}
+\item{Worksheet}{A tab-separated file with the following columns: Patient_ID, Normal_ID, Normal_file and Gender (additional columns can be provided but will not be used). Must contain one single normal per patient. Normal_file can either be paths to BAMs/CRAMs or paths to pre-computed (zipped) alleleCounts (e.g. "sample_alleleCounts_chr"). Gender must either be XX (females) or XY (males).}
 
 \item{Workdir}{The folder where output should go (will be created if it doesn't exist).}
 

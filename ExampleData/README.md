@@ -96,8 +96,7 @@ save(ascat.bc, ascat.output, QC, file = 'ASCAT_objects.Rdata')
 library(ASCAT)
 
 ascat.prepareTargetedSeq(
-  Worksheet = myWorksheet, # a DF with Patient_ID, Normal_ID, Normal_file and Gender (one single normal per patient). Normal_file can either be BAMs/CRAMs or paths to pre-computed (zipped) alleleCounts
-  Workdir = ".",
+  Worksheet = "myWorksheet.tsv", # A tab-separated file with specific information. Check format using ?ascat.prepareTargetedSeq
   alleles.prefix = "G1000_alleles_hg19_chr",
   BED_file = "my_targeted_design.bed",
   allelecounter_exe = "/PATH/TO/allelecounter",
