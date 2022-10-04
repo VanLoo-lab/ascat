@@ -70,10 +70,12 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
     probloci=data.frame(data.table::fread(probloci_file,sep='\t',showProgress=F,header=T),stringsAsFactors=F)
     probloci=paste0(gsub('^chr','',probloci[,1]),'_',probloci[,2])
     probloci=which(rownames(tumour_input_data) %in% probloci)
-    if (length(probloci>0)) {
+    if (length(probloci)>0) {
       tumour_input_data = tumour_input_data[-probloci,]
       normal_input_data = normal_input_data[-probloci,]
       allele_data = allele_data[-probloci,]
+    } else {
+      warning('The probloci did not remove any SNPs, it might be worth checking the data.')
     }
     rm(probloci)
   }
