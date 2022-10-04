@@ -96,9 +96,15 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
     requireNamespace("IRanges")
     overlaps=GenomicRanges::findOverlaps(GenomicRanges::GRanges(seqnames=BED$chr,ranges=IRanges::IRanges(start=BED$start,end=BED$end)),
                                          GenomicRanges::GRanges(seqnames=allele_data$chromosome,ranges=IRanges::IRanges(start=allele_data$position,end=allele_data$position)))
-    tumour_input_data=tumour_input_data[unique(overlaps@to),]
-    normal_input_data=normal_input_data[unique(overlaps@to),]
-    allele_data=allele_data[unique(overlaps@to),]
+    if (length(overlaps)>0) {
+      tumour_input_data=tumour_input_data[unique(overlaps@to),]
+      normal_input_data=normal_input_data[unique(overlaps@to),]
+      allele_data=allele_data[unique(overlaps@to),]
+    } else {
+      print(head(allele_data))
+      print(head(BED))
+      stop('The overlap between the BED file and loci is empty. Data must be checked!')
+    }
     rm(BED,overlaps)
   }
   # Obtain depth for both alleles for tumour and normal
