@@ -79,6 +79,7 @@ computeLogR=function(NORMAL_COUNTS_tot) {
 #' @noRd
 getLociFromNormals=function(Worksheet, Workdir, alleles.prefix, minCounts, is_chr_based=F, X_nonPAR=NULL, chrom_names=c(1:22,'X'), plotQC=T) {
   stopifnot((is.null(X_nonPAR)) || (length(X_nonPAR)==2 && all(is.numeric(X_nonPAR))))
+  min_samples_nonPAR=10 # This defines how many females we require to filter the nonPAR region
   # Read all alleleCount files (counts>=0)
   print('      Getting allele counts...')
   NORMAL_COUNTS=foreach(INDEX=1:nrow(Worksheet)) %dopar% {
@@ -99,113 +100,147 @@ getLociFromNormals=function(Worksheet, Workdir, alleles.prefix, minCounts, is_ch
     x=x[,c('ref','alt','tot','vaf')]
     return(x)
   })
-  # Get a DF with all total counts
-  NORMAL_COUNTS_tot=do.call(cbind,lapply(NORMAL_COUNTS,function(x) x[,'tot',drop=F]))
-  colnames(NORMAL_COUNTS_tot)=names(NORMAL_COUNTS)
   # Flag samples having too few SNPs (counts>minCounts)
-  COVERED=apply(NORMAL_COUNTS_tot,2,function(x) length(which(x>=minCounts)))
+  COVERED=sapply(NORMAL_COUNTS,function(x) length(which(x$tot>=minCounts)))
   if (plotQC) {
     png(paste0(Workdir,'/plotQC/Low_number_of_SNPs.png'),height=15,width=15,units='cm',res=300,pointsize=6)
-    par(mar=c(2.1,2.1,1.05,1.05))
-    barplot(sort(COVERED),names.arg=NA,col='black',border=NA,space=0)
+    par(mar=c(8.4,4.2,1.05,1.05))
+    barplot(sort(COVERED),names.arg=names(sort(COVERED)),space=0,las=3,cex.names=0.5,ylab=paste0('Number of SNPs (counts>=',minCounts,')'),cex.lab=1.25)
     abline(h=median(COVERED)/2,col='red')
     dev.off()
   }
   TO_REMOVE=names(which(COVERED<median(COVERED)/2))
   if (length(TO_REMOVE)>0) {
     print(paste0('   Remove samples with very low number of SNPs above threshold: ',paste(TO_REMOVE,collapse=', ')))
-    NORMAL_COUNTS_tot=NORMAL_COUNTS_tot[,setdiff(colnames(NORMAL_COUNTS_tot),TO_REMOVE)]
-    NORMAL_COUNTS=NORMAL_COUNTS[colnames(NORMAL_COUNTS_tot)]
+    NORMAL_COUNTS=NORMAL_COUNTS[setdiff(names(NORMAL_COUNTS),TO_REMOVE)]
     Worksheet=Worksheet[-which(Worksheet$Normal_ID %in% TO_REMOVE),]
   }
   rm(TO_REMOVE,COVERED)
   # Flag samples having low coverages
-  COVERED=apply(NORMAL_COUNTS_tot,2,function(x) sum(x[x>=minCounts]))
+  COVERED=sapply(NORMAL_COUNTS,function(x) sum(x$tot[x$tot>=minCounts]))
   if (plotQC) {
     png(paste0(Workdir,'/plotQC/Low_coverage.png'),height=15,width=15,units='cm',res=300,pointsize=6)
-    par(mar=c(2.1,2.1,1.05,1.05))
-    barplot(sort(COVERED),names.arg=NA,col='black',border=NA,space=0)
+    par(mar=c(8.4,4.2,1.05,1.05))
+    barplot(sort(COVERED),names.arg=names(sort(COVERED)),space=0,las=3,cex.names=0.5,ylab=paste0('Total coverage (counts>=',minCounts,')'),cex.lab=1.25)
     abline(h=median(COVERED)/2,col='red')
     dev.off()
   }
   TO_REMOVE=names(which(COVERED<median(COVERED)/2))
   if (length(TO_REMOVE)>0) {
     print(paste0('   Remove samples with very low coverage: ',paste(TO_REMOVE,collapse=', ')))
-    NORMAL_COUNTS_tot=NORMAL_COUNTS_tot[,setdiff(colnames(NORMAL_COUNTS_tot),TO_REMOVE)]
-    NORMAL_COUNTS=NORMAL_COUNTS[colnames(NORMAL_COUNTS_tot)]
+    NORMAL_COUNTS=NORMAL_COUNTS[setdiff(names(NORMAL_COUNTS),TO_REMOVE)]
     Worksheet=Worksheet[-which(Worksheet$Normal_ID %in% TO_REMOVE),]
   }
   rm(TO_REMOVE,COVERED)
   # Get SNPs covered in all samples
-  IDs=rownames(NORMAL_COUNTS_tot[apply(NORMAL_COUNTS_tot,1,min)>0,])
+  IDs=rownames(allele_data)[apply(do.call(cbind,lapply(NORMAL_COUNTS,function(x) x$tot)),1,min)>0]
   print(paste0('   Keep SNPs covered in all samples: ',length(IDs)))
   NORMAL_COUNTS=lapply(NORMAL_COUNTS,function(x) x[IDs,])
-  NORMAL_COUNTS_tot=NORMAL_COUNTS_tot[IDs,]
   allele_data=allele_data[IDs,]
   rm(IDs)
   #######################################################################################
   # FILTER: keep SNPs with enough coverage (>=minCounts in at least 90% of cases) #
   #######################################################################################
-  TO_KEEP=rowSums(NORMAL_COUNTS_tot>=minCounts)>=ncol(NORMAL_COUNTS_tot)*0.9
-  print(paste0('   Keep SNPs with enough coverage in most cases: ',length(which(TO_KEEP)),' (-',round((nrow(NORMAL_COUNTS_tot)-length(which(TO_KEEP)))/nrow(NORMAL_COUNTS_tot)*100,2),'%)'))
+  TO_KEEP=rowSums(do.call(cbind,lapply(NORMAL_COUNTS,function(x) x$tot))>=minCounts)>=length(NORMAL_COUNTS)*0.9
+  print(paste0('   Keep SNPs with enough coverage in most cases: ',length(which(TO_KEEP)),' (-',round((nrow(allele_data)-length(which(TO_KEEP)))/nrow(allele_data)*100,2),'%)'))
   allele_data=allele_data[TO_KEEP,]
   NORMAL_COUNTS=lapply(NORMAL_COUNTS,function(x) x[TO_KEEP,])
-  NORMAL_COUNTS_tot=NORMAL_COUNTS_tot[TO_KEEP,]
   rm(TO_KEEP)
-  # Get a DF with all VAFs
-  NORMAL_COUNTS_vaf=do.call(cbind,lapply(NORMAL_COUNTS,function(x) x[,'vaf',drop=F]))
-  colnames(NORMAL_COUNTS_vaf)=names(NORMAL_COUNTS)
   ############################################
   # FILTER: keep SNPs with finite BAF values #
   ############################################
-  TO_KEEP=apply(NORMAL_COUNTS_vaf,1,function(x) all(is.finite(x)))
-  print(paste0('   Keep SNPs with finite BAF values: ',length(which(TO_KEEP)),' (-',round((nrow(NORMAL_COUNTS_tot)-length(which(TO_KEEP)))/nrow(NORMAL_COUNTS_tot)*100,2),'%)'))
+  TO_KEEP=apply(do.call(cbind,lapply(NORMAL_COUNTS,function(x) x[,'vaf',drop=F])),1,function(x) all(is.finite(x)))
+  print(paste0('   Keep SNPs with finite BAF values: ',length(which(TO_KEEP)),' (-',round((nrow(allele_data)-length(which(TO_KEEP)))/nrow(allele_data)*100,2),'%)'))
   allele_data=allele_data[TO_KEEP,]
   NORMAL_COUNTS=lapply(NORMAL_COUNTS,function(x) x[TO_KEEP,])
-  NORMAL_COUNTS_tot=NORMAL_COUNTS_tot[TO_KEEP,]
-  NORMAL_COUNTS_vaf=NORMAL_COUNTS_vaf[TO_KEEP,]
   rm(TO_KEEP)
+  #################################################
+  # FILTER: remove homozygous SNPs in all samples #
+  #################################################
+  # The probabilistic method (based on binom.test) can be very slow because it needs to be computed for nSNPs x nSamples.
+  # We can speed-up the process by:
+  # 1) generating the unique list of alt/tot counts (so if several SNPs have 10/50, then it's computed once)
+  # 2) processing the 0-0.5 BAF space (two SNPs with 10/50 and 40/50 will have similar confidence intervals as conf and 1-rev(conf))
+  all_alt_tot=unique(do.call(rbind,lapply(NORMAL_COUNTS,function(x) x[,c('alt','tot')])))
+  all_alt_tot_inf=all_alt_tot[which(all_alt_tot$alt<=all_alt_tot$tot/2),]
+  all_alt_tot_sup=all_alt_tot[which(all_alt_tot$alt>all_alt_tot$tot/2),]
+  all_alt_tot_sup$alt=all_alt_tot_sup$tot-all_alt_tot_sup$alt
+  all_alt_tot=rbind(all_alt_tot_inf,all_alt_tot_sup)
+  rm(all_alt_tot_inf,all_alt_tot_sup)
+  all_alt_tot=unique(all_alt_tot)
+  all_alt_tot=all_alt_tot[order(all_alt_tot$tot,all_alt_tot$alt),]
+  rownames(all_alt_tot)=paste0(all_alt_tot$alt,'_',all_alt_tot$tot)
+  # Get confidence intervals
+  conf=foreach(MAX=unique(all_alt_tot$tot),.combine=c) %dopar% {
+    lapply(all_alt_tot$alt[all_alt_tot$tot==MAX],function(x) {
+      binom.test(x=x, n=MAX, alternative = "two.sided", p=0.01, conf.level = 0.98)$conf.int
+    })
+  }
+  # Get the interpretation
+  all_alt_tot$interpretation=sapply(conf,function(x) {
+    if (x[1]<=0.5 && x[2]>=0.5 && (x[1]<=0.01 || x[2]>=0.99)) return('noisy') # This will occur for low-coverage SNPs with mixed signal
+    if (x[1]<=0.5 && x[2]>=0.5) return('het')
+    if (x[1]<=0.01 || x[2]>=0.99) return('hom')
+    return('noisy')
+  })
+  # Now, assign genotypes to SNPs in all samples
+  GENOTYPES=foreach(INDEX=1:length(NORMAL_COUNTS),.combine=cbind) %dopar% {
+    all_alt_tot[paste0(ifelse(NORMAL_COUNTS[[INDEX]]$alt>NORMAL_COUNTS[[INDEX]]$tot/2,NORMAL_COUNTS[[INDEX]]$tot-NORMAL_COUNTS[[INDEX]]$alt,NORMAL_COUNTS[[INDEX]]$alt),'_',NORMAL_COUNTS[[INDEX]]$tot),'interpretation']
+  }
+  rm(conf)
+  TO_REMOVE=which(apply(GENOTYPES,1,function(x) all(x=='hom')))
+  if (length(which(Worksheet$Gender=='XX'))<min_samples_nonPAR) {
+    # Here, we don't have enough females for the nonPAR region. We rescue SNPs on the nonPAR region if they are not noisy in males
+    index_nonPAR=which(allele_data$chromosome==paste0(ifelse(is_chr_based,'chr',''),'X') & allele_data$position>=X_nonPAR[1] & allele_data$position<=X_nonPAR[2])
+    index_nonPAR=index_nonPAR[which(apply(GENOTYPES[index_nonPAR,which(Worksheet$Gender=='XY')],1,function(x) all(x=='hom')))]
+    TO_REMOVE=setdiff(TO_REMOVE,index_nonPAR)
+    rm(index_nonPAR)
+  }
+  if (length(TO_REMOVE)>0) {
+    print(paste0('   Remove homozygous SNPs in all samples: ',nrow(allele_data)-length(TO_REMOVE),' (-',round(length(TO_REMOVE)/nrow(allele_data)*100,2),'%)'))
+    allele_data=allele_data[-TO_REMOVE,]
+    NORMAL_COUNTS=lapply(NORMAL_COUNTS,function(x) x[-TO_REMOVE,])
+    GENOTYPES=GENOTYPES[-TO_REMOVE,]
+  }
+  rm(all_alt_tot,TO_REMOVE)
   #################################################################
   # FILTER: remove SNPs with noisy BAF values in multiple samples #
   #################################################################
-  if (is.null(X_nonPAR) || length(which(Worksheet$Gender=='XX'))<10) {
-    # No PAR/nonPAR information and/or too few females
-    TO_KEEP=rowSums(NORMAL_COUNTS_tot>=minCounts&(NORMAL_COUNTS_vaf<0.9&NORMAL_COUNTS_vaf>0.68|NORMAL_COUNTS_vaf>0.1&NORMAL_COUNTS_vaf<0.32))<2.5*0.053876*rowSums(NORMAL_COUNTS_tot>=minCounts&NORMAL_COUNTS_vaf<0.9&NORMAL_COUNTS_vaf>0.1)
-  } else {
-    FEMALES=which(Worksheet$Gender=='XX')
-    # Here, autosomes are 1:22 and PAR1/PAR2 regions in X. These regions should be 1+1
-    INDEX_autosomes=which(allele_data$chromosome %in% paste0(ifelse(is_chr_based,'chr',''),1:22) | (allele_data$chromosome==paste0(ifelse(is_chr_based,'chr',''),'X') & (allele_data$position<X_nonPAR[1] | allele_data$position>X_nonPAR[2])))
-    # For autosomes, consider all samples since SNPs will be located in 1+1 regions
-    TO_KEEP_autosomes=rowSums(NORMAL_COUNTS_tot[INDEX_autosomes,]>=minCounts&(NORMAL_COUNTS_vaf[INDEX_autosomes,]<0.9&NORMAL_COUNTS_vaf[INDEX_autosomes,]>0.68|NORMAL_COUNTS_vaf[INDEX_autosomes,]>0.1&NORMAL_COUNTS_vaf[INDEX_autosomes,]<0.32))<2.5*0.053876*rowSums(NORMAL_COUNTS_tot[INDEX_autosomes,]>=minCounts&NORMAL_COUNTS_vaf[INDEX_autosomes,]<0.9&NORMAL_COUNTS_vaf[INDEX_autosomes,]>0.1)
-    # Here, X is only nonPAR (1+1 for females and 1+0 for males)
-    INDEX_X=which(allele_data$chromosome==paste0(ifelse(is_chr_based,'chr',''),'X') & allele_data$position>=X_nonPAR[1] & allele_data$position<=X_nonPAR[2])
-    if (length(INDEX_X)>0) {
-      # For X, only consider females (1+1)
-      TO_KEEP_X=rowSums(NORMAL_COUNTS_tot[INDEX_X,FEMALES]>=minCounts&(NORMAL_COUNTS_vaf[INDEX_X,FEMALES]<0.9&NORMAL_COUNTS_vaf[INDEX_X,FEMALES]>0.68|NORMAL_COUNTS_vaf[INDEX_X,FEMALES]>0.1&NORMAL_COUNTS_vaf[INDEX_X,FEMALES]<0.32))<2.5*0.053876*rowSums(NORMAL_COUNTS_tot[INDEX_X,FEMALES]>=minCounts&NORMAL_COUNTS_vaf[INDEX_X,FEMALES]<0.9&NORMAL_COUNTS_vaf[INDEX_X,FEMALES]>0.1)
-      # Merge autosomes and X
-      TO_KEEP=c(TO_KEEP_autosomes,TO_KEEP_X)[order(c(INDEX_autosomes,INDEX_X))]
-      rm(TO_KEEP_X)
+  NORMAL_COUNTS_tot=do.call(cbind,lapply(NORMAL_COUNTS,function(x) x$tot))
+  INDEX_autosomes=which(allele_data$chromosome %in% paste0(ifelse(is_chr_based,'chr',''),1:22) | (allele_data$chromosome==paste0(ifelse(is_chr_based,'chr',''),'X') & (allele_data$position<X_nonPAR[1] | allele_data$position>X_nonPAR[2])))
+  TO_KEEP_autosomes=which(rowSums(NORMAL_COUNTS_tot[INDEX_autosomes,]>=minCounts&(GENOTYPES[INDEX_autosomes,]=='noisy'))<2.5*0.053876*rowSums(NORMAL_COUNTS_tot[INDEX_autosomes,]>=minCounts&GENOTYPES[INDEX_autosomes,] %in% c('noisy','het')))
+  TO_KEEP_autosomes=INDEX_autosomes[TO_KEEP_autosomes]
+  INDEX_XX=which(Worksheet$Gender=='XX')
+  INDEX_XY=which(Worksheet$Gender=='XY')
+  INDEX_nonPAR=which(allele_data$chromosome==paste0(ifelse(is_chr_based,'chr',''),'X') & allele_data$position>=X_nonPAR[1] & allele_data$position<=X_nonPAR[2])
+  if (length(INDEX_nonPAR)>0) {
+    if (length(INDEX_XX)>=min_samples_nonPAR) {
+      # Here, we do have enough female samples to proceed so we want SNPs to be clean (low noisy/(noisy+het) ratio)
+      TO_KEEP_nonPAR=which(rowSums(NORMAL_COUNTS_tot[INDEX_nonPAR,INDEX_XX]>=minCounts&(GENOTYPES[INDEX_nonPAR,INDEX_XX]=='noisy'))<2.5*0.053876*rowSums(NORMAL_COUNTS_tot[INDEX_nonPAR,INDEX_XX]>=minCounts&GENOTYPES[INDEX_nonPAR,INDEX_XX] %in% c('noisy','het')))
     } else {
-      TO_KEEP=TO_KEEP_autosomes
+      # Here, there are too few females so consider all SNPs as possible candidates
+      TO_KEEP_nonPAR=1:length(INDEX_nonPAR)
     }
-    rm(FEMALES,INDEX_autosomes,INDEX_X,TO_KEEP_autosomes)
+    # SNPs must be clean in males (all hom)
+    TO_KEEP_nonPAR=TO_KEEP_nonPAR[apply(GENOTYPES[INDEX_nonPAR[TO_KEEP_nonPAR],INDEX_XY],1,function(x) all(x=='hom'))]
+    TO_KEEP_nonPAR=INDEX_nonPAR[TO_KEEP_nonPAR]
+  } else {
+    TO_KEEP_nonPAR=NA
   }
-  
-  print(paste0('   Remove SNPs with noisy BAF: ',length(which(TO_KEEP)),' (-',round((nrow(NORMAL_COUNTS_tot)-length(which(TO_KEEP)))/nrow(NORMAL_COUNTS_tot)*100,2),'%)'))
+  TO_KEEP=sort(unique(c(TO_KEEP_autosomes,TO_KEEP_nonPAR)))
+  print(paste0('   Remove SNPs with noisy BAF: ',length(TO_KEEP),' (-',round((nrow(allele_data)-length(TO_KEEP))/nrow(allele_data)*100,2),'%)'))
   allele_data=allele_data[TO_KEEP,]
   NORMAL_COUNTS=lapply(NORMAL_COUNTS,function(x) x[TO_KEEP,])
-  NORMAL_COUNTS_tot=NORMAL_COUNTS_tot[TO_KEEP,]
-  NORMAL_COUNTS_vaf=NORMAL_COUNTS_vaf[TO_KEEP,]
-  rm(TO_KEEP)
+  GENOTYPES=GENOTYPES[TO_KEEP,]
+  rm(TO_KEEP,NORMAL_COUNTS_tot,INDEX_autosomes,INDEX_nonPAR,INDEX_XX,INDEX_XY,TO_KEEP_autosomes,TO_KEEP_nonPAR)
   ##################################################################
   # FILTER: remove SNPs close to each other with similar genotypes #
   ##################################################################
+  GENOTYPES[GENOTYPES=='noisy']='het'
   SNP_dist=diff(allele_data[,2])
   TO_REMOVE = sapply(which(SNP_dist<=75),function(poske) {
-    bafnp1 = NORMAL_COUNTS_vaf[poske,]
-    bafnp2 = NORMAL_COUNTS_vaf[poske+1,]
-    hetp1 = ifelse(bafnp1>0.1&bafnp1<0.9,1,0)
-    hetp2 = ifelse(bafnp2>0.1&bafnp2<0.9,1,0)
+    hetp1 = ifelse(GENOTYPES[poske,]=='het',1,0)
+    hetp2 = ifelse(GENOTYPES[poske+1,]=='het',1,0)
     # if less than 10% of the calls are different
     if(sum(abs(hetp1-hetp2))<0.05*(sum(hetp1)+sum(hetp2))) {
       if(SNP_dist[max(poske-1,1)]<SNP_dist[min(poske+1,length(SNP_dist))]) {
@@ -219,35 +254,54 @@ getLociFromNormals=function(Worksheet, Workdir, alleles.prefix, minCounts, is_ch
   })
   TO_REMOVE = unique(na.omit(TO_REMOVE))
   if (length(TO_REMOVE)>0) {
-    print(paste0('   Keep SNPs separated (distance and genotype): ',nrow(NORMAL_COUNTS_tot)-length(TO_REMOVE),' (-',round(length(TO_REMOVE)/nrow(NORMAL_COUNTS_tot)*100,2),'%)'))
+    print(paste0('   Keep SNPs separated (distance and genotype): ',nrow(allele_data)-length(TO_REMOVE),' (-',round(length(TO_REMOVE)/nrow(allele_data)*100,2),'%)'))
     allele_data=allele_data[-TO_REMOVE,]
     NORMAL_COUNTS=lapply(NORMAL_COUNTS,function(x) x[-TO_REMOVE,])
-    NORMAL_COUNTS_tot=NORMAL_COUNTS_tot[-TO_REMOVE,]
-    NORMAL_COUNTS_vaf=NORMAL_COUNTS_vaf[-TO_REMOVE,]
   }
-  rm(TO_REMOVE,SNP_dist)
-  # Compute logR
-  logR=computeLogR(NORMAL_COUNTS_tot)
-  # Get standard deviation
-  sdkes = apply(logR,1,sd)
+  rm(TO_REMOVE,SNP_dist,GENOTYPES)
   #######################################
   # FILTER: remove SNPs with noisy logR #
   #######################################
+  # Compute logR
+  TOT=do.call(cbind,lapply(NORMAL_COUNTS,function(x) x$tot))
+  INDEX_XY=which(Worksheet$Gender=='XY')
+  INDEX_nonPAR=which(allele_data$chromosome==paste0(ifelse(is_chr_based,'chr',''),'X') & allele_data$position>=X_nonPAR[1] & allele_data$position<=X_nonPAR[2])
+  if (length(INDEX_XY)>0 && length(INDEX_nonPAR)>0) TOT[INDEX_nonPAR,INDEX_XY]=TOT[INDEX_nonPAR,INDEX_XY]*2
+  logR=computeLogR(TOT)
+  rm(TOT,INDEX_nonPAR,INDEX_XY)
+  # Get standard deviation
+  sdkes = apply(logR,1,sd)
   TO_KEEP=sdkes<=2*median(sdkes)
-  print(paste0('   Remove SNPs with noisy logR: ',length(which(TO_KEEP)),' (-',round((nrow(NORMAL_COUNTS_tot)-length(which(TO_KEEP)))/nrow(NORMAL_COUNTS_tot)*100,2),'%)'))
+  if (plotQC) {
+    myRLE=rle(allele_data$chromosome)
+    png(paste0(Workdir,'/plotQC/LogR_noise.png'),height=7.5,width=15,units='cm',res=300,pointsize=6)
+    par(mar=c(2.1,4.2,1.05,1.05),lwd=0.5)
+    plot(NULL,xlim=c(1,length(sdkes)),ylim=c(0,max(c(max(sdkes),2*median(sdkes)))),ylab='LogR SD',xlab='',xaxt='n',xaxs='i')
+    abline(h=2*median(sdkes),col='red',lwd=0.5)
+    abline(v=cumsum(myRLE$lengths)[-length(myRLE$lengths)],lwd=0.5)
+    points(sdkes,pch=16,cex=0.125,col=ifelse(TO_KEEP,'black','red'))
+    axis(1,at=cumsum(c(0,myRLE$lengths[-length(myRLE$lengths)]))+myRLE$lengths/2,labels=myRLE$values,las=2,cex.axis=0.5)
+    dev.off()
+    rm(myRLE)
+  }
+  print(paste0('   Remove SNPs with noisy logR: ',length(which(TO_KEEP)),' (-',round((nrow(allele_data)-length(which(TO_KEEP)))/nrow(allele_data)*100,2),'%)'))
   allele_data=allele_data[TO_KEEP,]
   NORMAL_COUNTS=lapply(NORMAL_COUNTS,function(x) x[TO_KEEP,])
-  NORMAL_COUNTS_tot=NORMAL_COUNTS_tot[TO_KEEP,]
-  NORMAL_COUNTS_vaf=NORMAL_COUNTS_vaf[TO_KEEP,]
   rm(TO_KEEP,sdkes,logR)
   # Re-compute cleaned logR
-  logR=computeLogR(NORMAL_COUNTS_tot)
+  TOT=do.call(cbind,lapply(NORMAL_COUNTS,function(x) x[,'tot',drop=F]))
+  INDEX_XY=which(Worksheet$Gender=='XY')
+  INDEX_nonPAR=which(allele_data$chromosome==paste0(ifelse(is_chr_based,'chr',''),'X') & allele_data$position>=X_nonPAR[1] & allele_data$position<=X_nonPAR[2])
+  if (length(INDEX_XY)>0 && length(INDEX_nonPAR)>0) TOT[INDEX_nonPAR,INDEX_XY]=TOT[INDEX_nonPAR,INDEX_XY]*2
+  logR=computeLogR(TOT)
+  rm(TOT,INDEX_nonPAR,INDEX_XY)
+  colnames(logR)=names(NORMAL_COUNTS)
   # Flag noisy sample(s)
   sdsam = apply(logR,2,sd)
   if (plotQC) {
     png(paste0(Workdir,'/plotQC/Noisy_logR.png'),height=15,width=15,units='cm',res=300,pointsize=6)
-    par(mar=c(2.1,2.1,1.05,1.05))
-    barplot(sort(sdsam),names.arg=NA,col='black',border=NA,space=0)
+    par(mar=c(8.4,4.2,1.05,1.05))
+    barplot(sort(sdsam),names.arg=names(sort(sdsam)),space=0,las=3,cex.names=0.5,ylab='Noise in logR',cex.lab=1.25,ylim=c(0,max(1.5*median(sdsam),max(sdsam))))
     abline(h=1.5*median(sdsam),col='red')
     dev.off()
   }
@@ -258,9 +312,11 @@ getLociFromNormals=function(Worksheet, Workdir, alleles.prefix, minCounts, is_ch
   rm(IDs,sdsam)
   # Write & plot logR+BAF values
   if (!dir.exists(paste0(Workdir,'/Normal_data'))) dir.create(paste0(Workdir,'/Normal_data'))
-  write.table(cbind(allele_data[,1:2],NORMAL_COUNTS_vaf),paste0(Workdir,"/Normal_data/Normal_BAF.txt"),sep="\t",col.names=NA,row.names=T,quote=F)
+  write.table(cbind(allele_data[,1:2],do.call(cbind,lapply(NORMAL_COUNTS,function(x) x$vaf))),paste0(Workdir,"/Normal_data/Normal_BAF.txt"),sep="\t",col.names=NA,row.names=T,quote=F)
   write.table(cbind(allele_data[,1:2],logR),paste0(Workdir,"/Normal_data/Normal_LogR.txt"),sep="\t",col.names=NA,row.names=T,quote=F)
-  plotLogRandBAF(paste0(Workdir,'/Normal_data'),allele_data[,1:2],logR,NORMAL_COUNTS_vaf)
+  BAF=do.call(cbind,lapply(NORMAL_COUNTS,function(x) x[,'vaf',drop=F]))
+  colnames(BAF)=names(NORMAL_COUNTS)
+  plotLogRandBAF(paste0(Workdir,'/Normal_data'),allele_data[,1:2],logR,BAF)
   # Write output
   if (!dir.exists(paste0(Workdir,'/alleleData/Cleaned'))) dir.create(paste0(Workdir,'/alleleData/Cleaned'))
   for (CHR in chrom_names) {
