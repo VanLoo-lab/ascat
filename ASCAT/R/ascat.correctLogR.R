@@ -13,12 +13,29 @@ ascat.correctLogR = function(ASCATobj, GCcontentfile = NULL, replictimingfile = 
   } else {
     GC_newlist=readCorrectionFile(GCcontentfile)
     stopifnot(!is.null(GC_newlist))
+    is_input_chr_based=all(grepl('^chr',rownames(ASCATobj$Tumor_LogR)[1:10]))
+    is_gcfile_chr_based=all(grepl('^chr',rownames(GC_newlist)[1:10]))
+    if (is_input_chr_based!=is_gcfile_chr_based) {
+      if (is_input_chr_based && !is_gcfile_chr_based) {
+        rownames(GC_newlist)=paste0('chr',rownames(GC_newlist))
+      } else {
+        rownames(GC_newlist)=gsub('^chr','',rownames(GC_newlist))
+      }
+    }
     ovl=intersect(rownames(ASCATobj$Tumor_LogR),rownames(GC_newlist))
     stopifnot(length(ovl)>nrow(ASCATobj$Tumor_LogR)/10)
     GC_newlist=GC_newlist[ovl,]
     if (!is.null(replictimingfile)) {
       replic_newlist=readCorrectionFile(replictimingfile)
       stopifnot(!is.null(replic_newlist))
+      is_rtfile_chr_based=all(grepl('^chr',rownames(replic_newlist)[1:10]))
+      if (is_input_chr_based!=is_rtfile_chr_based) {
+        if (is_input_chr_based && !is_rtfile_chr_based) {
+          rownames(replic_newlist)=paste0('chr',rownames(replic_newlist))
+        } else {
+          rownames(replic_newlist)=gsub('^chr','',rownames(replic_newlist))
+        }
+      }
       stopifnot(all(ovl %in% rownames(replic_newlist)))
       replic_newlist=replic_newlist[ovl,]
     } else {
@@ -53,7 +70,7 @@ ascat.correctLogR = function(ASCATobj, GCcontentfile = NULL, replictimingfile = 
     GC_correction_after=c()
     RT_correction_before=c()
     RT_correction_after=c()
-    AUTOSOMES=!GC_newlist[,1] %in% ASCATobj$sexchromosomes
+    AUTOSOMES=!gsub('^chr','',GC_newlist[,1]) %in% gsub('^chr','',ASCATobj$sexchromosomes)
     
     for (s in 1:length(ASCATobj$samples)) {
       print.noquote(paste("Sample ", ASCATobj$samples[s], " (",s,"/",length(ASCATobj$samples),")",sep=""))
