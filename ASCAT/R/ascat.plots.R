@@ -23,7 +23,7 @@ ascat.plotRawData = function(ASCATobj, img.dir=".", img.prefix="", logr.y_values
       chrk_tot_len = chrk_tot_len + length(chrk)
       vpos = chrk_tot_len;
       tpos = (chrk_tot_len+chrk_tot_len_prev)/2;
-      text(tpos,1,ASCATobj$chrs[j], pos = 1, cex = 2)
+      text(tpos,logr.y_values[2],ASCATobj$chrs[j], pos = 1, cex = 2)
       abline(v=vpos+0.5,lty=1,col="lightgrey")
     }
     plot(c(1,dim(ASCATobj$Tumor_BAF)[1]), c(0,1), type = "n", xaxt = "n", main = paste(ASCATobj$samples[i], ", tumor data, BAF", sep = ""), xlab = "", ylab = "")
@@ -57,7 +57,7 @@ ascat.plotRawData = function(ASCATobj, img.dir=".", img.prefix="", logr.y_values
         chrk_tot_len = chrk_tot_len + length(chrk)
         vpos = chrk_tot_len;
         tpos = (chrk_tot_len+chrk_tot_len_prev)/2;
-        text(tpos,1,ASCATobj$chrs[j], pos = 1, cex = 2)
+        text(tpos,logr.y_values[2],ASCATobj$chrs[j], pos = 1, cex = 2)
         abline(v=vpos+0.5,lty=1,col="lightgrey")
       }
       plot(c(1,dim(ASCATobj$Germline_BAF)[1]), c(0,1), type = "n", xaxt = "n", main = paste(ASCATobj$samples[i], ", germline data, BAF", sep = ""), xlab = "", ylab = "")
@@ -111,7 +111,7 @@ ascat.plotSegmentedData = function(ASCATobj, img.dir=".", img.prefix="", logr.y_
       chrk_tot_len = chrk_tot_len + length(chrk)
       vpos = chrk_tot_len;
       tpos = (chrk_tot_len+chrk_tot_len_prev)/2;
-      text(tpos,1,ASCATobj$chrs[j], pos = 1, cex = 2)
+      text(tpos,logr.y_values[2],ASCATobj$chrs[j], pos = 1, cex = 2)
       abline(v=vpos+0.5,lty=1,col="lightgrey")
     }
     plot(c(1,length(beta)), c(0,1), type = "n", xaxt = "n", main = paste(colnames(ASCATobj$Tumor_BAF)[arraynr],", BAF",sep=""), xlab = "", ylab = "")

@@ -274,7 +274,7 @@ getLociFromNormals=function(Worksheet, Workdir, alleles.prefix, minCounts, is_ch
 #'
 #' From a complete set of loci (alleles.prefix), this method will keep SNPs falling into the targeted design (based on BED_file) and check allele counts in normal samples (listed in Worksheet). The cleaned list of loci/allele files will be located under Workdir/alleleData/Cleaned/.
 #' 
-#' @param Worksheet A table with the following columns: Patient_ID, Normal_ID, Normal_file and Gender. Must contain one single normal per patient. Normal_file can either be BAMs/CRAMs or paths to pre-computed (zipped) alleleCounts (e.g. "sample_alleleCounts_chr"). Gender must either be XX (females) or XY (males).
+#' @param Worksheet A tab-separated file with the following columns: Patient_ID, Normal_ID, Normal_file and Gender (additional columns can be provided but will not be used). Must contain one single normal per patient. Normal_file can either be paths to BAMs/CRAMs or paths to pre-computed (zipped) alleleCounts (e.g. "sample_alleleCounts_chr"). Gender must either be XX (females) or XY (males).
 #' @param Workdir The folder where output should go (will be created if it doesn't exist).
 #' @param alleles.prefix Prefix path to the allele data (e.g. "G1000_alleles_chr").
 #' @param BED_file A BED file for only looking at SNPs within specific intervals. Must fit with the design used for targeted sequencing.
