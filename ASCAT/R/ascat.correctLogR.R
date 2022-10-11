@@ -53,7 +53,7 @@ ascat.correctLogR = function(ASCATobj, GCcontentfile = NULL, replictimingfile = 
     GC_correction_after=c()
     RT_correction_before=c()
     RT_correction_after=c()
-    AUTOSOMES=!GC_newlist$Chr %in% ASCATobj$sexchromosomes
+    AUTOSOMES=!GC_newlist[,1] %in% ASCATobj$sexchromosomes
     
     for (s in 1:length(ASCATobj$samples)) {
       print.noquote(paste("Sample ", ASCATobj$samples[s], " (",s,"/",length(ASCATobj$samples),")",sep=""))
