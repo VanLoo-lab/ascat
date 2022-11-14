@@ -194,7 +194,7 @@ ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), asc
             dif = abs(pcfed2-logRPCFed[startpos3:endpos3])
             #0.3 is hardcoded here, in order not to have too many segments!
             #only replace if enough probes differ (in order not to get singular probes with different breakpoints)
-            if(!is.na(dif)&&sum(dif>0.3)>5) {
+            if(!anyNA(dif)&&sum(dif>0.3)>5) {
               #replace a bit more to make sure no 'lone' probes are left (startpos3 instead of startpos)
               logRPCFed[startpos3:endpos3]=ifelse(dif>0.3,pcfed2,logRPCFed[startpos3:endpos3])
             }
