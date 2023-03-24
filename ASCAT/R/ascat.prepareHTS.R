@@ -133,6 +133,16 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
   tumourBAF = vector(length=len, mode="numeric")
   normalLogR = vector(length=len, mode="numeric")
   tumourLogR = vector(length=len, mode="numeric")
+  # Output raw (=unmirrored) BAF from some downstream analyses (e.g. refphase)
+  normalBAF_unmirrored=normCount2/totalNormal
+  tumourBAF_unmirrored=mutCount2/totalTumour
+  germline.BAF_unmirrored = data.frame(Chromosome=allele_data$chromosome, Position=allele_data$position, baf=normalBAF_unmirrored, ID=rownames(allele_data), row.names=4, stringsAsFactors=F)
+  tumor.BAF_unmirrored = data.frame(Chromosome=allele_data$chromosome, Position=allele_data$position, baf=tumourBAF_unmirrored, ID=rownames(allele_data), row.names=4, stringsAsFactors=F)
+  colnames(tumor.BAF_unmirrored)[3]=samplename
+  colnames(germline.BAF_unmirrored)[3]=samplename
+  write.table(tumor.BAF_unmirrored,file=gsub('\\.txt$','_rawBAF.txt',tumourBAF_file), row.names=T, quote=F, sep="\t", col.names=NA)
+  write.table(germline.BAF_unmirrored,file=gsub('\\.txt$','_rawBAF.txt',normalBAF_file), row.names=T, quote=F, sep="\t", col.names=NA)
+  rm(normalBAF_unmirrored,tumourBAF_unmirrored,germline.BAF_unmirrored,tumor.BAF_unmirrored)
   # Randomise A and B alleles
   selector = round(runif(len))
   normalBAF[which(selector==0)] = normCount1[which(selector==0)] / totalNormal[which(selector==0)]
