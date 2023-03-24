@@ -31,7 +31,7 @@ Installing ASCAT using R: `devtools::install_github('VanLoo-lab/ascat/ASCAT')`
 - '*Aberrant cell fraction*' now refers to '*purity*'. For backward compatibility, `ascat.output$aberrantcellfraction` still exists but we encourage using `ascat.output$purity` instead.
 
 ### New features in v3:
-- New set of instructions, as part of the main `ascat.prepareHTS` function, to derive logR and BAF from high-throughput sequencing (HTS) data. Briefly, [alleleCounter](https://github.com/cancerit/alleleCount) is used to get allele counts at specific loci on a pair of tumour/normal (either BAM or CRAM files). This information is then converted into logR and BAF values, based on a similar method than in the [Battenberg package](https://github.com/Wedge-lab/battenberg). Although this method allows running ASCAT on different HTS data:
+- New set of instructions, as part of the main `ascat.prepareHTS` function, to derive logR and BAF from high-throughput sequencing (HTS) data. Briefly, [alleleCounter](https://github.com/cancerit/alleleCount) is used to get allele counts at specific loci on a pair of tumour/normal (either BAM or CRAM files). This information is then converted into logR and (mirrored) BAF values, based on a similar method than in the [Battenberg package](https://github.com/Wedge-lab/battenberg). Although this method allows running ASCAT on different HTS data:
   - **WES**: we recommend providing a BED file covering sequenced regions of the genome.
   - **WGS**: we recommend running [Battenberg](https://github.com/Wedge-lab/battenberg) for accurate clonal and subclonal allele-specific copy-number alteration calling. However, ASCAT can still be used to get a fast purity/ploidy fit (~30 minutes with 12 CPUs from BAMs to CNA profiles). To this end, we provide a set of files that can be used (see *[ReferenceFiles/WGS](ReferenceFiles/WGS)*).
   - **Targeted sequencing**: a bespoke function, `ascat.prepareTargetedSeq` has been implemented. Such a function must be run on a batch of normals (no tumours) and will identify high-quality SNPs to investigate. Then, `ascat.prepareHTS` can be used on selected SNPs to process tumour/normal pairs. Because of sparse datapoints, we recommend using `penalty=25` when running `ascat.aspcf`. `ascat.prepareTargetedSeq` was further fine-tuned in the v3.1.1 release and now uses a probabilistic method to infer genotypes (hom/het/noisy) based on counts (instead of fixed VAF in v3.1.0).
@@ -39,6 +39,7 @@ Installing ASCAT using R: `devtools::install_github('VanLoo-lab/ascat/ASCAT')`
 - A new function to collect metrics of interest has been added: `ascat.metrics`.
 - Boundaries can be defined for purity and ploidy (min & max) when running `ascat.runAscat` (arguments: `min_purity`/`max_purity` and `min_ploidy`/`max_ploidy`).
 - New function, `ascat.plotAdjustedAscatProfile`, that plots an ASCAT profile with respect to chromosome length (instead of the number of heterozygous SNPs).
+- For sequencing data processed with `ascat.prepareHTS`, ASCAT now reports raw (=unmirrored) BAF so true BAF values can be used in downstream analyses (*e.g.* rephase). Please note that such information is available in a couple of new files called `*_rawBAF.txt` (based on `tumourBAF_file` and `normalBAF_file`).
 
 ## Testing
 We provide some scripts and input data in the *[ExampleData](ExampleData)* folder.

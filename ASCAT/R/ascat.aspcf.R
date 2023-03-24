@@ -114,9 +114,10 @@ ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), asc
           bafASPCF = NULL
           if(length(logRaveraged)<6) {
             logRASPCF = rep(mean(logRaveraged),length(logRaveraged))
-            bafASPCF = rep(ifelse(mean(bafselwins)>=0.5,mean(bafselwins),1-mean(bafselwins)),length(logRaveraged))
+            bafASPCF = rep(mean(bafselwinsmirrored),length(logRaveraged))
+            if ('isTargetedSeq' %in% names(ASCATobj) && ASCATobj$isTargetedSeq && bafASPCF[1]<=0.55) bafASPCF=rep(0.5,length(logRaveraged))
           } else {
-            PCFed = fastAspcf(logRaveraged,bafselwins,6,segmentlength)
+            PCFed = fastAspcf(logRaveraged,bafselwins,6,segmentlength,ASCATobj$isTargetedSeq)
             logRASPCF = PCFed$yhat1
             bafASPCF = PCFed$yhat2
           }
@@ -307,7 +308,8 @@ predictGermlineHomozygousStretches = function(chr, hom) {
 # Whole chromosomes/chromosome arms wrapper function
 #
 
-fastAspcf <- function(logR, allB, kmin, gamma){
+fastAspcf <- function(logR, allB, kmin, gamma, isTargetedSeq){
+  if (is.null(isTargetedSeq)) isTargetedSeq=F
   
   N <- length(logR)
   w <- 1000 #w: windowsize
@@ -385,9 +387,9 @@ fastAspcf <- function(logR, allB, kmin, gamma){
       # if(sd3 < 1.8*sd2){
       mu <- 0
     }
+    if (isTargetedSeq && mu<=0.05) mu=0
     yhat2[frst[i]:last[i]] <- rep(mu+0.5,last[i]-frst[i]+1)
   }
-  
   return(list(yhat1=yhat1,yhat2=yhat2))
   
 }#end fastAspcf
