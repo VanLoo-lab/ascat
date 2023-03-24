@@ -121,7 +121,7 @@ ascat.correctLogR = function(ASCATobj, GCcontentfile = NULL, replictimingfile = 
         RT_correction_after=c(RT_correction_after,NA)
       }
       
-      if (!ASCATobj$isTargetedSeq) {
+      if ('isTargetedSeq' %in% names(ASCATobj) && !ASCATobj$isTargetedSeq) {
         chr=split_genome(SNPpos)
       } else {
         chr=ch
