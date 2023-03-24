@@ -28,6 +28,7 @@
 #' @export
 #'
 ascat.asmultipcf <- function(ASCATobj, ascat.gg = NULL, penalty = 70, out.dir = ".", wsample=NULL, selectAlg="exact",refine=TRUE, seed=as.integer(Sys.time())) {
+  if (is.null(ASCATobj$isTargetedSeq)) ASCATobj$isTargetedSeq=F
   set.seed(seed)
   useLogRonlySites=TRUE
   #first, set germline genotypes
@@ -141,6 +142,7 @@ ascat.asmultipcf <- function(ASCATobj, ascat.gg = NULL, penalty = 70, out.dir = 
           } else {
             logRASPCF = apply(logRaveraged,2,function(x) rep(mean(x,na.rm=TRUE),length(x)))
             bafASPCF = apply(bafwins,2,function(x) rep(ifelse(mean(x,na.rm=TRUE)>=0.5,mean(x,na.rm=TRUE),1-mean(x,na.rm=TRUE)),length(x)))
+            if (ASCATobj$isTargetedSeq) apply(bafASPCF,2,function(x) ifelse(x<=0.55,0.5,x))
           }
         } else {
           # combine logR and BAF data into one matrix for joint segmentation
@@ -241,6 +243,7 @@ ascat.asmultipcf <- function(ASCATobj, ascat.gg = NULL, penalty = 70, out.dir = 
                 if(sqrt(sd^2+mu^2) < 2*sd){
                   mu <- 0
                 }
+                if (ASCATobj$isTargetedSeq && mu<=0.05) mu=0
                 yhat[frst[i]:last[i]] <- rep(mu+0.5,last[i]-frst[i]+1)
               }
             }
