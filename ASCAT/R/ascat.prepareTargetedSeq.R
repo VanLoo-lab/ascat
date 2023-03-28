@@ -40,10 +40,13 @@ plotLogRandBAF=function(Plotdir,SNPpos,LogR,BAF) {
     # plot logR
     plot(c(1,dim(LogR)[1]),c(-2,2),type="n",xaxt="n",main=paste0(samples[i],", LogR"),xlab="",ylab="")
     points(LogR[,i],col="red")
+    points(LogR[,i],col="#77000011")
     myLegend(ch)
     # plot mirrored BAF
     plot(c(1,dim(BAF)[1]),c(0,1),type="n",xaxt="n",main=paste0(samples[i],", BAF"),xlab="",ylab="")
-    points(ifelse(runif(length(BAF[,i]))<0.5,BAF[,i],1-BAF[,i]),col="red")
+    plot_as_minor_or_major <- runif(length(BAF[,i]))<0.5
+    points(ifelse(plot_as_minor_or_major,BAF[,i],1-BAF[,i]),col="red")
+    points(ifelse(plot_as_minor_or_major,BAF[,i],1-BAF[,i]),col="#77000011")
     myLegend(ch)
     dev.off()
   }

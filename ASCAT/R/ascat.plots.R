@@ -15,6 +15,7 @@ ascat.plotRawData = function(ASCATobj, img.dir=".", img.prefix="", logr.y_values
     par(mar = c(0.5,5,5,0.5), mfrow = c(2,1), cex = 0.4, cex.main=3, cex.axis = 2, pch = ifelse(dim(ASCATobj$Tumor_LogR)[1]>100000,".",20))
     plot(c(1,dim(ASCATobj$Tumor_LogR)[1]), logr.y_values, type = "n", xaxt = "n", main = paste(ASCATobj$samples[i], ", tumor data, LogR", sep = ""), xlab = "", ylab = "")
     points(ASCATobj$Tumor_LogR[,i],col="red")
+    points(ASCATobj$Tumor_LogR[,i],col="#77000011")
     abline(v=0.5,lty=1,col="lightgrey")
     chrk_tot_len = 0
     for (j in 1:length(ASCATobj$ch)) {
@@ -28,6 +29,7 @@ ascat.plotRawData = function(ASCATobj, img.dir=".", img.prefix="", logr.y_values
     }
     plot(c(1,dim(ASCATobj$Tumor_BAF)[1]), c(0,1), type = "n", xaxt = "n", main = paste(ASCATobj$samples[i], ", tumor data, BAF", sep = ""), xlab = "", ylab = "")
     points(ASCATobj$Tumor_BAF[,i],col="red")
+    points(ASCATobj$Tumor_BAF[,i],col="#77000011")
     abline(v=0.5,lty=1,col="lightgrey")
     chrk_tot_len = 0
     for (j in 1:length(ASCATobj$ch)) {
@@ -49,6 +51,7 @@ ascat.plotRawData = function(ASCATobj, img.dir=".", img.prefix="", logr.y_values
       par(mar = c(0.5,5,5,0.5), mfrow = c(2,1), cex = 0.4, cex.main=3, cex.axis = 2, pch = ifelse(dim(ASCATobj$Tumor_LogR)[1]>100000,".",20))
       plot(c(1,dim(ASCATobj$Germline_LogR)[1]), logr.y_values, type = "n", xaxt = "n", main = paste(ASCATobj$samples[i], ", germline data, LogR", sep = ""), xlab = "", ylab = "")
       points(ASCATobj$Germline_LogR[,i],col="red")
+      points(ASCATobj$Germline_LogR[,i],col="#77000011")
       abline(v=0.5,lty=1,col="lightgrey")
       chrk_tot_len = 0
       for (j in 1:length(ASCATobj$ch)) {
@@ -62,6 +65,7 @@ ascat.plotRawData = function(ASCATobj, img.dir=".", img.prefix="", logr.y_values
       }
       plot(c(1,dim(ASCATobj$Germline_BAF)[1]), c(0,1), type = "n", xaxt = "n", main = paste(ASCATobj$samples[i], ", germline data, BAF", sep = ""), xlab = "", ylab = "")
       points(ASCATobj$Germline_BAF[,i],col="red")
+      points(ASCATobj$Germline_BAF[,i],col="#77000011")
       abline(v=0.5,lty=1,col="lightgrey")
       chrk_tot_len = 0
       for (j in 1:length(ASCATobj$ch)) {
@@ -102,6 +106,7 @@ ascat.plotSegmentedData = function(ASCATobj, img.dir=".", img.prefix="", logr.y_
     beta = ASCATobj$Tumor_BAF_segmented[[arraynr]][,,drop=FALSE]
     plot(c(1,length(r)), logr.y_values, type = "n", xaxt = "n", main = paste(colnames(ASCATobj$Tumor_BAF)[arraynr],", LogR",sep=""), xlab = "", ylab = "")
     points(ASCATobj$Tumor_LogR[rownames(ASCATobj$Tumor_BAF_segmented[[arraynr]]),arraynr], col = "red", pch=ifelse(dim(ASCATobj$Tumor_LogR)[1]>100000,".",20))
+    points(ASCATobj$Tumor_LogR[rownames(ASCATobj$Tumor_BAF_segmented[[arraynr]]),arraynr], col = "#77000011", pch=ifelse(dim(ASCATobj$Tumor_LogR)[1]>100000,".",20))
     points(r,col="green")
     abline(v=0.5,lty=1,col="lightgrey")
     chrk_tot_len = 0
@@ -116,6 +121,7 @@ ascat.plotSegmentedData = function(ASCATobj, img.dir=".", img.prefix="", logr.y_
     }
     plot(c(1,length(beta)), c(0,1), type = "n", xaxt = "n", main = paste(colnames(ASCATobj$Tumor_BAF)[arraynr],", BAF",sep=""), xlab = "", ylab = "")
     points(ASCATobj$Tumor_BAF[rownames(ASCATobj$Tumor_BAF_segmented[[arraynr]]),arraynr], col = "red", pch=ifelse(dim(ASCATobj$Tumor_LogR)[1]>100000,".",20))
+    points(ASCATobj$Tumor_BAF[rownames(ASCATobj$Tumor_BAF_segmented[[arraynr]]),arraynr], col = "#77000011", pch=ifelse(dim(ASCATobj$Tumor_LogR)[1]>100000,".",20))
     points(beta, col = "green")
     points(1-beta, col = "green")
     abline(v=0.5,lty=1,col="lightgrey")
@@ -364,6 +370,7 @@ ascat.plotGenotypes<-function(ASCATobj, title, Tumor_BAF_noNA, Hom, ch_noNA){
   par(mar = c(0.5,5,5,0.5), cex = 0.4, cex.main=3, cex.axis = 2, pch = ifelse(dim(ASCATobj$Tumor_LogR)[1]>100000,".",20))
   plot(c(1,length(Tumor_BAF_noNA)), c(0,1), type = "n", xaxt = "n", main = title, xlab = "", ylab = "")
   points(Tumor_BAF_noNA,col=ifelse(is.na(Hom),"green",ifelse(Hom,"blue","red")))
+  points(Tumor_BAF_noNA,col=ifelse(is.na(Hom),"#00990011",ifelse(Hom,"#00005511","#77000011")))
   
   abline(v=0.5,lty=1,col="lightgrey")
   chrk_tot_len = 0
