@@ -107,7 +107,7 @@ ascat.plotSegmentedData = function(ASCATobj, img.dir=".", img.prefix="", logr.y_
     plot(c(1,length(r)), logr.y_values, type = "n", xaxt = "n", main = paste(colnames(ASCATobj$Tumor_BAF)[arraynr],", LogR",sep=""), xlab = "", ylab = "")
     points(ASCATobj$Tumor_LogR[rownames(ASCATobj$Tumor_BAF_segmented[[arraynr]]),arraynr], col = "red", pch=ifelse(dim(ASCATobj$Tumor_LogR)[1]>100000,".",20))
     points(ASCATobj$Tumor_LogR[rownames(ASCATobj$Tumor_BAF_segmented[[arraynr]]),arraynr], col = "#77000011", pch=ifelse(dim(ASCATobj$Tumor_LogR)[1]>100000,".",20))
-    points(r,col="green")
+    points(r,col="#1b38ae",pch=16)
     abline(v=0.5,lty=1,col="lightgrey")
     chrk_tot_len = 0
     for (j in 1:length(ASCATobj$ch)) {
@@ -122,8 +122,8 @@ ascat.plotSegmentedData = function(ASCATobj, img.dir=".", img.prefix="", logr.y_
     plot(c(1,length(beta)), c(0,1), type = "n", xaxt = "n", main = paste(colnames(ASCATobj$Tumor_BAF)[arraynr],", BAF",sep=""), xlab = "", ylab = "")
     points(ASCATobj$Tumor_BAF[rownames(ASCATobj$Tumor_BAF_segmented[[arraynr]]),arraynr], col = "red", pch=ifelse(dim(ASCATobj$Tumor_LogR)[1]>100000,".",20))
     points(ASCATobj$Tumor_BAF[rownames(ASCATobj$Tumor_BAF_segmented[[arraynr]]),arraynr], col = "#77000011", pch=ifelse(dim(ASCATobj$Tumor_LogR)[1]>100000,".",20))
-    points(beta, col = "green")
-    points(1-beta, col = "green")
+    points(beta, col = "#1b38ae",pch=16)
+    points(1-beta, col = "#1b38ae",pch=16)
     abline(v=0.5,lty=1,col="lightgrey")
     chrk_tot_len = 0
     for (j in 1:length(ASCATobj$ch)) {

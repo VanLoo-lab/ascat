@@ -1,8 +1,8 @@
 Package: ASCAT
 Type: Package
 Title: Allele-Specific Copy Number Analysis of Tumors
-Version: 3.1.1
-Date: 2022-12-21
+Version: 3.1.2
+Date: 2023-04-12
 Authors@R: c(person("Peter", "Van Loo", role=c("aut","cre"), email="Peter.VanLoo@crick.ac.uk"),
     person("Gro", "Nielsen", role="ctb"),
     person("Jiqiu","Cheng", role="ctb"),
