@@ -173,8 +173,9 @@ ascat.aspcf = function(ASCATobj, selectsamples = 1:length(ASCATobj$samples), asc
         if(length(homsegs)==3) {
           homsegs=t(as.matrix(homsegs))
         }
-        if(!is.null(homsegs)&&!is.na(homsegs)&&dim(homsegs)[1]!=0) {
+        if(!is.null(homsegs)&&dim(homsegs)[1]!=0) {
           for (i in 1:dim(homsegs)[1]) {
+            if (anyNA(homsegs[i,])) next
             # note that only the germline homozygous segment is resegmented, plus a bit extra (but this is NOT replaced)
             startpos = max(homsegs[i,2],startchr)
             endpos = min(homsegs[i,3],endchr)
