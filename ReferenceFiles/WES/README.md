@@ -16,6 +16,8 @@ Data availability:
 #### Loci file
 One file per chromosome, no header, the first column is the chromosome name and the second column is the position.
 
+| | |
+| --- | --- |
 | 1 | 10642 |
 | 1 | 11008 |
 | 1 | 11012 |
