@@ -91,6 +91,36 @@ QC = ascat.metrics(ascat.bc,ascat.output)
 save(ascat.bc, ascat.output, QC, file = 'ASCAT_objects.Rdata')
 ```
 
+## Extracting logR and BAF from Tumor-only HTS (WGS) data and running ASCAT
+
+```R
+library(ASCAT)
+
+ascat.prepareHTS(
+  tumourseqfile = "Tumour.bam",
+  tumourname = "Tumour_name",
+  allelecounter_exe = "/PATH/TO/allelecounter",
+  alleles.prefix = "G1000_alleles_hg38_chr",
+  loci.prefix = "G1000_loci_hg38_chr",
+  gender = "XX",
+  genomeVersion = "hg38",
+  nthreads = 8,
+  tumourLogR_file = "Tumor_LogR.txt",
+  tumourBAF_file = "Tumor_BAF.txt")
+
+ascat.bc = ascat.loadData(Tumor_LogR_file = "Tumor_LogR.txt", Tumor_BAF_file = "Tumor_BAF.txt", gender = 'XX', genomeVersion = "hg38")
+ascat.plotRawData(ascat.bc, img.prefix = "Before_correction_")
+ascat.bc = ascat.correctLogR(ascat.bc, GCcontentfile = "GC_file.txt", replictimingfile = "RT_file.txt")
+ascat.plotRawData(ascat.bc, img.prefix = "After_correction_")
+gg = ascat.predictGermlineGenotypes(ascat.bc, platform = "HTS_WGS_1000G")
+ascat.bc = ascat.aspcf(ascat.bc, ascat.gg=gg)
+ascat.plotSegmentedData(ascat.bc)
+ascat.output = ascat.runAscat(ascat.bc, gamma=1, write_segments = T)
+QC = ascat.metrics(ascat.bc,ascat.output)
+save(ascat.bc, ascat.output, QC, file = 'ASCAT_objects.Rdata')
+```
+
+
 ## Processing targeted sequencing data
 ```R
 library(ASCAT)
