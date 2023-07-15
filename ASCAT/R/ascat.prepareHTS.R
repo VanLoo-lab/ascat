@@ -9,7 +9,7 @@
 #' @param ref.fasta A FASTA file for CRAM processing (optional).
 #' @author sd11, tl
 #' @export
-ascat.getAlleleCounts = function(seq.file, output.file, loci.file, min.base.qual=20, min.map.qual=35, allelecounter.exe="alleleCounter", ref.fasta=NA) {
+ascat.getAlleleCounts = function(seq.file, output.file, loci.file, min.base.qual=20, min.map.qual=35, additional_flags=NA, allelecounter.exe="alleleCounter") {
   if (!file.exists(seq.file) || file.info(seq.file)$size==0) {warning('seq.file does not seem to exist or is empty'); return()}
   if (!file.exists(loci.file) || file.info(loci.file)$size==0) {warning('loci.file does not seem to exist or is empty'); return()}
   cmd = paste(allelecounter.exe,
@@ -23,9 +23,9 @@ ascat.getAlleleCounts = function(seq.file, output.file, loci.file, min.base.qual
   if (as.integer(substr(x = counter_version, start = 1, stop = 1)) >= 4) {
     cmd = paste(cmd, "--dense-snps")
   }
-  # if ref.fasta is provided, add it to the command line
-  if (!is.na(ref.fasta)) {
-    cmd = paste(cmd, "-r", ref.fasta)
+  # allow to pass additional flags to alleleCount (e.g. -f)
+  if (!is.na(additional_flags)) {
+    cmd = paste(cmd, additional_flags)
   }
   EXIT_CODE=system(cmd, wait=T)
   stopifnot(EXIT_CODE==0)
@@ -253,7 +253,7 @@ ascat.synchroniseFiles=function(samplename,tumourLogR_file,tumourBAF_file,normal
 #' @param chrom_names A vector containing the names of chromosomes to be considered (optional, default=c(1:22,'X')).
 #' @param min_base_qual Minimum base quality required for a read to be counted (optional, default=20).
 #' @param min_map_qual Minimum mapping quality required for a read to be counted (optional, default=35).
-#' @param ref.fasta FASTA file used for generating CRAMs (optional, default=NA).
+#' @param additional_allelecounter_flags Additional flags passed on to alleleCounter, e.g., -r <FASTA> for parsing CRAMs (optional, default=NA).
 #' @param skip_allele_counting_tumour Flag, set to TRUE if tumour allele counting is already complete (files are expected in the working directory on disk; optional, default=FALSE).
 #' @param skip_allele_counting_normal Flag, set to TRUE if normal allele counting is already complete (files are expected in the working directory on disk; optional, default=FALSE).
 #' @param seed A seed to be set when randomising the alleles (optional, default=as.integer(Sys.time())).
@@ -261,7 +261,7 @@ ascat.synchroniseFiles=function(samplename,tumourLogR_file,tumourBAF_file,normal
 #' @export
 ascat.prepareHTS = function(tumourseqfile, normalseqfile=NA, tumourname, normalname=NA, allelecounter_exe, alleles.prefix, loci.prefix, gender, genomeVersion,
                             nthreads=1, tumourLogR_file=NA, tumourBAF_file=NA, normalLogR_file=NA, normalBAF_file=NA, minCounts=10, BED_file=NA,
-                            probloci_file=NA, chrom_names=c(1:22,'X'), min_base_qual=20, min_map_qual=35, ref.fasta=NA,
+                            probloci_file=NA, chrom_names=c(1:22,'X'), min_base_qual=20, min_map_qual=35, additional_allelecounter_flags=NA,
                             skip_allele_counting_tumour=F, skip_allele_counting_normal=F, seed=as.integer(Sys.time())) {
   requireNamespace("foreach")
   requireNamespace("doParallel")
@@ -291,7 +291,7 @@ ascat.prepareHTS = function(tumourseqfile, normalseqfile=NA, tumourname, normaln
                             min.base.qual=min_base_qual,
                             min.map.qual=min_map_qual,
                             allelecounter.exe=allelecounter_exe,
-                            ref.fasta=ref.fasta)
+                            additional_flags=additional_allelecounter_flags)
     }
   }
   if (!skip_allele_counting_normal) {
@@ -303,7 +303,7 @@ ascat.prepareHTS = function(tumourseqfile, normalseqfile=NA, tumourname, normaln
                             min.base.qual=min_base_qual,
                             min.map.qual=min_map_qual,
                             allelecounter.exe=allelecounter_exe,
-                            ref.fasta=ref.fasta)
+                            additional_flags=additional_allelecounter_flags)
     }
   }
   # Obtain BAF and LogR from the raw allele counts
