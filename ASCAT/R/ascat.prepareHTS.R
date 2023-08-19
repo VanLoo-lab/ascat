@@ -7,7 +7,7 @@
 #' @param min.map.qual The minimum mapping quality required for it to be counted (optional, default=35).
 #' @param allelecounter.exe A pointer to where the alleleCounter executable can be found (optional, default points to $PATH).
 #' @param ref.fasta A FASTA file for CRAM processing (optional).
-#' @author sd11, tl
+#' @author sd11, tl, jd
 #' @export
 ascat.getAlleleCounts = function(seq.file, output.file, loci.file, min.base.qual=20, min.map.qual=35, additional_flags=NA, allelecounter.exe="alleleCounter") {
   if (!file.exists(seq.file) || file.info(seq.file)$size==0) {warning('seq.file does not seem to exist or is empty'); return()}
@@ -48,7 +48,8 @@ ascat.getAlleleCounts = function(seq.file, output.file, loci.file, min.base.qual
 #' @param BED_file A BED file for only looking at SNPs within specific intervals (optional, default=NA).
 #' @param probloci_file A file (chromosome <tab> position; no header) containing specific loci to ignore (optional, default=NA).
 #' @param seed A seed to be set when randomising the alleles (optional, default=as.integer(Sys.time())).
-#' @author dw9, sd11, tl
+#' @param tumour_only_mode Should the BAF and LogR be compute from tumour-only (optional, default = F)
+#' @author dw9, sd11, tl, jd
 #' @export
 ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, normalAlleleCountsFile.prefix, tumourLogR_file, tumourBAF_file, normalLogR_file, normalBAF_file, alleles.prefix, gender, genomeVersion, chrom_names=c(1:22,'X'), minCounts=20, BED_file=NA, probloci_file=NA, seed=as.integer(Sys.time()), tumour_only_mode=F) {
   set.seed(seed)
@@ -159,25 +160,25 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
   normalBAF[which(selector==1)] = normCount2[which(selector==1)] / totalNormal[which(selector==1)]
   tumourBAF[which(selector==0)] = mutCount1[which(selector==0)] / totalTumour[which(selector==0)]
   tumourBAF[which(selector==1)] = mutCount2[which(selector==1)] / totalTumour[which(selector==1)]
+  rm(selector)
   # Normalise tumourLogR to normalLogR
   if (tumour_only_mode) {
-    tumourLogR = log2(totalTumour/mean(totalTumour, na.rm=T))
+    tumourLogR = log2(totalTumour/median(totalTumour, na.rm=T))
   } else {
     tumourLogR = totalTumour/totalNormal
-    tumourLogR = log2(tumourLogR/mean(tumourLogR, na.rm=T))
-  }
-  rm(selector)
-  # For males, chrX needs to be adjusted as logR baseline will be 0 because of T/N ratio
-  if (gender=='XY') {
-    # PAR1 and PAR2 information should be a mix of chrX and chrY so we should expect 1+1 (1 from X and 1 from Y).
-    # nonPAR should be X-specific and baseline is 1+0 so logR needs to be decreased according to gamma parameter (ascat.runAscat)
-    if (genomeVersion=='hg19') {
-      nonPAR=c(2699521,154931043)
-    } else if (genomeVersion=='hg38') {
-      nonPAR=c(2781480,155701382)
+    tumourLogR = log2(tumourLogR/median(tumourLogR, na.rm=T))
+      # For males, chrX needs to be adjusted as logR baseline will be 0 because of T/N ratio
+    if (gender=='XY') {
+      # PAR1 and PAR2 information should be a mix of chrX and chrY so we should expect 1+1 (1 from X and 1 from Y).
+      # nonPAR should be X-specific and baseline is 1+0 so logR needs to be decreased according to gamma parameter (ascat.runAscat)
+      if (genomeVersion=='hg19') {
+        nonPAR=c(2699521,154931043)
+      } else if (genomeVersion=='hg38') {
+        nonPAR=c(2781480,155701382)
+      }
+      nonPAR=which(allele_data$chromosome %in% c('X','chrX') & allele_data$position>=nonPAR[1] & allele_data$position<=nonPAR[2])
+      tumourLogR[nonPAR]=tumourLogR[nonPAR]-1
     }
-    nonPAR=which(allele_data$chromosome %in% c('X','chrX') & allele_data$position>=nonPAR[1] & allele_data$position<=nonPAR[2])
-    tumourLogR[nonPAR]=tumourLogR[nonPAR]-1
   }
   # Create the output data.frames
   tumor.LogR = data.frame(Chromosome=allele_data$chromosome, Position=allele_data$position, logr=tumourLogR, ID=rownames(allele_data), row.names=4, stringsAsFactors=F)
