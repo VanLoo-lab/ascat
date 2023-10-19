@@ -42,6 +42,7 @@ Illumina700k\cr
 Illumina1M\cr
 Illumina2.5M\cr
 IlluminaOmni5\cr
+IlluminaGDACyto-8\cr
 Affy10k\cr
 Affy100k\cr
 Affy250k_sty\cr

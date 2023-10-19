@@ -19,6 +19,7 @@
 #' Illumina1M\cr
 #' Illumina2.5M\cr
 #' IlluminaOmni5\cr
+#' IlluminaGDACyto-8\cr
 #' Affy10k\cr
 #' Affy100k\cr
 #' Affy250k_sty\cr
@@ -115,6 +116,12 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6", img.d
     proportionHomo = 0.855
     proportionOpen = 0.01
     segmentLength = 100
+  } else if (platform=="IlluminaGDACyto-8") {
+    maxHomozygous = 0.06
+    proportionHetero = 0.12
+    proportionHomo = 0.85
+    proportionOpen = 0.02
+    segmentLength = 150
   } else if (platform=="Affy10k") {
     maxHomozygous = 0.04
     proportionHetero = 0.355
