@@ -6,10 +6,10 @@ Please note that such files can also be used for processing targeted sequencing 
 
 Data availability:
 
-- Loci files: [hg19](https://drive.google.com/file/d/1R2MON6M77kh3M2v7nSOM1_MOEXXnpIbH/view?usp=share_link) & [hg38](https://drive.google.com/file/d/1BqqYUFdQ3uVllBwSkBYs-jrRJFsmB-No/view?usp=share_link) (unzip and set `alleles.prefix="G1000_loci_hg19_chr"` in `ascat.prepareHTS`)
-- Allele files: [hg19](https://drive.google.com/file/d/1NtwlPiArWeFaMO1PjuH7aNhhNZ3bMX5J/view?usp=share_link) & [hg38](https://drive.google.com/file/d/101tHEt4r81b-bZxCE50edRXuOCh4bo-M/view?usp=share_link) (unzip and set `loci.prefix="G1000_alleles_hg19_chr"` in `ascat.prepareHTS`)
-- GC correction file: [hg19](https://drive.google.com/file/d/1-WZGH0XTtWFjyJV6ucWQ-yaoYtHcztvq/view?usp=share_link) & [hg38](https://drive.google.com/file/d/1-0wOc5woK27tEpUpSNsz0U3xwI-xvBb3/view?usp=share_link) (unzip and set `GCcontentfile="GC_G1000_hg19.txt"` in `ascat.correctLogR`)
-- Replication timing correction file: [hg19](https://drive.google.com/file/d/1unad1TkrXV-EFcRM8KBUCXpLXWCIxWyv/view?usp=share_link) & [hg38](https://drive.google.com/file/d/1Etl5HYdC4TNw0oj4AxvbJR_1a1atYBFt/view?usp=share_link) (unzip and set `replictimingfile="RT_G1000_hg19.txt"` in `ascat.correctLogR`)
+- Loci files: [hg19](https://zenodo.org/records/10513234/files/G1000_loci_WES_hg19.zip?download=1) & [hg38](https://zenodo.org/records/10513234/files/G1000_loci_WES_hg38.zip?download=1) (unzip and set `alleles.prefix="G1000_loci_hg19_chr"` in `ascat.prepareHTS`)
+- Allele files: [hg19](https://zenodo.org/records/10513234/files/G1000_alleles_WES_hg19.zip?download=1) & [hg38](https://zenodo.org/records/10513234/files/G1000_alleles_WES_hg38.zip?download=1) (unzip and set `loci.prefix="G1000_alleles_hg19_chr"` in `ascat.prepareHTS`)
+- GC correction file: [hg19](https://zenodo.org/records/10513234/files/GC_G1000_WES_hg19.zip?download=1) & [hg38](https://zenodo.org/records/10513234/files/GC_G1000_WES_hg38.zip?download=1) (unzip and set `GCcontentfile="GC_G1000_hg19.txt"` in `ascat.correctLogR`)
+- Replication timing correction file: [hg19](https://zenodo.org/records/10513234/files/RT_G1000_WES_hg19.zip?download=1) & [hg38](https://zenodo.org/records/10513234/files/RT_G1000_WES_hg38.zip?download=1) (unzip and set `replictimingfile="RT_G1000_hg19.txt"` in `ascat.correctLogR`)
 
 ### File format
 
