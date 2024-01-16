@@ -7,9 +7,9 @@
 #' @param min.map.qual The minimum mapping quality required for it to be counted (optional, default=35).
 #' @param allelecounter.exe A pointer to where the alleleCounter executable can be found (optional, default points to $PATH).
 #' @param ref.fasta A FASTA file for CRAM processing (optional).
-#' @author sd11, tl
+#' @author sd11, tl, jd
 #' @export
-ascat.getAlleleCounts = function(seq.file, output.file, loci.file, min.base.qual=20, min.map.qual=35, allelecounter.exe="alleleCounter", ref.fasta=NA) {
+ascat.getAlleleCounts = function(seq.file, output.file, loci.file, min.base.qual=20, min.map.qual=35, additional_flags=NA, allelecounter.exe="alleleCounter") {
   if (!file.exists(seq.file) || file.info(seq.file)$size==0) {warning('seq.file does not seem to exist or is empty'); return()}
   if (!file.exists(loci.file) || file.info(loci.file)$size==0) {warning('loci.file does not seem to exist or is empty'); return()}
   cmd = paste(allelecounter.exe,
@@ -23,9 +23,9 @@ ascat.getAlleleCounts = function(seq.file, output.file, loci.file, min.base.qual
   if (as.integer(substr(x = counter_version, start = 1, stop = 1)) >= 4) {
     cmd = paste(cmd, "--dense-snps")
   }
-  # if ref.fasta is provided, add it to the command line
-  if (!is.na(ref.fasta)) {
-    cmd = paste(cmd, "-r", ref.fasta)
+  # allow to pass additional flags to alleleCount (e.g. -f)
+  if (!is.na(additional_flags)) {
+    cmd = paste(cmd, additional_flags)
   }
   EXIT_CODE=system(cmd, wait=T)
   stopifnot(EXIT_CODE==0)
@@ -48,15 +48,20 @@ ascat.getAlleleCounts = function(seq.file, output.file, loci.file, min.base.qual
 #' @param BED_file A BED file for only looking at SNPs within specific intervals (optional, default=NA).
 #' @param probloci_file A file (chromosome <tab> position; no header) containing specific loci to ignore (optional, default=NA).
 #' @param seed A seed to be set when randomising the alleles (optional, default=as.integer(Sys.time())).
-#' @author dw9, sd11, tl
+#' @param tumour_only_mode Should the BAF and LogR be compute from tumour-only (optional, default = F)
+#' @author dw9, sd11, tl, jd
 #' @export
-ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, normalAlleleCountsFile.prefix, tumourLogR_file, tumourBAF_file, normalLogR_file, normalBAF_file, alleles.prefix, gender, genomeVersion, chrom_names=c(1:22,'X'), minCounts=20, BED_file=NA, probloci_file=NA, seed=as.integer(Sys.time())) {
+ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, normalAlleleCountsFile.prefix, tumourLogR_file, tumourBAF_file, normalLogR_file, normalBAF_file, alleles.prefix, gender, genomeVersion, chrom_names=c(1:22,'X'), minCounts=20, BED_file=NA, probloci_file=NA, seed=as.integer(Sys.time()), tumour_only_mode=F) {
   set.seed(seed)
   stopifnot(gender %in% c('XX','XY'))
   stopifnot(genomeVersion %in% c('hg19','hg38'))
   # Load data, only keep SNPs with enough coverage
   tumour_input_data = readAlleleCountFiles(tumourAlleleCountsFile.prefix, ".txt", chrom_names, 1)
-  normal_input_data = readAlleleCountFiles(normalAlleleCountsFile.prefix, ".txt", chrom_names, minCounts)
+  if (tumour_only_mode) {
+    normal_input_data = tumour_input_data
+  } else {
+    normal_input_data = readAlleleCountFiles(normalAlleleCountsFile.prefix, ".txt", chrom_names, minCounts)
+  }
   allele_data = readAllelesFiles(alleles.prefix, ".txt", chrom_names)
   # Synchronise DFs
   matched_data = Reduce(intersect, list(rownames(tumour_input_data), rownames(normal_input_data), rownames(allele_data)))
@@ -114,7 +119,11 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
   normal_input_data$REF=normal_input_data[cbind(1:len,allele_data[,3])]
   normal_input_data$ALT=normal_input_data[cbind(1:len,allele_data[,4])]
   # Make sure that ALT+REF fit with minimal counts
-  TO_KEEP=which(tumour_input_data$REF+tumour_input_data$ALT>=1 & normal_input_data$REF+normal_input_data$ALT>=minCounts)
+  if (tumour_only_mode) {
+    TO_KEEP=which(tumour_input_data$REF+tumour_input_data$ALT>=1)
+  } else {
+    TO_KEEP=which(tumour_input_data$REF+tumour_input_data$ALT>=1 & normal_input_data$REF+normal_input_data$ALT>=minCounts)
+  }
   stopifnot(length(TO_KEEP)>0)
   allele_data=allele_data[TO_KEEP,]
   tumour_input_data=tumour_input_data[TO_KEEP,]
@@ -141,7 +150,9 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
   colnames(tumor.BAF_unmirrored)[3]=samplename
   colnames(germline.BAF_unmirrored)[3]=samplename
   write.table(tumor.BAF_unmirrored,file=gsub('\\.txt$','_rawBAF.txt',tumourBAF_file), row.names=T, quote=F, sep="\t", col.names=NA)
-  write.table(germline.BAF_unmirrored,file=gsub('\\.txt$','_rawBAF.txt',normalBAF_file), row.names=T, quote=F, sep="\t", col.names=NA)
+  if (!tumour_only_mode) {
+    write.table(germline.BAF_unmirrored,file=gsub('\\.txt$','_rawBAF.txt',normalBAF_file), row.names=T, quote=F, sep="\t", col.names=NA)
+  }
   rm(normalBAF_unmirrored,tumourBAF_unmirrored,germline.BAF_unmirrored,tumor.BAF_unmirrored)
   # Randomise A and B alleles
   selector = round(runif(len))
@@ -149,21 +160,25 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
   normalBAF[which(selector==1)] = normCount2[which(selector==1)] / totalNormal[which(selector==1)]
   tumourBAF[which(selector==0)] = mutCount1[which(selector==0)] / totalTumour[which(selector==0)]
   tumourBAF[which(selector==1)] = mutCount2[which(selector==1)] / totalTumour[which(selector==1)]
-  # Normalise tumourLogR to normalLogR
-  tumourLogR = totalTumour/totalNormal
-  tumourLogR = log2(tumourLogR/mean(tumourLogR, na.rm=T))
   rm(selector)
-  # For males, chrX needs to be adjusted as logR baseline will be 0 because of T/N ratio
-  if (gender=='XY') {
-    # PAR1 and PAR2 information should be a mix of chrX and chrY so we should expect 1+1 (1 from X and 1 from Y).
-    # nonPAR should be X-specific and baseline is 1+0 so logR needs to be decreased according to gamma parameter (ascat.runAscat)
-    if (genomeVersion=='hg19') {
-      nonPAR=c(2699521,154931043)
-    } else if (genomeVersion=='hg38') {
-      nonPAR=c(2781480,155701382)
+  # Normalise tumourLogR to normalLogR
+  if (tumour_only_mode) {
+    tumourLogR = log2(totalTumour/median(totalTumour, na.rm=T))
+  } else {
+    tumourLogR = totalTumour/totalNormal
+    tumourLogR = log2(tumourLogR/median(tumourLogR, na.rm=T))
+      # For males, chrX needs to be adjusted as logR baseline will be 0 because of T/N ratio
+    if (gender=='XY') {
+      # PAR1 and PAR2 information should be a mix of chrX and chrY so we should expect 1+1 (1 from X and 1 from Y).
+      # nonPAR should be X-specific and baseline is 1+0 so logR needs to be decreased according to gamma parameter (ascat.runAscat)
+      if (genomeVersion=='hg19') {
+        nonPAR=c(2699521,154931043)
+      } else if (genomeVersion=='hg38') {
+        nonPAR=c(2781480,155701382)
+      }
+      nonPAR=which(allele_data$chromosome %in% c('X','chrX') & allele_data$position>=nonPAR[1] & allele_data$position<=nonPAR[2])
+      tumourLogR[nonPAR]=tumourLogR[nonPAR]-1
     }
-    nonPAR=which(allele_data$chromosome %in% c('X','chrX') & allele_data$position>=nonPAR[1] & allele_data$position<=nonPAR[2])
-    tumourLogR[nonPAR]=tumourLogR[nonPAR]-1
   }
   # Create the output data.frames
   tumor.LogR = data.frame(Chromosome=allele_data$chromosome, Position=allele_data$position, logr=tumourLogR, ID=rownames(allele_data), row.names=4, stringsAsFactors=F)
@@ -177,8 +192,10 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
   # Save data.frames to disk
   write.table(tumor.LogR,file=tumourLogR_file, row.names=T, quote=F, sep="\t", col.names=NA)
   write.table(tumor.BAF,file=tumourBAF_file, row.names=T, quote=F, sep="\t", col.names=NA)
-  write.table(germline.LogR,file=normalLogR_file, row.names=T, quote=F, sep="\t", col.names=NA)
-  write.table(germline.BAF,file=normalBAF_file, row.names=T, quote=F, sep="\t", col.names=NA)
+  if (!tumour_only_mode) {
+    write.table(germline.LogR,file=normalLogR_file, row.names=T, quote=F, sep="\t", col.names=NA)
+    write.table(germline.BAF,file=normalBAF_file, row.names=T, quote=F, sep="\t", col.names=NA)
+  }
 }
 
 #' Synchronise SNPs across files
@@ -193,20 +210,22 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
 ascat.synchroniseFiles=function(samplename,tumourLogR_file,tumourBAF_file,normalLogR_file,normalBAF_file) {
   # read all files
   FILES=lapply(c(tumourLogR_file,tumourBAF_file,normalLogR_file,normalBAF_file),function(x) {
+    if (!file.exists(x)) return(NA)
     tmp=data.frame(data.table::fread(x,sep='\t',showProgress=F,header=T,na.strings=c('-Inf','Inf','NA','NaN','','-')),row.names=1,stringsAsFactors=F,check.names=F)
     colnames(tmp)=c('Chromosome','Position',samplename)
     tmp=tmp[!is.na(tmp[,3]),]
     return(tmp)
   })
   names(FILES)=c(tumourLogR_file,tumourBAF_file,normalLogR_file,normalBAF_file)
+  FILES=FILES[!is.na(FILES)]
   # get IDs shared between DFs
   IDs=Reduce(intersect, lapply(FILES,rownames))
   FILES=lapply(FILES,function(x) x[rownames(x) %in% IDs,])
   rm(IDs)
   # check whether DFs have been synchronised
-  stopifnot(all(sapply(2:4,function(x) identical(FILES[[1]][,1:2],FILES[[x]][,1:2]))))
+  stopifnot(all(sapply(2:length(FILES),function(x) identical(FILES[[1]][,1:2],FILES[[x]][,1:2]))))
   # write output
-  for (i in 1:4) {
+  for (i in 1:length(FILES)) {
     write.table(FILES[[i]],file=names(FILES)[i],sep='\t',quote=F,row.names=T,col.names=NA)
   }; rm(i)
 }
@@ -235,15 +254,15 @@ ascat.synchroniseFiles=function(samplename,tumourLogR_file,tumourBAF_file,normal
 #' @param chrom_names A vector containing the names of chromosomes to be considered (optional, default=c(1:22,'X')).
 #' @param min_base_qual Minimum base quality required for a read to be counted (optional, default=20).
 #' @param min_map_qual Minimum mapping quality required for a read to be counted (optional, default=35).
-#' @param ref.fasta FASTA file used for generating CRAMs (optional, default=NA).
+#' @param additional_allelecounter_flags Additional flags passed on to alleleCounter, e.g., -r <FASTA> for parsing CRAMs (optional, default=NA).
 #' @param skip_allele_counting_tumour Flag, set to TRUE if tumour allele counting is already complete (files are expected in the working directory on disk; optional, default=FALSE).
 #' @param skip_allele_counting_normal Flag, set to TRUE if normal allele counting is already complete (files are expected in the working directory on disk; optional, default=FALSE).
 #' @param seed A seed to be set when randomising the alleles (optional, default=as.integer(Sys.time())).
 #' @author sd11, tl
 #' @export
-ascat.prepareHTS = function(tumourseqfile, normalseqfile, tumourname, normalname, allelecounter_exe, alleles.prefix, loci.prefix, gender, genomeVersion,
+ascat.prepareHTS = function(tumourseqfile, normalseqfile=NA, tumourname, normalname=NA, allelecounter_exe, alleles.prefix, loci.prefix, gender, genomeVersion,
                             nthreads=1, tumourLogR_file=NA, tumourBAF_file=NA, normalLogR_file=NA, normalBAF_file=NA, minCounts=10, BED_file=NA,
-                            probloci_file=NA, chrom_names=c(1:22,'X'), min_base_qual=20, min_map_qual=35, ref.fasta=NA,
+                            probloci_file=NA, chrom_names=c(1:22,'X'), min_base_qual=20, min_map_qual=35, additional_allelecounter_flags=NA,
                             skip_allele_counting_tumour=F, skip_allele_counting_normal=F, seed=as.integer(Sys.time())) {
   requireNamespace("foreach")
   requireNamespace("doParallel")
@@ -254,6 +273,15 @@ ascat.prepareHTS = function(tumourseqfile, normalseqfile, tumourname, normalname
   if (is.na(tumourBAF_file)) tumourBAF_file=paste0(tumourname,"_tumourBAF.txt")
   if (is.na(normalLogR_file)) normalLogR_file=paste0(tumourname,"_normalLogR.txt")
   if (is.na(normalBAF_file)) normalBAF_file=paste0(tumourname,"_normalBAF.txt")
+
+  # if no normal bam is provided, skip counting
+  if (is.na(normalseqfile)) {
+    skip_allele_counting_normal=T
+    tumour_only_mode = T
+    print("No normal bam file provided, running in Tumour-only mode")
+  } else {
+    tumour_only_mode = F
+  }
   
   if (!skip_allele_counting_tumour) {
     # Obtain allele counts at specific loci for tumour
@@ -264,7 +292,7 @@ ascat.prepareHTS = function(tumourseqfile, normalseqfile, tumourname, normalname
                             min.base.qual=min_base_qual,
                             min.map.qual=min_map_qual,
                             allelecounter.exe=allelecounter_exe,
-                            ref.fasta=ref.fasta)
+                            additional_flags=additional_allelecounter_flags)
     }
   }
   if (!skip_allele_counting_normal) {
@@ -276,7 +304,7 @@ ascat.prepareHTS = function(tumourseqfile, normalseqfile, tumourname, normalname
                             min.base.qual=min_base_qual,
                             min.map.qual=min_map_qual,
                             allelecounter.exe=allelecounter_exe,
-                            ref.fasta=ref.fasta)
+                            additional_flags=additional_allelecounter_flags)
     }
   }
   # Obtain BAF and LogR from the raw allele counts
@@ -294,7 +322,8 @@ ascat.prepareHTS = function(tumourseqfile, normalseqfile, tumourname, normalname
                         minCounts=minCounts,
                         BED_file=BED_file,
                         probloci_file=probloci_file,
-                        seed=seed)
+                        seed=seed,
+                        tumour_only_mode=tumour_only_mode)
 
   # Synchronise all information
   ascat.synchroniseFiles(samplename=tumourname,
