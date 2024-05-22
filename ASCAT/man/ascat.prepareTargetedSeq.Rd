@@ -13,12 +13,12 @@ ascat.prepareTargetedSeq(
   genomeVersion,
   nthreads = 1,
   minCounts = 10,
-  is_chr_based = F,
+  is_chr_based = FALSE,
   chrom_names = c(1:22, "X"),
   min_base_qual = 20,
   min_map_qual = 35,
   ref.fasta = NA,
-  plotQC = T
+  plotQC = TRUE
 )
 }
 \arguments{
@@ -38,9 +38,9 @@ ascat.prepareTargetedSeq(
 
 \item{minCounts}{Minimum depth required in the normal for a SNP to be considered (optional, default=10).}
 
-\item{is_chr_based}{A boolean indicating whether data is 'chr'-based (e.g. 'chr1' instead of '1'; optional, default=F).}
+\item{is_chr_based}{A boolean indicating whether data is "chr"-based (e.g. 'chr1' instead of '1'; optional, default=FALSE).}
 
-\item{chrom_names}{A vector containing the names of chromosomes to be considered (optional, default=c(1:22,'X')). Do not set it to paste0('chr',c(1:22,'X')) if data is 'chr'-based.}
+\item{chrom_names}{A vector containing the names of chromosomes to be considered (optional, default=c(1:22, "X")). Do not set it to paste0("chr", c(1:22, "X")) if data is "chr"-based.}
 
 \item{min_base_qual}{Minimum base quality required for a read to be counted (optional, default=20).}
 
@@ -48,7 +48,7 @@ ascat.prepareTargetedSeq(
 
 \item{ref.fasta}{FASTA file used for generating CRAMs (optional, default=NA).}
 
-\item{plotQC}{A boolean to generate QC reports as PNGs (optional, default=T).}
+\item{plotQC}{A boolean to generate QC reports as PNGs (optional, default=TRUE).}
 }
 \description{
 From a complete set of loci (alleles.prefix), this method will keep SNPs falling into the targeted design (based on BED_file) and check allele counts in normal samples (listed in Worksheet). The cleaned list of loci/allele files will be located under Workdir/alleleData/Cleaned/.

@@ -41,11 +41,11 @@ output: ascat data structure containing:\cr
 5. Germline_LogR data matrix\cr
 6. Germline_BAF data matrix\cr
 7. SNPpos: position of all SNPs\cr
-8. ch: a list containing vectors with the indices for each chromosome (e.g. Tumor_LogR[ch[[13]],] will output the Tumor_LogR data of chromosome 13\cr
+8. ch: a list containing vectors with the indices for each chromosome (e.g. Tumor_LogR[ch[[13]], ] will output the Tumor_LogR data of chromosome 13\cr
 9. chr: a list containing vectors with the indices for each distinct part that can be segmented separately (e.g. chromosome arm, stretch of DNA between gaps in the array design)\cr
 }
 \description{
-This segmentation function should only be used if part of the breakpoints are expected to be shared 
+This segmentation function should only be used if part of the breakpoints are expected to be shared
 between samples, e.g. due to a common ancestry.
 }
 \details{

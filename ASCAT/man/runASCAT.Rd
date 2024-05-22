@@ -14,7 +14,7 @@ runASCAT(
   chromosomes,
   chrnames,
   sexchromosomes,
-  failedqualitycheck = F,
+  failedqualitycheck = FALSE,
   distancepng = NA,
   copynumberprofilespng = NA,
   nonroundedprofilepng = NA,
@@ -22,7 +22,7 @@ runASCAT(
   gamma = 0.55,
   rho_manual = NA,
   psi_manual = NA,
-  pdfPlot = F,
+  pdfPlot = FALSE,
   y_limit = 5,
   circos = NA,
   min_ploidy = 1.5,
@@ -47,7 +47,7 @@ runASCAT(
 
 \item{chromosomes}{a list containing c vectors, where c is the number of chromosomes and every vector contains all probe numbers per chromosome}
 
-\item{chrnames}{a vector containing the names for the chromosomes (e.g. c(1:22,"X"))}
+\item{chrnames}{a vector containing the names for the chromosomes (e.g. c(1:22, "X"))}
 
 \item{sexchromosomes}{a vector containing the names for the sex chromosomes}
 
@@ -67,7 +67,7 @@ runASCAT(
 
 \item{psi_manual}{optional argument to override ASCAT optimization and supply psi parameter (not recommended)}
 
-\item{pdfPlot}{Optional flag if nonrounded plots and ASCAT profile in pdf format are desired. Default=F}
+\item{pdfPlot}{Optional flag if nonrounded plots and ASCAT profile in pdf format are desired. Default=FALSE}
 
 \item{y_limit}{Optional parameter determining the size of the y axis in the nonrounded plot and ASCAT profile. Default=5}
 

@@ -18,7 +18,7 @@ ascat.plotRawData(
 
 \item{img.prefix}{prefix for figure names}
 
-\item{logr.y_values}{define Y min and max values for logR track (optional; default: c(-2,2))}
+\item{logr.y_values}{define Y min and max values for logR track (optional; default: c(-2, 2))}
 }
 \value{
 Produces png files showing the logR and BAF values for tumour and germline samples

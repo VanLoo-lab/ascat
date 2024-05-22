@@ -42,7 +42,7 @@ ascat.plotAscatProfile(
 
 \item{bafsegmented}{B Allele Frequency, segmented, in genomic sequence (only probes heterozygous in germline), with probe IDs}
 
-\item{chrs}{a vector containing the names for the chromosomes (e.g. c(1:22,"X"))}
+\item{chrs}{a vector containing the names for the chromosomes (e.g. c(1:22, "X"))}
 }
 \value{
 plot showing the ASCAT profile of the sample

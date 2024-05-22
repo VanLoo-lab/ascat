@@ -7,7 +7,7 @@
 ascat.runAscat(
   ASCATobj,
   gamma = 0.55,
-  pdfPlot = F,
+  pdfPlot = FALSE,
   y_limit = 5,
   circos = NA,
   min_ploidy = 1.5,
@@ -18,7 +18,7 @@ ascat.runAscat(
   psi_manual = NA,
   img.dir = ".",
   img.prefix = "",
-  write_segments = F
+  write_segments = FALSE
 )
 }
 \arguments{

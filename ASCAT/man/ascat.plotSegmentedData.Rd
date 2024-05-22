@@ -18,7 +18,7 @@ ascat.plotSegmentedData(
 
 \item{img.prefix}{prefix for figure names}
 
-\item{logr.y_values}{define Y min and max values for logR track (optional; default: c(-2,2))}
+\item{logr.y_values}{define Y min and max values for logR track (optional; default: c(-2, 2))}
 }
 \value{
 png files showing raw and segmented tumour logR and BAF

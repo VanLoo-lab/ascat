@@ -26,8 +26,8 @@ ascat.prepareHTS(
   min_base_qual = 20,
   min_map_qual = 35,
   ref.fasta = NA,
-  skip_allele_counting_tumour = F,
-  skip_allele_counting_normal = F,
+  skip_allele_counting_tumour = FALSE,
+  skip_allele_counting_normal = FALSE,
   seed = as.integer(Sys.time())
 )
 }
@@ -52,13 +52,13 @@ ascat.prepareHTS(
 
 \item{nthreads}{The number of parallel processes for getting allele counts (optional, default=1).}
 
-\item{tumourLogR_file}{Path to the tumour logR output (optional, paste0(tumourname,"_tumourLogR.txt")).}
+\item{tumourLogR_file}{Path to the tumour logR output (optional, paste0(tumourname, "_tumourLogR.txt")).}
 
-\item{tumourBAF_file}{Path to the tumour BAF output (optional, paste0(tumourname,"_tumourBAF.txt")).}
+\item{tumourBAF_file}{Path to the tumour BAF output (optional, paste0(tumourname, "_tumourBAF.txt")).}
 
-\item{normalLogR_file}{Path to the normal logR output (optional, paste0(tumourname,"_normalLogR.txt")).}
+\item{normalLogR_file}{Path to the normal logR output (optional, paste0(tumourname, "_normalLogR.txt")).}
 
-\item{normalBAF_file}{Path to the normal BAF output (optional, paste0(tumourname,"_normalBAF.txt")).}
+\item{normalBAF_file}{Path to the normal BAF output (optional, paste0(tumourname, "_normalBAF.txt")).}
 
 \item{minCounts}{Minimum depth required in the normal for a SNP to be considered (optional, default=10).}
 
@@ -66,7 +66,7 @@ ascat.prepareHTS(
 
 \item{probloci_file}{A file (chromosome <tab> position; no header) containing specific loci to ignore (optional, default=NA).}
 
-\item{chrom_names}{A vector containing the names of chromosomes to be considered (optional, default=c(1:22,'X')).}
+\item{chrom_names}{A vector containing the names of chromosomes to be considered (optional, default=c(1:22, 'X')).}
 
 \item{min_base_qual}{Minimum base quality required for a read to be counted (optional, default=20).}
 
