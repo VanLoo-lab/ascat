@@ -2,14 +2,14 @@
 
 ## Description
 
-This repository provides the ASCAT R package (v3.1.2) that can be used to infer tumour purity, ploidy and allele-specific copy number profiles.
+This repository provides the ASCAT R package (v3.1.3) that can be used to infer tumour purity, ploidy and allele-specific copy number profiles.
 
-ASCAT is described in detail in: [Allele-specific copy number analysis of tumors. Van Loo P *et al*. *PNAS* (2010)](http://www.ncbi.nlm.nih.gov/pubmed/20837533).
+ASCAT is described in detail in: [Allele-specific copy number analysis of tumors. Van Loo P *et al*. *PNAS* (2010)](https://pubmed.ncbi.nlm.nih.gov/20837533).
 
 This repository also contains the code underlying additional publication:
 [Allele-specific multi-sample copy number segmentation. Ross EM, Haase K, Van Loo P & Markowetz F. *Bioinformatics* (2020)](https://pubmed.ncbi.nlm.nih.gov/32449758).
 
-## Installation (v3.1.2 version)
+## Installation (v3.1.3 version)
 Bioconductor package dependencies: [GenomicRanges](https://bioconductor.org/packages/release/bioc/html/GenomicRanges.html) & [IRanges](https://bioconductor.org/packages/release/bioc/html/IRanges.html) (`BiocManager::install(c('GenomicRanges','IRanges'))` with a recent R/BiocManager version).
 
 Processing high-throughput sequencing data: [alleleCounter](https://github.com/cancerit/alleleCount) (C version)
