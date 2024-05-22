@@ -11,7 +11,7 @@ vignette: >
 
 ## Vignette Info
 
-This vignette demonstrates how to use ASCAT to analyse multiple phylogenetically related samples. For the general usage of ASCAT including parameters that are not specific to multi-sample analysis please refer to the [ASCAT webpage](https://www.crick.ac.uk/peter-van-loo/software/ASCAT) and the [example pipeline](https://github.com/Crick-CancerGenomics/ascat/blob/master/ExampleData/ASCAT_examplePipeline.R).
+This vignette demonstrates how to use ASCAT to analyse multiple phylogenetically related samples. For the general usage of ASCAT including parameters that are not specific to multi-sample analysis please refer to the [ASCAT webpage](https://www.crick.ac.uk/research/labs/peter-van-loo/software) and the [example pipeline](https://github.com/VanLoo-lab/ascat/blob/c96ed37c127ce2533960323c55bc8e0787c77a3e/ExampleData/ASCAT_examplePipeline.R).
 
 ## Using ASCAT for multi-sample analyses
 
@@ -48,7 +48,7 @@ axis(side = 2, at = 0:3, labels = 0:3)
 
 The multi-sample segmentation algorithm can be run using the function <tt>ascat.asmultipcf</tt>.
 ```{r,message=FALSE}
-ascat.bcMulti <- ascat.asmultipcf(ascat.bcMulti,penalty = 5)
+ascat.bcMulti <- ascat.asmultipcf(ascat.bcMulti,penalty = 5,out.dir=NA)
 ```
 
 Finally ASCAT can be run on the segmented data set.
@@ -63,7 +63,7 @@ ascat.bc = ascat.loadData(system.file("extdata", "tumour.logR.txt", package="ASC
                           system.file("extdata", "tumour.BAF.txt", package="ASCAT"),
                           system.file("extdata", "normal.logR.txt", package="ASCAT"),
                           system.file("extdata", "normal.BAF.txt", package="ASCAT"))
-ascat.bc = ascat.aspcf(ascat.bc,penalty = 25)
+ascat.bc = ascat.aspcf(ascat.bc,penalty = 25,out.dir=NA)
 ```
 Note that in the single-sample case the same segmentation sensitivity is achieved with a higher penalty parameter compared to the multi-sample case. This means, when switching from single- to multi-sample segmentation, the penalty parameter needs to be lowered to maintain a similar sensitivity.
 
@@ -101,7 +101,7 @@ In case of single-sample segmentation the inferred positions of most of the shar
 
 ##Comparison with another multi-sample copy number method
 
-In order to compare asmultipcf segmentation to other copy number inference methods, we ran ASCAT on two samples from two patients from a metastatic prostate cancer study ([Gundem et al](https://www.ncbi.nlm.nih.gov/pubmed/25830880)). For the same study, copy number profiles are available from HATCHet ([github repository](https://github.com/raphael-group/hatchet); [publication](https://www.biorxiv.org/content/10.1101/496174v1)).
+In order to compare asmultipcf segmentation to other copy number inference methods, we ran ASCAT on two samples from two patients from a metastatic prostate cancer study ([Gundem et al](https://pubmed.ncbi.nlm.nih.gov/25830880)). For the same study, copy number profiles are available from HATCHet ([github repository](https://github.com/raphael-group/hatchet); [publication](https://www.biorxiv.org/content/10.1101/496174v1)).
 
 
 Loading all neccessary packages.
