@@ -258,6 +258,7 @@ ascat.prepareHTS = function(tumourseqfile, normalseqfile, tumourname, normalname
   if (!skip_allele_counting_tumour) {
     # Obtain allele counts at specific loci for tumour
     foreach(CHR=chrom_names) %dopar% {
+      CHR=get("CHR")
       ascat.getAlleleCounts(seq.file=tumourseqfile,
                             output.file=paste0(tumourname, "_alleleFrequencies_chr", CHR, ".txt"),
                             loci.file=paste0(loci.prefix, CHR, ".txt"),
@@ -270,6 +271,7 @@ ascat.prepareHTS = function(tumourseqfile, normalseqfile, tumourname, normalname
   if (!skip_allele_counting_normal) {
     # Obtain allele counts at specific loci for normal
     foreach(CHR=chrom_names) %dopar% {
+      CHR=get("CHR")
       ascat.getAlleleCounts(seq.file=normalseqfile,
                             output.file=paste0(normalname, "_alleleFrequencies_chr", CHR, ".txt"),
                             loci.file=paste0(loci.prefix, CHR, ".txt"),

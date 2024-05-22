@@ -86,6 +86,7 @@ getLociFromNormals=function(Worksheet, Workdir, alleles.prefix, minCounts, is_ch
   # Read all alleleCount files (counts>=0)
   print("      Getting allele counts...")
   NORMAL_COUNTS=foreach(INDEX=1:nrow(Worksheet)) %dopar% {
+    INDEX=get("INDEX")
     return(readAlleleCountFiles(paste0(Workdir, "/alleleCounts/", Worksheet$Patient_ID[INDEX], "/", Worksheet$Normal_ID[INDEX], "/", Worksheet$Normal_ID[INDEX], "_unfiltered_chr"), ".txt", chrom_names, 0, keep_chr_string=is_chr_based))
   }
   names(NORMAL_COUNTS)=Worksheet$Normal_ID
@@ -175,6 +176,7 @@ getLociFromNormals=function(Worksheet, Workdir, alleles.prefix, minCounts, is_ch
   rownames(all_alt_tot)=paste0(all_alt_tot$alt, "_", all_alt_tot$tot)
   # Get confidence intervals
   conf=foreach(MAX=unique(all_alt_tot$tot), .combine=c) %dopar% {
+    MAX=get("MAX")
     lapply(all_alt_tot$alt[all_alt_tot$tot==MAX], function(x) {
       binom.test(x=x, n=MAX, alternative = "two.sided", p=0.01, conf.level = 0.98)$conf.int
     })
@@ -188,6 +190,7 @@ getLociFromNormals=function(Worksheet, Workdir, alleles.prefix, minCounts, is_ch
   })
   # Now, assign genotypes to SNPs in all samples
   GENOTYPES=foreach(INDEX=1:length(NORMAL_COUNTS), .combine=cbind) %dopar% {
+    INDEX=get("INDEX")
     all_alt_tot[paste0(ifelse(NORMAL_COUNTS[[INDEX]]$alt>NORMAL_COUNTS[[INDEX]]$tot/2, NORMAL_COUNTS[[INDEX]]$tot-NORMAL_COUNTS[[INDEX]]$alt, NORMAL_COUNTS[[INDEX]]$alt), "_", NORMAL_COUNTS[[INDEX]]$tot), "interpretation"]
   }
   rm(conf)
@@ -423,6 +426,7 @@ ascat.prepareTargetedSeq=function(Worksheet, Workdir, alleles.prefix, BED_file, 
     if (Process_HTS_file) {
       # Run alleleCounter on all samples (normals only)
       foreach(CHR=chrom_names) %dopar% {
+        CHR=get("CHR")
         ascat.getAlleleCounts(seq.file=Worksheet$Normal_file[INDEX],
                               output.file=paste0(Workdir, "/alleleCounts/", Worksheet$Patient_ID[INDEX], "/", Worksheet$Normal_ID[INDEX], "/", Worksheet$Normal_ID[INDEX], "_unfiltered_chr", CHR, ".txt"),
                               loci.file=paste0(Workdir, "/alleleData/Raw/loci_chr", CHR, ".txt"),
@@ -433,6 +437,7 @@ ascat.prepareTargetedSeq=function(Worksheet, Workdir, alleles.prefix, BED_file, 
       }
     } else {
       foreach(CHR=chrom_names) %dopar% {
+        CHR=get("CHR")
         LOCI=fread(paste0(Worksheet$Normal_file[INDEX], CHR, SUFFIX), sep="\t", data.table=FALSE, showProgress=FALSE, quote="")
         rownames(LOCI)=paste0(LOCI[, 1], "_", LOCI[, 2])
         stopifnot(all(allele_data[[paste0(ifelse(is_chr_based, "chr", ""), CHR)]] %in% rownames(LOCI)))
