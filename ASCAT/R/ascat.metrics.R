@@ -36,27 +36,27 @@
 #'
 #' @author tl
 #' @export
-ascat.metrics = function(ASCAT_input_object,ASCAT_output_object) {
-  METRICS=do.call(rbind,lapply(1:length(ASCAT_input_object$samples), function(nSAMPLE) {
+ascat.metrics = function(ASCAT_input_object, ASCAT_output_object) {
+  METRICS=do.call(rbind, lapply(1:length(ASCAT_input_object$samples), function(nSAMPLE) {
     SAMPLE=ASCAT_input_object$samples[nSAMPLE]
     sex=ASCAT_input_object$gender[nSAMPLE]
-    tumour_mapd=round(median(abs(diff(na.omit(ASCAT_input_object$Tumor_LogR[,SAMPLE])))),4)
+    tumour_mapd=round(median(abs(diff(na.omit(ASCAT_input_object$Tumor_LogR[, SAMPLE])))), 4)
     if (!is.null(ASCAT_input_object$Germline_LogR) && any(SAMPLE %in% colnames(ASCAT_input_object$Germline_LogR))) {
-      normal_mapd=round(median(abs(diff(na.omit(ASCAT_input_object$Germline_LogR[,SAMPLE])))),4)
+      normal_mapd=round(median(abs(diff(na.omit(ASCAT_input_object$Germline_LogR[, SAMPLE])))), 4)
     } else {
       normal_mapd=NA
     }
-    if ('GC_correction_before' %in% names(ASCAT_input_object)) {GC_correction_before=ASCAT_input_object$GC_correction_before[SAMPLE]} else {GC_correction_before=NA}
-    if ('GC_correction_after' %in% names(ASCAT_input_object)) {GC_correction_after=ASCAT_input_object$GC_correction_after[SAMPLE]} else {GC_correction_after=NA}
-    if ('RT_correction_before' %in% names(ASCAT_input_object)) {RT_correction_before=ASCAT_input_object$RT_correction_before[SAMPLE]} else {RT_correction_before=NA}
-    if ('RT_correction_after' %in% names(ASCAT_input_object)) {RT_correction_after=ASCAT_input_object$RT_correction_after[SAMPLE]} else {RT_correction_after=NA}
+    if ("GC_correction_before" %in% names(ASCAT_input_object)) {GC_correction_before=ASCAT_input_object$GC_correction_before[SAMPLE]} else {GC_correction_before=NA}
+    if ("GC_correction_after" %in% names(ASCAT_input_object)) {GC_correction_after=ASCAT_input_object$GC_correction_after[SAMPLE]} else {GC_correction_after=NA}
+    if ("RT_correction_before" %in% names(ASCAT_input_object)) {RT_correction_before=ASCAT_input_object$RT_correction_before[SAMPLE]} else {RT_correction_before=NA}
+    if ("RT_correction_after" %in% names(ASCAT_input_object)) {RT_correction_after=ASCAT_input_object$RT_correction_after[SAMPLE]} else {RT_correction_after=NA}
     if (!is.null(ASCAT_input_object$Tumor_LogR_segmented) && !is.null(ASCAT_input_object$Tumor_BAF_segmented[[nSAMPLE]])) {
       n_het_SNP=length(ASCAT_input_object$Tumor_BAF_segmented[[nSAMPLE]])
-      n_segs_logR=length(rle(paste0(as.character(ASCAT_input_object$SNPpos[names(ASCAT_input_object$Tumor_LogR_segmented[,SAMPLE]),1]),'_',ASCAT_input_object$Tumor_LogR_segmented[,SAMPLE]))$values)
-      n_segs_BAF=length(rle(paste0(as.character(ASCAT_input_object$SNPpos[names(ASCAT_input_object$Tumor_BAF_segmented[[nSAMPLE]][,1]),1]),'_',ASCAT_input_object$Tumor_BAF_segmented[[nSAMPLE]][,1]))$values)
+      n_segs_logR=length(rle(paste0(as.character(ASCAT_input_object$SNPpos[names(ASCAT_input_object$Tumor_LogR_segmented[, SAMPLE]), 1]), "_", ASCAT_input_object$Tumor_LogR_segmented[, SAMPLE]))$values)
+      n_segs_BAF=length(rle(paste0(as.character(ASCAT_input_object$SNPpos[names(ASCAT_input_object$Tumor_BAF_segmented[[nSAMPLE]][, 1]), 1]), "_", ASCAT_input_object$Tumor_BAF_segmented[[nSAMPLE]][, 1]))$values)
       n_segs_logRBAF_diff=abs(n_segs_logR-n_segs_BAF)
-      segm_baf=ASCAT_input_object$Tumor_BAF[rownames(ASCAT_input_object$Tumor_BAF_segmented[[nSAMPLE]]),SAMPLE]
-      frac_homo=round(length(which(segm_baf<0.1 | segm_baf>0.9))/length(segm_baf),4)
+      segm_baf=ASCAT_input_object$Tumor_BAF[rownames(ASCAT_input_object$Tumor_BAF_segmented[[nSAMPLE]]), SAMPLE]
+      frac_homo=round(length(which(segm_baf<0.1 | segm_baf>0.9))/length(segm_baf), 4)
       rm(segm_baf)
     } else {
       n_het_SNP=NA
@@ -66,53 +66,53 @@ ascat.metrics = function(ASCAT_input_object,ASCAT_output_object) {
       frac_homo=NA
     }
     if (!is.null(ASCAT_output_object$segments) && SAMPLE %in% ASCAT_output_object$segments$sample) {
-      purity=round(as.numeric(ASCAT_output_object$purity[SAMPLE]),4)
-      ploidy=round(as.numeric(ASCAT_output_object$ploidy[SAMPLE]),4)
-      goodness_of_fit=round(ASCAT_output_object$goodnessOfFit[SAMPLE],4)
-      unroundedprofile=ASCAT_output_object$segments_raw[ASCAT_output_object$segments_raw$sample==SAMPLE,]
+      purity=round(as.numeric(ASCAT_output_object$purity[SAMPLE]), 4)
+      ploidy=round(as.numeric(ASCAT_output_object$ploidy[SAMPLE]), 4)
+      goodness_of_fit=round(ASCAT_output_object$goodnessOfFit[SAMPLE], 4)
+      unroundedprofile=ASCAT_output_object$segments_raw[ASCAT_output_object$segments_raw$sample==SAMPLE, ]
       unroundedprofile$nAraw_adjusted=unroundedprofile$nAraw-floor(unroundedprofile$nAraw)
       unroundedprofile$nBraw_adjusted=unroundedprofile$nBraw-floor(unroundedprofile$nBraw)
-      stopifnot(all(c(unroundedprofile$nAraw_adjusted,unroundedprofile$nBraw_adjusted)>=0 & c(unroundedprofile$nAraw_adjusted,unroundedprofile$nBraw_adjusted)<=1))
-      unroundedprofile=unroundedprofile[which((unroundedprofile$nAraw_adjusted>=0.45 & unroundedprofile$nAraw_adjusted<=0.55) | (unroundedprofile$nBraw_adjusted>=0.45 & unroundedprofile$nBraw_adjusted<=0.55)),]
+      stopifnot(all(c(unroundedprofile$nAraw_adjusted, unroundedprofile$nBraw_adjusted)>=0 & c(unroundedprofile$nAraw_adjusted, unroundedprofile$nBraw_adjusted)<=1))
+      unroundedprofile=unroundedprofile[which((unroundedprofile$nAraw_adjusted>=0.45 & unroundedprofile$nAraw_adjusted<=0.55) | (unroundedprofile$nBraw_adjusted>=0.45 & unroundedprofile$nBraw_adjusted<=0.55)), ]
       if (nrow(unroundedprofile)==0) {
         size_intermediate_segments=0
       } else {
         size_intermediate_segments=sum(unroundedprofile$endpos-unroundedprofile$startpos+1)
       }
       rm(unroundedprofile)
-      profile=ASCAT_output_object$segments[ASCAT_output_object$segments$sample==SAMPLE,]
+      profile=ASCAT_output_object$segments[ASCAT_output_object$segments$sample==SAMPLE, ]
       profile$size=profile$endpos-profile$startpos+1
-      size_odd_segments=sum(profile$size[which(profile$nMajor %in% seq(1,max(c(profile$nMajor,profile$nMinor,1)),2) | profile$nMinor %in% seq(1,max(c(profile$nMajor,profile$nMinor,1)),2))])
+      size_odd_segments=sum(profile$size[which(profile$nMajor %in% seq(1, max(c(profile$nMajor, profile$nMinor, 1)), 2) | profile$nMinor %in% seq(1, max(c(profile$nMajor, profile$nMinor, 1)), 2))])
       n_segs=nrow(profile)
       segs_size=sum(profile$size)
-      n_segs_1kSNP=round(n_segs/(length(ASCAT_input_object$Tumor_BAF_segmented[[nSAMPLE]])/1e3),4)
+      n_segs_1kSNP=round(n_segs / (length(ASCAT_input_object$Tumor_BAF_segmented[[nSAMPLE]])/1e3), 4)
       INDEX_HD=which(profile$nMajor==0 & profile$nMinor==0)
       if (length(INDEX_HD)>0) {
         homdel_segs=length(INDEX_HD)
         homdel_largest=max(profile$size[INDEX_HD])
         homdel_size=sum(profile$size[INDEX_HD])
-        homdel_fraction=round(homdel_size/sum(profile$size),4)
+        homdel_fraction=round(homdel_size/sum(profile$size), 4)
       } else {
         homdel_segs=homdel_largest=homdel_size=homdel_fraction=0
       }
       rm(INDEX_HD)
-      profile=profile[which(profile$chr %in% setdiff(ASCAT_input_object$chrs,ASCAT_input_object$sexchromosomes)),] # do not consider sex chromosomes for the next metrics
-      LOH=round(sum(profile$size[which(profile$nMinor==0)])/sum(profile$size),4)
-      mode_minA=modeAllele(profile,'nMinor')
-      mode_majA=modeAllele(profile,'nMajor')
+      profile=profile[which(profile$chr %in% setdiff(ASCAT_input_object$chrs, ASCAT_input_object$sexchromosomes)), ] # do not consider sex chromosomes for the next metrics
+      LOH=round(sum(profile$size[which(profile$nMinor==0)])/sum(profile$size), 4)
+      mode_minA=modeAllele(profile, "nMinor")
+      mode_majA=modeAllele(profile, "nMajor")
       if (mode_majA==0 || !(mode_majA %in% 1:5)) {
         WGD=NA
         GI=NA
       } else {
         if (mode_majA==1) {
           WGD=0
-          GI=computeGIscore(WGD,profile)
+          GI=computeGIscore(WGD, profile)
         } else if (mode_majA==2) {
           WGD=1
-          GI=computeGIscore(WGD,profile)
+          GI=computeGIscore(WGD, profile)
         } else if (mode_majA %in% 3:5) {
-          WGD='1+'
-          GI=computeGIscore(1,profile)
+          WGD="1+"
+          GI=computeGIscore(1, profile)
         }
       }
       rm(profile)
@@ -164,7 +164,7 @@ ascat.metrics = function(ASCAT_input_object,ASCAT_output_object) {
                    mode_majA=mode_majA,
                    WGD=WGD,
                    GI=GI,
-                   stringsAsFactors=F)
+                   stringsAsFactors=FALSE)
     rownames(OUT)=SAMPLE
     return(OUT)
   }))
@@ -173,18 +173,18 @@ ascat.metrics = function(ASCAT_input_object,ASCAT_output_object) {
 
 #' Function to get mode of the allele (either minor or major)
 #' @noRd
-modeAllele=function(cn,col) {
-  y=round(cn[,col])
+modeAllele=function(cn, col) {
+  y=round(cn[, col])
   y[y>5]=5
-  y=tapply(1:nrow(cn),y,function(z) sum((cn[z,'endpos']-cn[z,'startpos'])/1e6))
-  ord=order(y,decreasing=T)
+  y=tapply(1:nrow(cn), y, function(z) sum((cn[z, "endpos"]-cn[z, "startpos"])/1e6))
+  ord=order(y, decreasing=TRUE)
   y=y[ord]
   return(as.numeric(names(y)[which.max(y)]))
 }
 
 #' Function to compute GI score based on WGD information
 #' @noRd
-computeGIscore=function(WGD,profile) {
+computeGIscore=function(WGD, profile) {
   stopifnot(WGD %in% 0:2)
   if (WGD==0) {
     baseline=1
@@ -193,5 +193,5 @@ computeGIscore=function(WGD,profile) {
   } else if (WGD==2) {
     baseline=4
   }
-  return(round(1-sum(profile$size[which(profile$nMajor==baseline & profile$nMinor==baseline)])/sum(profile$size),4))
+  return(round(1-sum(profile$size[which(profile$nMajor==baseline & profile$nMinor==baseline)])/sum(profile$size), 4))
 }
