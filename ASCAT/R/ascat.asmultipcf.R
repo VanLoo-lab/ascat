@@ -4,7 +4,7 @@
 #' between samples, e.g. due to a common ancestry.
 #'
 #' @param ASCATobj an ASCAT object
-#' @param ascat.gg germline genotypes (NULL if germline data is available)
+#' @param ascat.gg germline genotypes (NULL if germline data is not available)
 #' @param penalty penalty of introducing an additional ASPCF breakpoint (expert parameter, don't adapt unless you know what you are doing)
 #' @param out.dir directory in which output files will be written. Can be set to NA to not write PCFed files.
 #' @param wsample Vector of length length(ASCATobj$samples). Can be used to assign different weights to samples, for example to account for differences in sequencing quality. (Default = NULL)
