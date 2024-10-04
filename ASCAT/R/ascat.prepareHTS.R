@@ -166,7 +166,7 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
     tumourLogR = log2(totalTumour/median(totalTumour, na.rm=T))
   } else {
     tumourLogR = totalTumour/totalNormal
-    tumourLogR = log2(tumourLogR/median(tumourLogR, na.rm=T))
+    tumourLogR = log2(tumourLogR/mean(tumourLogR, na.rm=T))
       # For males, chrX needs to be adjusted as logR baseline will be 0 because of T/N ratio
     if (gender=='XY') {
       # PAR1 and PAR2 information should be a mix of chrX and chrY so we should expect 1+1 (1 from X and 1 from Y).
