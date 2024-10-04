@@ -112,7 +112,7 @@ ascat.bc = ascat.loadData(Tumor_LogR_file = "Tumor_LogR.txt", Tumor_BAF_file = "
 ascat.plotRawData(ascat.bc, img.prefix = "Before_correction_")
 ascat.bc = ascat.correctLogR(ascat.bc, GCcontentfile = "GC_file.txt", replictimingfile = "RT_file.txt")
 ascat.plotRawData(ascat.bc, img.prefix = "After_correction_")
-gg = ascat.predictGermlineGenotypes(ascat.bc, platform = "HTS_WGS_1000G")
+gg = ascat.predictGermlineGenotypes(ascat.bc, platform = "WGS_hg38_50X")
 ascat.bc = ascat.aspcf(ascat.bc, ascat.gg=gg)
 ascat.plotSegmentedData(ascat.bc)
 ascat.output = ascat.runAscat(ascat.bc, gamma=1, write_segments = T)
