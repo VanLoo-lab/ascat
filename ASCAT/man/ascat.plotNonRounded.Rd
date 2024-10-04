@@ -39,7 +39,7 @@ ascat.plotNonRounded(
 
 \item{lrr}{(unsegmented) log R, in genomic sequence (all probes), with probe IDs}
 
-\item{chrs}{a vector containing the names for the chromosomes (e.g. c(1:22,"X"))}
+\item{chrs}{a vector containing the names for the chromosomes (e.g. c(1:22, "X"))}
 }
 \value{
 plot showing the nonrounded copy number profile, using base plotting function

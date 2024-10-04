@@ -1,9 +1,9 @@
 Package: ASCAT
 Type: Package
 Title: Allele-Specific Copy Number Analysis of Tumors
-Version: 3.1.2
-Date: 2023-04-12
-Authors@R: c(person("Peter", "Van Loo", role=c("aut","cre"), email="Peter.VanLoo@crick.ac.uk"),
+Version: 3.1.3
+Date: 2024-05-22
+Authors@R: c(person("Peter", "Van Loo", role=c("aut","cre"), email="PVanLoo@mdanderson.org"),
     person("Gro", "Nielsen", role="ctb"),
     person("Jiqiu","Cheng", role="ctb"),
     person("Stefan","Dentro", role="ctb"),
@@ -11,27 +11,34 @@ Authors@R: c(person("Peter", "Van Loo", role=c("aut","cre"), email="Peter.VanLoo
     person("Kerstin","Haase", role="ctb"),
     person("Jonas","Demeulemeester", role="ctb"),
     person("Maxime","Tarabichi", role="ctb"),
-    person("Tom","Lesluyes", role="ctb"))
+    person("Tom","Lesluyes", role="ctb"),
+    person("Zhihui","Zhang", role="ctb"))
 Author: Peter Van Loo [aut, cre], Gro Nielsen [ctb], Jiqiu Cheng [ctb], Stefan Dentro [ctb],
     Edith Ross [ctb], Kerstin Haase [ctb], Jonas Demeulemeester [ctb], Maxime Tarabichi [ctb],
-    Tom Lesluyes [ctb]
-Maintainer: Tom Lesluyes <tom.lesluyes@crick.ac.uk>
-Description: R package of ASCAT as published in http://www.ncbi.nlm.nih.gov/pubmed/20837533
+    Tom Lesluyes [ctb], Zhihui Zhang [ctb]
+Description: R package of ASCAT as published in <https://pubmed.ncbi.nlm.nih.gov/20837533>.
 Depends:
-    R (>= 2.13.0),
-    RColorBrewer,
-    grDevices,
-    graphics,
-    stats,
-    splines,
+    R (>= 2.13.0)
+Imports:
     data.table,
-    GenomicRanges,
-    IRanges,
-    parallel,
     doParallel,
     foreach,
+    GenomicRanges,
+    graphics,
+    grDevices,
+    IRanges,
+    RColorBrewer,
+    S4Vectors,
+    splines,
+    stats,
     utils
+Suggests:
+    ggplot2,
+    knitr,
+    plyr,
+    rmarkdown
 License: GPL-3
 Encoding: UTF-8
+VignetteBuilder: knitr
 LazyLoad: yes
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.3

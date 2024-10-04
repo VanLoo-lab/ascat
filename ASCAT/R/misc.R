@@ -1,15 +1,15 @@
-div <- function(a, b, c){
-  
-  if(nargs() < 3){
+div <- function(a, b, c) {
+
+  if (nargs() < 3) {
     c <- 0
   }#endif
-  
-  if(b > 0){
+
+  if (b > 0) {
     v <-  a/b
-  }else{
+  } else {
     v <- c
   }#endif
-  
+
   return(v)
 }#endfunction
 

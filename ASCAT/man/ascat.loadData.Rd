@@ -13,7 +13,7 @@ ascat.loadData(
   gender = NULL,
   sexchromosomes = c("X", "Y"),
   genomeVersion = NULL,
-  isTargetedSeq = F
+  isTargetedSeq = FALSE
 )
 }
 \arguments{
@@ -25,11 +25,11 @@ ascat.loadData(
 
 \item{Germline_BAF_file}{file containing BAF of germline sample(s), NULL}
 
-\item{chrs}{a vector containing the names for the chromosomes (e.g. c(1:22,"X"))}
+\item{chrs}{a vector containing the names for the chromosomes (e.g. c(1:22, "X"))}
 
 \item{gender}{a vector of gender for each cases ("XX" or "XY"). Default = all female ("XX")}
 
-\item{sexchromosomes}{a vector containing the names for the sex chromosomes. Default = c("X","Y")}
+\item{sexchromosomes}{a vector containing the names for the sex chromosomes. Default = c("X", "Y")}
 
 \item{genomeVersion}{a string (either 'hg19' or 'hg38') so nonPAR coordinates on X can be stored, NULL}
 
@@ -44,7 +44,7 @@ ascat data structure containing:\cr
 5. Germline_LogR data matrix\cr
 6. Germline_BAF data matrix\cr
 7. SNPpos: position of all SNPs\cr
-8. ch: a list containing vectors with the indices for each chromosome (e.g. Tumor_LogR[ch[[13]],] will output the Tumor_LogR data of chromosome 13\cr
+8. ch: a list containing vectors with the indices for each chromosome (e.g. Tumor_LogR[ch[[13]], ] will output the Tumor_LogR data of chromosome 13\cr
 9. chr: a list containing vectors with the indices for each distinct part that can be segmented separately (e.g. chromosome arm, stretch of DNA between gaps in the array design)\cr
 10. chrs: a vector containing chromosome names\cr
 11. samples: a vector containing sample name(s)\cr

@@ -8,7 +8,7 @@ ascat.plotAdjustedAscatProfile(
   ASCAT_output_object,
   REF,
   y_limit = 5,
-  plot_unrounded = F,
+  plot_unrounded = FALSE,
   png_prefix = ""
 )
 }

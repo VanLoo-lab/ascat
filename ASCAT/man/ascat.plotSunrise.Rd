@@ -4,7 +4,7 @@
 \alias{ascat.plotSunrise}
 \title{ascat.plotSunrise}
 \usage{
-ascat.plotSunrise(d, psi_opt1, rho_opt1, minim = T)
+ascat.plotSunrise(d, psi_opt1, rho_opt1, minim = TRUE)
 }
 \arguments{
 \item{d}{distance matrix for a range of ploidy and tumour percentage values}
