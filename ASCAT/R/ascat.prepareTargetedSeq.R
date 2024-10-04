@@ -345,11 +345,11 @@ getLociFromNormals=function(Worksheet, Workdir, alleles.prefix, minCounts, is_ch
 #' @param chrom_names A vector containing the names of chromosomes to be considered (optional, default=c(1:22,'X')). Do not set it to paste0('chr',c(1:22,'X')) if data is 'chr'-based.
 #' @param min_base_qual Minimum base quality required for a read to be counted (optional, default=20).
 #' @param min_map_qual Minimum mapping quality required for a read to be counted (optional, default=35).
-#' @param ref.fasta FASTA file used for generating CRAMs (optional, default=NA).
+#' @param additional_allelecounter_flags Additional flags passed on to alleleCounter, e.g., -r <FASTA> for parsing CRAMs (optional, default=NA).
 #' @param plotQC A boolean to generate QC reports as PNGs (optional, default=T).
 #' @export
 ascat.prepareTargetedSeq=function(Worksheet, Workdir, alleles.prefix, BED_file, allelecounter_exe, genomeVersion, nthreads=1,
-                                  minCounts=10, is_chr_based=F, chrom_names=c(1:22,'X'), min_base_qual=20, min_map_qual=35, ref.fasta=NA, plotQC=T) {
+                                  minCounts=10, is_chr_based=F, chrom_names=c(1:22,'X'), min_base_qual=20, min_map_qual=35, additional_allelecounter_flags=NA, plotQC=T) {
   requireNamespace("GenomicRanges")
   requireNamespace("IRanges")
   requireNamespace("foreach")
@@ -429,7 +429,7 @@ ascat.prepareTargetedSeq=function(Worksheet, Workdir, alleles.prefix, BED_file, 
                               min.base.qual=min_base_qual,
                               min.map.qual=min_map_qual,
                               allelecounter.exe=allelecounter_exe,
-                              ref.fasta=ref.fasta)
+                              additional_allelecounter_flags=additional_allelecounter_flags)
       }
     } else {
       foreach(CHR=chrom_names) %dopar% {
