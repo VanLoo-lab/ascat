@@ -56,5 +56,7 @@ We provide some scripts and input data in the *[ExampleData](ExampleData)* folde
 
 Because arrays have a defined set of SNP probes, with a fairly constant rate of heterozygous probes across individuals, useful metrics in `ascat.predictGermlineGenotypes` can be inferred from some cases (with no or very few CN changes). However, sequencing data is subjected to massive variations because of design, coverage and/or artefacts. Therefore, we are not able to provide pre-defined metrics for unmatched sequencing data.
 
+We now provide a preset for WGS data under specific conditions: hg38 assembly and >50x coverage. Although this preset might be used in some other conditions, please note that is has not been extensively benchmarked under other conditions so we do not provide any guarantee outside of the scope. Such a preset is called *WGS_hg38_50X*.
+
 ## Misc
 For more information about ASCAT and other projects of our group, please visit our [website](https://www.crick.ac.uk/research/a-z-researchers/researchers-v-y/peter-van-loo/software/).

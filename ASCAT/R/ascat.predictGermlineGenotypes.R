@@ -30,6 +30,7 @@
 #' HumanCoreExome24\cr
 #' HumanOmniExpress12\cr
 #' IlluminaOmniExpressExome\cr
+#' WGS_hg38_50X\cr
 #'
 #' @return predicted germline genotypes
 #'
@@ -145,12 +146,6 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6", img.d
     proportionHomo = 0.67
     proportionOpen = 0.04
     segmentLength = 100
-  } else if (platform=="HTS_WGS_1000G") {
-    maxHomozygous = 0.01
-    proportionHetero = 0.38
-    proportionHomo = 0.54
-    proportionOpen = 0.04
-    segmentLength = 100
   } else if (platform=="AffyOncoScan") {
     maxHomozygous = 0.04
     proportionHetero = 0.355
@@ -202,6 +197,12 @@ ascat.predictGermlineGenotypes = function(ASCATobj, platform = "AffySNP6", img.d
     proportionHetero = 0.35
     proportionHomo = 0.60
     proportionOpen = 0.03
+    segmentLength = 100
+  } else if (platform=="WGS_hg38_50X") {
+    maxHomozygous = 0.01
+    proportionHetero = 0.38
+    proportionHomo = 0.54
+    proportionOpen = 0.04
     segmentLength = 100
   } else {
     print("Error: platform unknown")
