@@ -41,17 +41,17 @@ ascat.getAlleleCounts = function(seq.file, output.file, loci.file, min.base.qual
 #' @param normalLogR_file File where LogR from the normal will be written.
 #' @param normalBAF_file File where BAF from the normal will be written.
 #' @param alleles.prefix Prefix path to the allele data (e.g. "G1000_alleles_chr")
-#' @param gender Gender information, either 'XX' (=female) or 'XY' (=male).
-#' @param genomeVersion Genome version, either 'hg19' or 'hg38'.
-#' @param chrom_names A vector with allowed chromosome names (optional, default=c(1:22, 'X')). Do not set it to paste0('chr', c(1:22, 'X')) if data is 'chr'-based.
+#' @param gender Gender information, either "XX" (=female) or "XY" (=male).
+#' @param genomeVersion Genome version, either "hg19" or "hg38".
+#' @param chrom_names A vector with allowed chromosome names (optional, default=c(1:22, "X")). Do not set it to paste0("chr", c(1:22, "X")) if data is "chr"-based.
 #' @param minCounts Minimum depth, in normal samples, required for a SNP to be considered (optional, default=20).
 #' @param BED_file A BED file for only looking at SNPs within specific intervals (optional, default=NA).
 #' @param probloci_file A file (chromosome <tab> position; no header) containing specific loci to ignore (optional, default=NA).
-#' @param tumour_only_mode Should the BAF and LogR be computed from tumour-only (optional, default = F)
+#' @param tumour_only_mode Should the BAF and LogR be computed from tumour-only (optional, default = FALSE)
 #' @param seed A seed to be set when randomising the alleles (optional, default=as.integer(Sys.time())).
 #' @author dw9, sd11, tl, jd
 #' @export
-ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, normalAlleleCountsFile.prefix, tumourLogR_file, tumourBAF_file, normalLogR_file, normalBAF_file, alleles.prefix, gender, genomeVersion, chrom_names=c(1:22,'X'), minCounts=20, BED_file=NA, probloci_file=NA, tumour_only_mode=F, seed=as.integer(Sys.time())) {
+ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, normalAlleleCountsFile.prefix, tumourLogR_file, tumourBAF_file, normalLogR_file, normalBAF_file, alleles.prefix, gender, genomeVersion, chrom_names=c(1:22, "X"), minCounts=20, BED_file=NA, probloci_file=NA, tumour_only_mode=FALSE, seed=as.integer(Sys.time())) {
   set.seed(seed)
   stopifnot(gender %in% c("XX", "XY"))
   stopifnot(genomeVersion %in% c("hg19", "hg38"))
@@ -241,8 +241,8 @@ ascat.synchroniseFiles=function(samplename, tumourLogR_file, tumourBAF_file, nor
 #' @param allelecounter_exe Path to the allele counter executable.
 #' @param alleles.prefix Prefix path to the allele data (e.g. "G1000_alleles_chr").
 #' @param loci.prefix Prefix path to the loci data (e.g. "G1000_loci_chr").
-#' @param gender Gender information, either 'XX' (=female) or 'XY' (=male).
-#' @param genomeVersion Genome version, either 'hg19' or 'hg38'.
+#' @param gender Gender information, either "XX" (=female) or "XY" (=male).
+#' @param genomeVersion Genome version, either "hg19" or "hg38".
 #' @param nthreads The number of parallel processes for getting allele counts (optional, default=1).
 #' @param tumourLogR_file Path to the tumour logR output (optional, paste0(tumourname, "_tumourLogR.txt")).
 #' @param tumourBAF_file Path to the tumour BAF output (optional, paste0(tumourname, "_tumourBAF.txt")).
@@ -251,7 +251,7 @@ ascat.synchroniseFiles=function(samplename, tumourLogR_file, tumourBAF_file, nor
 #' @param minCounts Minimum depth required in the normal for a SNP to be considered (optional, default=10).
 #' @param BED_file A BED file for only looking at SNPs within specific intervals (optional, default=NA).
 #' @param probloci_file A file (chromosome <tab> position; no header) containing specific loci to ignore (optional, default=NA).
-#' @param chrom_names A vector containing the names of chromosomes to be considered (optional, default=c(1:22, 'X')).
+#' @param chrom_names A vector containing the names of chromosomes to be considered (optional, default=c(1:22, "X")).
 #' @param min_base_qual Minimum base quality required for a read to be counted (optional, default=20).
 #' @param min_map_qual Minimum mapping quality required for a read to be counted (optional, default=35).
 #' @param additional_allelecounter_flags Additional flags passed on to alleleCounter, e.g., -r <FASTA> for parsing CRAMs (optional, default=NA).
@@ -268,7 +268,7 @@ ascat.prepareHTS = function(tumourseqfile, normalseqfile=NA, tumourname, normaln
   requireNamespace("doParallel")
   requireNamespace("parallel")
   registerDoParallel(cores=nthreads)
-  
+
   if (is.na(tumourLogR_file)) tumourLogR_file=paste0(tumourname, "_tumourLogR.txt")
   if (is.na(tumourBAF_file)) tumourBAF_file=paste0(tumourname, "_tumourBAF.txt")
   if (is.na(normalLogR_file)) normalLogR_file=paste0(tumourname, "_normalLogR.txt")
@@ -282,7 +282,7 @@ ascat.prepareHTS = function(tumourseqfile, normalseqfile=NA, tumourname, normaln
   } else {
     tumour_only_mode = FALSE
   }
-  
+
   if (!skip_allele_counting_tumour) {
     # Obtain allele counts at specific loci for tumour
     foreach(CHR=chrom_names) %dopar% {
