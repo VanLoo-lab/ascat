@@ -367,7 +367,7 @@ ascat.prepareTargetedSeq=function(Worksheet, Workdir, alleles.prefix, BED_file, 
   } else if (genomeVersion=="hg38") {
     X_nonPAR=c(2781480, 155701382)
   } else if (genomeVersion=="CHM13") {
-    X_nonPAR=c(2394410, 153925834)
+    X_nonPAR=c(2394411, 153925834)
   }
   Worksheet=read.table(Worksheet, sep="\t", header=TRUE, stringsAsFactors=FALSE)
   stopifnot(nrow(Worksheet)>1)
