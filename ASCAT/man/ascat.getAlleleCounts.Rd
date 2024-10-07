@@ -11,7 +11,7 @@ ascat.getAlleleCounts(
   min.base.qual = 20,
   min.map.qual = 35,
   allelecounter.exe = "alleleCounter",
-  ref.fasta = NA
+  additional_allelecounter_flags = NA
 )
 }
 \arguments{
@@ -27,11 +27,11 @@ ascat.getAlleleCounts(
 
 \item{allelecounter.exe}{A pointer to where the alleleCounter executable can be found (optional, default points to $PATH).}
 
-\item{ref.fasta}{A FASTA file for CRAM processing (optional).}
+\item{additional_allelecounter_flags}{Additional flags passed on to alleleCounter, e.g., -r <FASTA> for parsing CRAMs (optional, default=NA).}
 }
 \description{
 Obtain allele counts for a given set of loci through external program alleleCounter.
 }
 \author{
-sd11, tl
+sd11, tl, jd
 }

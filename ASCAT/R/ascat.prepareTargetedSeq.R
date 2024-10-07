@@ -341,7 +341,7 @@ getLociFromNormals=function(Worksheet, Workdir, alleles.prefix, minCounts, is_ch
 #' @param alleles.prefix Prefix path to the allele data (e.g. "G1000_alleles_chr").
 #' @param BED_file A BED file for only looking at SNPs within specific intervals. Must fit with the design used for targeted sequencing.
 #' @param allelecounter_exe Path to the allele counter executable.
-#' @param genomeVersion Genome version, either 'hg19' or 'hg38'.
+#' @param genomeVersion Genome version, available options are 'hg19', 'hg38' or 'CHM13'.
 #' @param nthreads The number of parallel processes to speed up the process (optional, default=1).
 #' @param minCounts Minimum depth required in the normal for a SNP to be considered (optional, default=10).
 #' @param is_chr_based A boolean indicating whether data is "chr"-based (e.g. 'chr1' instead of '1'; optional, default=FALSE).
@@ -361,11 +361,13 @@ ascat.prepareTargetedSeq=function(Worksheet, Workdir, alleles.prefix, BED_file, 
   ########
   # Init #
   ########
-  stopifnot(genomeVersion %in% c("hg19", "hg38"))
+  stopifnot(genomeVersion %in% c("hg19", "hg38", "CHM13"))
   if (genomeVersion=="hg19") {
     X_nonPAR=c(2699521, 154931043)
   } else if (genomeVersion=="hg38") {
     X_nonPAR=c(2781480, 155701382)
+  } else if (genomeVersion=="CHM13") {
+    X_nonPAR=c(2394410, 153925834)
   }
   Worksheet=read.table(Worksheet, sep="\t", header=TRUE, stringsAsFactors=FALSE)
   stopifnot(nrow(Worksheet)>1)

@@ -31,7 +31,7 @@ ascat.loadData(
 
 \item{sexchromosomes}{a vector containing the names for the sex chromosomes. Default = c("X", "Y")}
 
-\item{genomeVersion}{a string (either 'hg19' or 'hg38') so nonPAR coordinates on X can be stored, NULL}
+\item{genomeVersion}{a string ('hg19', 'hg38' or 'CHM13') so nonPAR coordinates on X can be stored, NULL}
 
 \item{isTargetedSeq}{a boolean indicating whether data come from a targeted sequencing experiment. Default = F}
 }

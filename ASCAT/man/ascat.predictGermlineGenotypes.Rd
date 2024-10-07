@@ -54,4 +54,5 @@ HumanCore12\cr
 HumanCoreExome24\cr
 HumanOmniExpress12\cr
 IlluminaOmniExpressExome\cr
+WGS_hg38_50X\cr
 }

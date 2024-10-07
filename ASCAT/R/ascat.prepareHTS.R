@@ -42,7 +42,7 @@ ascat.getAlleleCounts = function(seq.file, output.file, loci.file, min.base.qual
 #' @param normalBAF_file File where BAF from the normal will be written.
 #' @param alleles.prefix Prefix path to the allele data (e.g. "G1000_alleles_chr")
 #' @param gender Gender information, either "XX" (=female) or "XY" (=male).
-#' @param genomeVersion Genome version, either "hg19" or "hg38".
+#' @param genomeVersion Genome version, available options are "hg19", "hg38" or "CHM13".
 #' @param chrom_names A vector with allowed chromosome names (optional, default=c(1:22, "X")). Do not set it to paste0("chr", c(1:22, "X")) if data is "chr"-based.
 #' @param minCounts Minimum depth, in normal samples, required for a SNP to be considered (optional, default=20).
 #' @param BED_file A BED file for only looking at SNPs within specific intervals (optional, default=NA).
@@ -54,7 +54,7 @@ ascat.getAlleleCounts = function(seq.file, output.file, loci.file, min.base.qual
 ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, normalAlleleCountsFile.prefix, tumourLogR_file, tumourBAF_file, normalLogR_file, normalBAF_file, alleles.prefix, gender, genomeVersion, chrom_names=c(1:22, "X"), minCounts=20, BED_file=NA, probloci_file=NA, tumour_only_mode=FALSE, seed=as.integer(Sys.time())) {
   set.seed(seed)
   stopifnot(gender %in% c("XX", "XY"))
-  stopifnot(genomeVersion %in% c("hg19", "hg38"))
+  stopifnot(genomeVersion %in% c("hg19", "hg38", "CHM13"))
   # Load data, only keep SNPs with enough coverage
   tumour_input_data = readAlleleCountFiles(tumourAlleleCountsFile.prefix, ".txt", chrom_names, 1)
   if (tumour_only_mode) {
@@ -175,6 +175,8 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
         nonPAR=c(2699521, 154931043)
       } else if (genomeVersion=="hg38") {
         nonPAR=c(2781480, 155701382)
+      } else if (genomeVersion=="CHM13") {
+        nonPAR=c(2394410, 153925834)
       }
       nonPAR=which(allele_data$chromosome %in% c("X", "chrX") & allele_data$position>=nonPAR[1] & allele_data$position<=nonPAR[2])
       tumourLogR[nonPAR]=tumourLogR[nonPAR]-1
@@ -242,7 +244,7 @@ ascat.synchroniseFiles=function(samplename, tumourLogR_file, tumourBAF_file, nor
 #' @param alleles.prefix Prefix path to the allele data (e.g. "G1000_alleles_chr").
 #' @param loci.prefix Prefix path to the loci data (e.g. "G1000_loci_chr").
 #' @param gender Gender information, either "XX" (=female) or "XY" (=male).
-#' @param genomeVersion Genome version, either "hg19" or "hg38".
+#' @param genomeVersion Genome version, available options are "hg19", "hg38" or "CHM13".
 #' @param nthreads The number of parallel processes for getting allele counts (optional, default=1).
 #' @param tumourLogR_file Path to the tumour logR output (optional, paste0(tumourname, "_tumourLogR.txt")).
 #' @param tumourBAF_file Path to the tumour BAF output (optional, paste0(tumourname, "_tumourBAF.txt")).

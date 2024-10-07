@@ -19,6 +19,7 @@ ascat.getBAFsAndLogRs(
   minCounts = 20,
   BED_file = NA,
   probloci_file = NA,
+  tumour_only_mode = FALSE,
   seed = as.integer(Sys.time())
 )
 }
@@ -39,11 +40,11 @@ ascat.getBAFsAndLogRs(
 
 \item{alleles.prefix}{Prefix path to the allele data (e.g. "G1000_alleles_chr")}
 
-\item{gender}{Gender information, either 'XX' (=female) or 'XY' (=male).}
+\item{gender}{Gender information, either "XX" (=female) or "XY" (=male).}
 
-\item{genomeVersion}{Genome version, either 'hg19' or 'hg38'.}
+\item{genomeVersion}{Genome version, available options are "hg19", "hg38" or "CHM13".}
 
-\item{chrom_names}{A vector with allowed chromosome names (optional, default=c(1:22, 'X')). Do not set it to paste0('chr', c(1:22, 'X')) if data is 'chr'-based.}
+\item{chrom_names}{A vector with allowed chromosome names (optional, default=c(1:22, "X")). Do not set it to paste0("chr", c(1:22, "X")) if data is "chr"-based.}
 
 \item{minCounts}{Minimum depth, in normal samples, required for a SNP to be considered (optional, default=20).}
 
@@ -51,11 +52,13 @@ ascat.getBAFsAndLogRs(
 
 \item{probloci_file}{A file (chromosome <tab> position; no header) containing specific loci to ignore (optional, default=NA).}
 
+\item{tumour_only_mode}{Should the BAF and LogR be computed from tumour-only (optional, default = FALSE)}
+
 \item{seed}{A seed to be set when randomising the alleles (optional, default=as.integer(Sys.time())).}
 }
 \description{
 Obtain BAF and LogR from the allele counts.
 }
 \author{
-dw9, sd11, tl
+dw9, sd11, tl, jd
 }

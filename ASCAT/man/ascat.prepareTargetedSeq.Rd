@@ -17,7 +17,7 @@ ascat.prepareTargetedSeq(
   chrom_names = c(1:22, "X"),
   min_base_qual = 20,
   min_map_qual = 35,
-  ref.fasta = NA,
+  additional_allelecounter_flags = NA,
   plotQC = TRUE
 )
 }
@@ -32,7 +32,7 @@ ascat.prepareTargetedSeq(
 
 \item{allelecounter_exe}{Path to the allele counter executable.}
 
-\item{genomeVersion}{Genome version, either 'hg19' or 'hg38'.}
+\item{genomeVersion}{Genome version, available options are 'hg19', 'hg38' or 'CHM13'.}
 
 \item{nthreads}{The number of parallel processes to speed up the process (optional, default=1).}
 
@@ -46,7 +46,7 @@ ascat.prepareTargetedSeq(
 
 \item{min_map_qual}{Minimum mapping quality required for a read to be counted (optional, default=35).}
 
-\item{ref.fasta}{FASTA file used for generating CRAMs (optional, default=NA).}
+\item{additional_allelecounter_flags}{Additional flags passed on to alleleCounter, e.g., -r <FASTA> for parsing CRAMs (optional, default=NA).}
 
 \item{plotQC}{A boolean to generate QC reports as PNGs (optional, default=TRUE).}
 }

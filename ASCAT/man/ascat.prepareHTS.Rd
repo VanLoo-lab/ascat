@@ -6,9 +6,9 @@
 \usage{
 ascat.prepareHTS(
   tumourseqfile,
-  normalseqfile,
+  normalseqfile = NA,
   tumourname,
-  normalname,
+  normalname = NA,
   allelecounter_exe,
   alleles.prefix,
   loci.prefix,
@@ -25,7 +25,7 @@ ascat.prepareHTS(
   chrom_names = c(1:22, "X"),
   min_base_qual = 20,
   min_map_qual = 35,
-  ref.fasta = NA,
+  additional_allelecounter_flags = NA,
   skip_allele_counting_tumour = FALSE,
   skip_allele_counting_normal = FALSE,
   seed = as.integer(Sys.time())
@@ -46,9 +46,9 @@ ascat.prepareHTS(
 
 \item{loci.prefix}{Prefix path to the loci data (e.g. "G1000_loci_chr").}
 
-\item{gender}{Gender information, either 'XX' (=female) or 'XY' (=male).}
+\item{gender}{Gender information, either "XX" (=female) or "XY" (=male).}
 
-\item{genomeVersion}{Genome version, either 'hg19' or 'hg38'.}
+\item{genomeVersion}{Genome version, available options are "hg19", "hg38" or "CHM13".}
 
 \item{nthreads}{The number of parallel processes for getting allele counts (optional, default=1).}
 
@@ -66,13 +66,13 @@ ascat.prepareHTS(
 
 \item{probloci_file}{A file (chromosome <tab> position; no header) containing specific loci to ignore (optional, default=NA).}
 
-\item{chrom_names}{A vector containing the names of chromosomes to be considered (optional, default=c(1:22, 'X')).}
+\item{chrom_names}{A vector containing the names of chromosomes to be considered (optional, default=c(1:22, "X")).}
 
 \item{min_base_qual}{Minimum base quality required for a read to be counted (optional, default=20).}
 
 \item{min_map_qual}{Minimum mapping quality required for a read to be counted (optional, default=35).}
 
-\item{ref.fasta}{FASTA file used for generating CRAMs (optional, default=NA).}
+\item{additional_allelecounter_flags}{Additional flags passed on to alleleCounter, e.g., -r <FASTA> for parsing CRAMs (optional, default=NA).}
 
 \item{skip_allele_counting_tumour}{Flag, set to TRUE if tumour allele counting is already complete (files are expected in the working directory on disk; optional, default=FALSE).}
 

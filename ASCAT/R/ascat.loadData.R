@@ -8,7 +8,7 @@
 #' @param chrs a vector containing the names for the chromosomes (e.g. c(1:22, "X"))
 #' @param gender a vector of gender for each cases ("XX" or "XY"). Default = all female ("XX")
 #' @param sexchromosomes a vector containing the names for the sex chromosomes. Default = c("X", "Y")
-#' @param genomeVersion a string (either 'hg19' or 'hg38') so nonPAR coordinates on X can be stored, NULL
+#' @param genomeVersion a string ('hg19', 'hg38' or 'CHM13') so nonPAR coordinates on X can be stored, NULL
 #' @param isTargetedSeq a boolean indicating whether data come from a targeted sequencing experiment. Default = F
 #'
 #' @return ascat data structure containing:\cr
@@ -121,8 +121,10 @@ ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = 
       X_nonPAR=c(2699521, 154931043)
     } else if (genomeVersion=="hg38") {
       X_nonPAR=c(2781480, 155701382)
+    } else if (genomeVersion=="CHM13") {
+      X_nonPAR=c(2394410, 153925834)
     } else {
-      stop("genomeVersion must be either \'hg19\' or \'hg38\'.")
+      stop("genomeVersion must be \'hg19\', \'hg38\' or \'CHM13\'.")
     }
   } else {
     X_nonPAR=NULL
