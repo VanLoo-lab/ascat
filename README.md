@@ -21,9 +21,9 @@ Installing ASCAT using R: `devtools::install_github('VanLoo-lab/ascat/ASCAT')`
 - Default penalty for both ASPCF (`ascat.aspcf`) and ASmultiPCF (`ascat.asmultipcf`) is now **70** (was 25). It is suitable for SNP arrays, as well as WES and WGS data.
 - LogR correction can now be used to correct for both GC content (standard requirement) and replication timing (optional). Also, the correction method has been updated (it now uses autosomes to compute correlations with covariates and applies a linear model with *splines* on all chromosomes). Please note that `ascat.correctLogR` should be used from now on (`ascat.GCcorrect` is still there for backward compatibility but is just a wrapper to `ascat.correctLogR`).
 - Color scheme has been changed for CNA profiles so it is now colorblind-friendly:
-  - Rounded profiles: red is the major allele and blue is the minor allele.
-  - Unrounded profiles: purple is the total CN and green is the minor allele.
-  - ASPCF plots: red dots are raw values and blue dots are segmented values.
+	- Rounded profiles: red is the major allele and blue is the minor allele.
+	- Unrounded profiles: purple is the total CN and green is the minor allele.
+	- ASPCF plots: red dots are raw values and blue dots are segmented values.
 - Because ASCAT leverages genomic information from heterozygous SNPs, the nonPAR region in chromosome X for males is challenging as there are no such SNP, as opposed to PAR1 and PAR2 regions being present on chrX and chrY. We improved CNA calling in chrX by considering specificities between nonPAR and PAR1/PAR2. To this end, `ascat.loadData` has a new argument, `genomeVersion` (either `'hg19'` or `'hg38'`), that enables locating the nonPAR region on chrX. If provided, such information will be considered in the different ASCAT functions. We recommend always providing this information so CNA calling on chrX for males will be more accurate. Since PAR1 and PAR2 are present in both chrX and chrY, a 1+1 status in males refers to 1 copy in X and 1 copy in Y, but 1+0 could either be 1 copy in X (and no copy in Y) or 1 copy of Y (and no copy in X). Also, please note that most platforms have a limited resolution for PAR1 and PAR2 so results should carefully be interpreted in respect to available resolution.
 - Ploidy value displayed in CNA profiles no longer comes from the grid search and is now the final tumour ploidy (matching with `ascat.output$ploidy`).
 
@@ -58,20 +58,22 @@ Because arrays have a defined set of SNP probes, with a fairly constant rate of 
 
 ## Misc
 For more information about ASCAT and other projects of our group, please visit our [website](https://www.crick.ac.uk/research/a-z-researchers/researchers-v-y/peter-van-loo/software/).
-# ASCAT_for_long_reads
-- Made changes to let it run on long read data.
-- First the Allelecounter needs to be altered, set the min_bas_qual lower to run on long reads (15) and added the flag: f -0. Both changes are exposed to ascat.prepareHTS().
-- Next Created a loci_binsize = 1 parameter in ascat.getBAFsAndLogRs() and exposed it to ascat.prepareHTS() as well:
- #' @param loci_binsize Size of the bins to subsample loci, reduces autocorrelation in BAF/LogR for long-read sequencing (optional, default = 1, no binning) and modified the ascat.getBAFsAndLogRs(). Now you want the alter the local_binsize in ascat.prepareHTS(). (In my experience runs best at 2000)
-- Further, no GC-correction is needed as long read doesn't use PCR
-- Latsly, in my experience setting the penalty in ascat.aspcf to 200 reduces the noice.
-- You want the run it like this:
-- #HTS tumour only long-read
 
+# Changes to let ASCAT run on long-read data:
+- First the Allelecounter needs to be altered, set the `min_base_qual=10` to run on long reads and add the flag: `f -0`. Both changes are exposed to `ascat.prepareHTS()`.
+- `loci_binsize` Size of the bins to subsample loci, reduces autocorrelation in BAF/LogR for long-read sequencing (optional, default = 1, no binning) and modified in the `ascat.getBAFsAndLogRs()`. Now you want to set the `local_binsize=500` in `ascat.prepareHTS()` for long reads. (In my experience, long read need to be binned at 500 or even higher depending on the average length of your reads)
+- Further, if there was no PCR step in the library prep, GC correction is not needed.
+- Lastly, changing the penalty in `ascat.aspcf` to a higher value can help in reducing the noise.
+- Example of the new `ascat.prepareHTS` function for long reads:
+
+```
 ascat.prepareHTS(
   tumourseqfile = tumour_BAM,
-  tumourname = name,
-  allelecounter_exe = allelecounter ,
+  normalseqfile = normal_BAM,
+  tumourname = name_tumour,
+  normalname = name_normal,
+  allelecounter_exe = allelecounter,
+  skip_allele_counting_normal = FALSE,
   skip_allele_counting_tumour = FALSE,
   alleles.prefix = G1000_alleles_hg38_chr,
   loci.prefix = G1000_loci_hg38_chr,
@@ -80,6 +82,10 @@ ascat.prepareHTS(
   nthreads = 12,
   tumourLogR_file = "Tumor_LogR.txt",
   tumourBAF_file = "Tumor_BAF.txt",
-  loci_binsize = 2000,
-  min_base_qual= 15,
+  loci_binsize = 500,
+  min_base_qual= 10,
   additional_allelecounter_flags="-f 0")
+```
+
+
+  

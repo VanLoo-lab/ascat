@@ -1,12 +1,12 @@
 # Processing WGS data with ASCAT
 Although we recommend running [Battenberg](https://github.com/Wedge-lab/battenberg) on WGS data to get accurate clonal and subclonal allele-specific copy-number alteration calls, ASCAT can still be used to get a fast ploidy/purity estimate. To this end, we pre-generated a set of loci, alongside with GC content and replication timing correction files.
 
-Briefly, such a list was derived from 1000 Genomes Project SNPs ([hg19](http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/) and [hg38](http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000_genomes_project/release/20190312_biallelic_SNV_and_INDEL/)):
+Briefly, such a list was derived from 1000 Genomes Project SNPs ([hg19](http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/), [hg38](http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000_genomes_project/release/20190312_biallelic_SNV_and_INDEL/) and for [T2T-CHM13](https://s3-us-west-2.amazonaws.com/human-pangenomics/index.html?prefix=T2T/CHM13/assemblies/variants/1000_Genomes_Project/chm13v2.0/unrelated_samples_2504/)):
 
 - Biallelic SNPs with allele frequency higher than 0.35 and lower than 0.65 in any population were selected using *BCFtools*.
 - Duplicated entries were removed using *R*.
-- SNPs located in the [ENCODE blacklisted regions](https://github.com/Boyle-Lab/Blacklist/) were discarded.
-- SNPs with noisy BAF (distant from 0/0.5/1) in normal samples (a.k.a probloci) as part of the [Battenberg](https://github.com/Wedge-lab/battenberg) package were discarded (*probloci_270415.txt.gz* for hg19 and *probloci.zip* for hg38).
+- For hg19 and hg38 SNPs located in the [ENCODE blacklisted regions](https://github.com/Boyle-Lab/Blacklist/) were discarded. For T2T-CHM13, SNPs located in the excluderanges BED file from the [Dozmorovlab](https://github.com/dozmorovlab/excluderanges?tab=readme-ov-file/) were discarded.
+- SNPs with noisy BAF (distant from 0/0.5/1) in normal samples (a.k.a probloci) as part of the [Battenberg](https://github.com/Wedge-lab/battenberg) package were discarded (*probloci_270415.txt.gz* for hg19 and *probloci.zip* for hg38). For T2T-CHM13, a lifted over version (form the GRCh38 to T2T) of the problematic loci identified by Battenberg were discarded.
 
 Since hg38 data for the non-PAR region of chrX is not available (as of September 2021), hg38 data for the whole chrX comes from a lift-over from hg19.
 
@@ -14,8 +14,8 @@ GC content and replication timing correction files were then generated using scr
 
 Data availability:
 
-- Loci files: [hg19](https://drive.google.com/file/d/1W0Yxkj9osFs6raEc18TuNhBG9wthnPoB/view?usp=share_link) & [hg38](https://drive.google.com/file/d/1uD2emA-LRJKYabrKSOH-XL40QnyJW1Lh/view?usp=share_link) (unzip and set `loci.prefix="G1000_loci_hg19_chr"` in `ascat.prepareHTS`)
-- Allele files: [hg19](https://drive.google.com/file/d/1ztA_LrBVsyMJJ6niiqcf_5uvTvxJPOze/view?usp=share_link) & [hg38](https://drive.google.com/file/d/14iDvfUegZ4eF5wSuxkeEA7yR-yZYkLjt/view?usp=share_link) (unzip and set `alleles.prefix="G1000_alleles_hg19_chr"` in `ascat.prepareHTS`)
+- Loci files: [hg19](https://drive.google.com/file/d/1W0Yxkj9osFs6raEc18TuNhBG9wthnPoB/view?usp=share_link) & [hg38](https://drive.google.com/file/d/1uD2emA-LRJKYabrKSOH-XL40QnyJW1Lh/view?usp=share_link) (unzip and set `alleles.prefix="G1000_loci_hg19_chr"` in `ascat.prepareHTS`)
+- Allele files: [hg19](https://drive.google.com/file/d/1ztA_LrBVsyMJJ6niiqcf_5uvTvxJPOze/view?usp=share_link) & [hg38](https://drive.google.com/file/d/14iDvfUegZ4eF5wSuxkeEA7yR-yZYkLjt/view?usp=share_link) (unzip and set `loci.prefix="G1000_alleles_hg19_chr"` in `ascat.prepareHTS`)
 - GC correction file: [hg19](https://drive.google.com/file/d/1JB4tBGJmzmjYDtpYY9estRxdTYQSLldD/view?usp=share_link) & [hg38](https://drive.google.com/file/d/1919sBMW5_ul8dXHNgy58_dFy79fpfGY8/view?usp=share_link) (unzip and set `GCcontentfile="GC_G1000_hg19.txt"` in `ascat.correctLogR`)
 - Replication timing correction file: [hg19](https://drive.google.com/file/d/1K1qSS8NUzMM8sXdVD8wan9wQ0WRoW593/view?usp=share_link) & [hg38](https://drive.google.com/file/d/1coDFcPp3bCWr-9ZaNoCzQUwewdEfH7fg/view?usp=share_link) (unzip and set `replictimingfile="RT_G1000_hg19.txt"` in `ascat.correctLogR`)
 
