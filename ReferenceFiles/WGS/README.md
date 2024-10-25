@@ -14,8 +14,8 @@ GC content and replication timing correction files were then generated using scr
 
 Data availability:
 
-- Loci files: [hg19](https://drive.google.com/file/d/1W0Yxkj9osFs6raEc18TuNhBG9wthnPoB/view?usp=share_link) & [hg38](https://drive.google.com/file/d/1uD2emA-LRJKYabrKSOH-XL40QnyJW1Lh/view?usp=share_link) (unzip and set `alleles.prefix="G1000_loci_hg19_chr"` in `ascat.prepareHTS`)
-- Allele files: [hg19](https://drive.google.com/file/d/1ztA_LrBVsyMJJ6niiqcf_5uvTvxJPOze/view?usp=share_link) & [hg38](https://drive.google.com/file/d/14iDvfUegZ4eF5wSuxkeEA7yR-yZYkLjt/view?usp=share_link) (unzip and set `loci.prefix="G1000_alleles_hg19_chr"` in `ascat.prepareHTS`)
+- Loci files: [hg19](https://drive.google.com/file/d/1W0Yxkj9osFs6raEc18TuNhBG9wthnPoB/view?usp=share_link) & [hg38](https://drive.google.com/file/d/1uD2emA-LRJKYabrKSOH-XL40QnyJW1Lh/view?usp=share_link) (unzip and set `loci.prefix="G1000_loci_hg19_chr"` in `ascat.prepareHTS`)
+- Allele files: [hg19](https://drive.google.com/file/d/1ztA_LrBVsyMJJ6niiqcf_5uvTvxJPOze/view?usp=share_link) & [hg38](https://drive.google.com/file/d/14iDvfUegZ4eF5wSuxkeEA7yR-yZYkLjt/view?usp=share_link) (unzip and set `alleles.prefix="G1000_alleles_hg19_chr"` in `ascat.prepareHTS`)
 - GC correction file: [hg19](https://drive.google.com/file/d/1JB4tBGJmzmjYDtpYY9estRxdTYQSLldD/view?usp=share_link) & [hg38](https://drive.google.com/file/d/1919sBMW5_ul8dXHNgy58_dFy79fpfGY8/view?usp=share_link) (unzip and set `GCcontentfile="GC_G1000_hg19.txt"` in `ascat.correctLogR`)
 - Replication timing correction file: [hg19](https://drive.google.com/file/d/1K1qSS8NUzMM8sXdVD8wan9wQ0WRoW593/view?usp=share_link) & [hg38](https://drive.google.com/file/d/1coDFcPp3bCWr-9ZaNoCzQUwewdEfH7fg/view?usp=share_link) (unzip and set `replictimingfile="RT_G1000_hg19.txt"` in `ascat.correctLogR`)
 
