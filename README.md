@@ -2,14 +2,14 @@
 
 ## Description
 
-This repository provides the ASCAT R package (v3.1.2) that can be used to infer tumour purity, ploidy and allele-specific copy number profiles.
+This repository provides the ASCAT R package (v3.1.3) that can be used to infer tumour purity, ploidy and allele-specific copy number profiles.
 
-ASCAT is described in detail in: [Allele-specific copy number analysis of tumors. Van Loo P *et al*. *PNAS* (2010)](http://www.ncbi.nlm.nih.gov/pubmed/20837533).
+ASCAT is described in detail in: [Allele-specific copy number analysis of tumors. Van Loo P *et al*. *PNAS* (2010)](https://pubmed.ncbi.nlm.nih.gov/20837533).
 
 This repository also contains the code underlying additional publication:
 [Allele-specific multi-sample copy number segmentation. Ross EM, Haase K, Van Loo P & Markowetz F. *Bioinformatics* (2020)](https://pubmed.ncbi.nlm.nih.gov/32449758).
 
-## Installation (v3.1.2 version)
+## Installation (v3.1.3 version)
 Bioconductor package dependencies: [GenomicRanges](https://bioconductor.org/packages/release/bioc/html/GenomicRanges.html) & [IRanges](https://bioconductor.org/packages/release/bioc/html/IRanges.html) (`BiocManager::install(c('GenomicRanges','IRanges'))` with a recent R/BiocManager version).
 
 Processing high-throughput sequencing data: [alleleCounter](https://github.com/cancerit/alleleCount) (C version)
@@ -47,24 +47,27 @@ Installing ASCAT using R: `devtools::install_github('VanLoo-lab/ascat/ASCAT')`
 We provide some scripts and input data in the *[ExampleData](ExampleData)* folder.
 
 ## Reference files
+All reference files are hosted on [Zenodo](https://zenodo.org/records/10513234).
 - LogR correction files (`ascat.correctLogR`) for standard platforms (Affymetrix SNP 6.0, Affymetrix 250k STY, Illumina 660k and Illumina OmniExpress) can be found in the *[ReferenceFiles/SNParrays](ReferenceFiles/SNParrays)* folder. For other platforms, please use our scripts (in *[LogRcorrection](LogRcorrection)*) to generate such correction files.
 - For WGS, we provide logR correction files as well as loci and allele files in *[ReferenceFiles/WGS](ReferenceFiles/WGS)*.
 - For WES and TS, we provide logR correction files as well as loci and allele files in: *[ReferenceFiles/WES](ReferenceFiles/WES)*. Please note that reference files for WES and TS contain way more SNPs than the ones for WGS. This is because they will be downsampled so we need to provide an exhaustive list of SNPs to begin with. Do not use such a list for processing WGS data and do not use reference files for WGS to process WES/TS data.
 
 ## Supported arrays without matched germline
-*Custom10k*, *IlluminaASA*, *IlluminaGSAv3*, *Illumina109k*, *IlluminaCytoSNP*, *IlluminaCytoSNP850k*, *Illumina610k*, *Illumina660k*, *Illumina700k*, *Illumina1M*, *Illumina2.5M*, *IlluminaOmni5*, *Affy10k*, *Affy100k*, *Affy250k_sty*, *Affy250k_nsp*, *AffyOncoScan*, *AffyCytoScanHD*, *AffySNP6*, *HumanCNV370quad*, *HumanCore12*, *HumanCoreExome24*, *HumanOmniExpress12* and *IlluminaOmniExpressExome*.
+*Custom10k*, *IlluminaASA*, *IlluminaGSAv3*, *Illumina109k*, *IlluminaCytoSNP*, *IlluminaCytoSNP850k*, *Illumina610k*, *Illumina660k*, *Illumina700k*, *Illumina1M*, *Illumina2.5M*, *IlluminaOmni5*, *IlluminaOmniExpressExome*, *IlluminaGDACyto-8*, *Affy10k*, *Affy100k*, *Affy250k_sty*, *Affy250k_nsp*, *AffyOncoScan*, *AffyCytoScanHD*, *AffySNP6*, *HumanCNV370quad*, *HumanCore12*, *HumanCoreExome24* and *HumanOmniExpress12*.
 
 Because arrays have a defined set of SNP probes, with a fairly constant rate of heterozygous probes across individuals, useful metrics in `ascat.predictGermlineGenotypes` can be inferred from some cases (with no or very few CN changes). However, sequencing data is subjected to massive variations because of design, coverage and/or artefacts. Therefore, we are not able to provide pre-defined metrics for unmatched sequencing data.
+
+We now provide a preset for WGS data under specific conditions: hg38 assembly and >50x coverage. Although this preset might be used in some other conditions, please note that is has not been extensively benchmarked under other conditions so we do not provide any guarantee outside of the scope. Such a preset is called *WGS_hg38_50X*.
 
 ## Misc
 For more information about ASCAT and other projects of our group, please visit our [website](https://www.crick.ac.uk/research/a-z-researchers/researchers-v-y/peter-van-loo/software/).
 
 # Changes to let ASCAT run on long-read data:
-- First the Allelecounter needs to be altered, set the `min_base_qual=10` to run on long reads and add the flag: `f -0`. Both changes are exposed to `ascat.prepareHTS()`.
-- `loci_binsize` Size of the bins to subsample loci, reduces autocorrelation in BAF/LogR for long-read sequencing (optional, default = 1, no binning) and modified in the `ascat.getBAFsAndLogRs()`. Now you want to set the `local_binsize=500` in `ascat.prepareHTS()` for long reads. (In my experience, long read need to be binned at 500 or even higher depending on the average length of your reads)
-- Further, if there was no PCR step in the library prep, GC correction is not needed.
-- Lastly, changing the penalty in `ascat.aspcf` to a higher value can help in reducing the noise.
-- Example of the new `ascat.prepareHTS` function for long reads:
+- When running `ascat.prepareHTS()`, the following two parameters must be set (options for alleleCounter): `min_base_qual=10` and `additional_allelecounter_flags="-f 0"`.
+- Also, `loci_binsize` must be set to a higher value (default=1, no binning). This activates the binning process and a value of 500 (maybe higher, depending on the average length of your reads) works well in our experience. This reduces autocorrelation in BAF/LogR for long-read sequencing.
+- If there was no PCR step in the library preparation, GC correction is not needed.
+- Increasing the penalty value in `ascat.aspcf` can help in reducing the noise.
+- Example of the new `ascat.prepareHTS` function for long-reads sequencing:
 
 ```
 ascat.prepareHTS(
@@ -86,6 +89,3 @@ ascat.prepareHTS(
   min_base_qual= 10,
   additional_allelecounter_flags="-f 0")
 ```
-
-
-  
