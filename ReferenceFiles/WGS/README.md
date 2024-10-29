@@ -14,10 +14,10 @@ GC content and replication timing correction files were then generated using scr
 
 Data availability:
 
-- Loci files: [hg19](https://zenodo.org/records/10513234/files/G1000_loci_WGS_hg19.zip?download=1), [hg38](https://zenodo.org/records/10513234/files/G1000_loci_WGS_hg38.zip?download=1) and [CHM13](https://zenodo.org/records/14008443/files/G1000_loci_WGS_CHM13.zip?download=1) (unzip and set `loci.prefix="G1000_loci_hg19_chr"` in `ascat.prepareHTS`)
-- Allele files: [hg19](https://zenodo.org/records/10513234/files/G1000_alleles_WGS_hg19.zip?download=1), [hg38](https://zenodo.org/records/10513234/files/G1000_alleles_WGS_hg38.zip?download=1) and [CHM13](https://zenodo.org/records/14008443/files/G1000_alleles_WGS_CHM13.zip?download=1) (unzip and set `alleles.prefix="G1000_alleles_hg19_chr"` in `ascat.prepareHTS`)
-- GC correction file: [hg19](https://zenodo.org/records/10513234/files/GC_G1000_WGS_hg19.zip?download=1), [hg38](https://zenodo.org/records/10513234/files/GC_G1000_WGS_hg38.zip?download=1) and [CHM13](https://zenodo.org/records/14008443/files/GC_G1000_WGS_CHM13.zip?download=1) (unzip and set `GCcontentfile="GC_G1000_hg19.txt"` in `ascat.correctLogR`)
-- Replication timing correction file: [hg19](https://zenodo.org/records/10513234/files/RT_G1000_WGS_hg19.zip?download=1) & [hg38](https://zenodo.org/records/10513234/files/RT_G1000_WGS_hg38.zip?download=1) (unzip and set `replictimingfile="RT_G1000_hg19.txt"` in `ascat.correctLogR`)
+- Loci files: [hg19](https://zenodo.org/records/14008443/files/G1000_loci_WGS_hg19.zip?download=1), [hg38](https://zenodo.org/records/14008443/files/G1000_loci_WGS_hg38.zip?download=1) and [CHM13](https://zenodo.org/records/14008443/files/G1000_loci_WGS_CHM13.zip?download=1) (unzip and set `loci.prefix="G1000_loci_hg19_chr"` in `ascat.prepareHTS`)
+- Allele files: [hg19](https://zenodo.org/records/14008443/files/G1000_alleles_WGS_hg19.zip?download=1), [hg38](https://zenodo.org/records/14008443/files/G1000_alleles_WGS_hg38.zip?download=1) and [CHM13](https://zenodo.org/records/14008443/files/G1000_alleles_WGS_CHM13.zip?download=1) (unzip and set `alleles.prefix="G1000_alleles_hg19_chr"` in `ascat.prepareHTS`)
+- GC correction file: [hg19](https://zenodo.org/records/14008443/files/GC_G1000_WGS_hg19.zip?download=1), [hg38](https://zenodo.org/records/14008443/files/GC_G1000_WGS_hg38.zip?download=1) and [CHM13](https://zenodo.org/records/14008443/files/GC_G1000_WGS_CHM13.zip?download=1) (unzip and set `GCcontentfile="GC_G1000_hg19.txt"` in `ascat.correctLogR`)
+- Replication timing correction file: [hg19](https://zenodo.org/records/14008443/files/RT_G1000_WGS_hg19.zip?download=1) & [hg38](https://zenodo.org/records/14008443/files/RT_G1000_WGS_hg38.zip?download=1) (unzip and set `replictimingfile="RT_G1000_hg19.txt"` in `ascat.correctLogR`)
 
 ### File format
 

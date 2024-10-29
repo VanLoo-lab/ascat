@@ -47,7 +47,7 @@ Installing ASCAT using R: `devtools::install_github('VanLoo-lab/ascat/ASCAT')`
 We provide some scripts and input data in the *[ExampleData](ExampleData)* folder.
 
 ## Reference files
-All reference files are hosted on [Zenodo](https://zenodo.org/records/10513234).
+All reference files are hosted on [Zenodo](https://zenodo.org/records/14008443).
 - LogR correction files (`ascat.correctLogR`) for standard platforms (Affymetrix SNP 6.0, Affymetrix 250k STY, Illumina 660k and Illumina OmniExpress) can be found in the *[ReferenceFiles/SNParrays](ReferenceFiles/SNParrays)* folder. For other platforms, please use our scripts (in *[LogRcorrection](LogRcorrection)*) to generate such correction files.
 - For WGS, we provide logR correction files as well as loci and allele files in *[ReferenceFiles/WGS](ReferenceFiles/WGS)*.
 - For WES and TS, we provide logR correction files as well as loci and allele files in: *[ReferenceFiles/WES](ReferenceFiles/WES)*. Please note that reference files for WES and TS contain way more SNPs than the ones for WGS. This is because they will be downsampled so we need to provide an exhaustive list of SNPs to begin with. Do not use such a list for processing WGS data and do not use reference files for WGS to process WES/TS data.
