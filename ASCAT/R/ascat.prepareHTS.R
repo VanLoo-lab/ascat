@@ -48,10 +48,11 @@ ascat.getAlleleCounts = function(seq.file, output.file, loci.file, min.base.qual
 #' @param BED_file A BED file for only looking at SNPs within specific intervals (optional, default=NA).
 #' @param probloci_file A file (chromosome <tab> position; no header) containing specific loci to ignore (optional, default=NA).
 #' @param tumour_only_mode Should the BAF and LogR be computed from tumour-only (optional, default = FALSE)
+#' @param loci_binsize Size of the bins for long-read sequencing data (optional, default = 1)
 #' @param seed A seed to be set when randomising the alleles (optional, default=as.integer(Sys.time())).
-#' @author dw9, sd11, tl, jd
+#' @author dw9, sd11, tl, jd, rc
 #' @export
-ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, normalAlleleCountsFile.prefix, tumourLogR_file, tumourBAF_file, normalLogR_file, normalBAF_file, alleles.prefix, gender, genomeVersion, chrom_names=c(1:22, "X"), minCounts=20, BED_file=NA, probloci_file=NA, tumour_only_mode=FALSE, seed=as.integer(Sys.time())) {
+ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, normalAlleleCountsFile.prefix, tumourLogR_file, tumourBAF_file, normalLogR_file, normalBAF_file, alleles.prefix, gender, genomeVersion, chrom_names=c(1:22, "X"), minCounts=20, BED_file=NA, probloci_file=NA, tumour_only_mode=FALSE, loci_binsize = 1, seed=as.integer(Sys.time())) {
   set.seed(seed)
   stopifnot(gender %in% c("XX", "XY"))
   stopifnot(genomeVersion %in% c("hg19", "hg38", "CHM13"))
@@ -191,12 +192,28 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
   colnames(tumor.BAF)[3]=samplename
   colnames(germline.LogR)[3]=samplename
   colnames(germline.BAF)[3]=samplename
+
+  # subsample loci approx uniformly to reduce autocorrelation (and oversegmentation) in BAF/LogR with long-reads
+  if (loci_binsize > 1) {
+    # bin loci by creating rounded ID
+    posbins <- paste(germline.BAF$Chromosome, round(germline.BAF$Position/loci_binsize), sep = "_")
+    # get idx of likely hetSNPs, max 1 per bin
+    hetidx <- which(germline.BAF$baf > 0.01 & germline.BAF$baf < 0.99)
+    hetidx <- hetidx[which(!duplicated(posbins[hetidx]))]
+    # get idx of rest of loci, max 1 per bin
+    homidx <- which(!(duplicated(posbins) | posbins %in% posbins[hetidx]))
+    # merge idxs and sort again
+    unifidx <- sort(x = union(homidx, hetidx), decreasing = FALSE)
+    # unifidx <- which(!duplicated(paste(germline.BAF$Chromosome, round(germline.BAF$Position/(subsample_logr_binsize)), sep = "_")))
+  } else {
+    unifidx <- 1:nrow(germline.BAF)
+  }
   # Save data.frames to disk
-  write.table(tumor.LogR, file=tumourLogR_file, row.names=TRUE, quote=FALSE, sep="\t", col.names=NA)
-  write.table(tumor.BAF, file=tumourBAF_file, row.names=TRUE, quote=FALSE, sep="\t", col.names=NA)
+  write.table(tumor.LogR[unifidx, ], file=tumourLogR_file, row.names=TRUE, quote=FALSE, sep="\t", col.names=NA)
+  write.table(tumor.BAF[unifidx, ], file=tumourBAF_file, row.names=TRUE, quote=FALSE, sep="\t", col.names=NA)
   if (!tumour_only_mode) {
-    write.table(germline.LogR, file=normalLogR_file, row.names=TRUE, quote=FALSE, sep="\t", col.names=NA)
-    write.table(germline.BAF, file=normalBAF_file, row.names=TRUE, quote=FALSE, sep="\t", col.names=NA)
+    write.table(germline.LogR[unifidx, ], file=normalLogR_file, row.names=TRUE, quote=FALSE, sep="\t", col.names=NA)
+    write.table(germline.BAF[unifidx, ], file=normalBAF_file, row.names=TRUE, quote=FALSE, sep="\t", col.names=NA)
   }
 }
 
@@ -259,13 +276,14 @@ ascat.synchroniseFiles=function(samplename, tumourLogR_file, tumourBAF_file, nor
 #' @param additional_allelecounter_flags Additional flags passed on to alleleCounter, e.g., -r <FASTA> for parsing CRAMs (optional, default=NA).
 #' @param skip_allele_counting_tumour Flag, set to TRUE if tumour allele counting is already complete (files are expected in the working directory on disk; optional, default=FALSE).
 #' @param skip_allele_counting_normal Flag, set to TRUE if normal allele counting is already complete (files are expected in the working directory on disk; optional, default=FALSE).
+#' @param loci_binsize Size of the bins for long-read sequencing data (optional, default=1).
 #' @param seed A seed to be set when randomising the alleles (optional, default=as.integer(Sys.time())).
 #' @author sd11, tl
 #' @export
 ascat.prepareHTS = function(tumourseqfile, normalseqfile=NA, tumourname, normalname=NA, allelecounter_exe, alleles.prefix, loci.prefix, gender, genomeVersion,
                             nthreads=1, tumourLogR_file=NA, tumourBAF_file=NA, normalLogR_file=NA, normalBAF_file=NA, minCounts=10, BED_file=NA,
                             probloci_file=NA, chrom_names=c(1:22, "X"), min_base_qual=20, min_map_qual=35, additional_allelecounter_flags=NA,
-                            skip_allele_counting_tumour=FALSE, skip_allele_counting_normal=FALSE, seed=as.integer(Sys.time())) {
+                            skip_allele_counting_tumour=FALSE, skip_allele_counting_normal=FALSE, loci_binsize = 1, seed=as.integer(Sys.time())) {
   requireNamespace("foreach")
   requireNamespace("doParallel")
   requireNamespace("parallel")
@@ -327,6 +345,7 @@ ascat.prepareHTS = function(tumourseqfile, normalseqfile=NA, tumourname, normaln
                         BED_file=BED_file,
                         probloci_file=probloci_file,
                         tumour_only_mode=tumour_only_mode,
+                        loci_binsize = loci_binsize,
                         seed=seed)
 
   # Synchronise all information

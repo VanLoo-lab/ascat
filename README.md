@@ -47,7 +47,7 @@ Installing ASCAT using R: `devtools::install_github('VanLoo-lab/ascat/ASCAT')`
 We provide some scripts and input data in the *[ExampleData](ExampleData)* folder.
 
 ## Reference files
-All reference files are hosted on [Zenodo](https://zenodo.org/records/10513234).
+All reference files are hosted on [Zenodo](https://zenodo.org/records/14008443).
 - LogR correction files (`ascat.correctLogR`) for standard platforms (Affymetrix SNP 6.0, Affymetrix 250k STY, Illumina 660k and Illumina OmniExpress) can be found in the *[ReferenceFiles/SNParrays](ReferenceFiles/SNParrays)* folder. For other platforms, please use our scripts (in *[LogRcorrection](LogRcorrection)*) to generate such correction files.
 - For WGS, we provide logR correction files as well as loci and allele files in *[ReferenceFiles/WGS](ReferenceFiles/WGS)*.
 - For WES and TS, we provide logR correction files as well as loci and allele files in: *[ReferenceFiles/WES](ReferenceFiles/WES)*. Please note that reference files for WES and TS contain way more SNPs than the ones for WGS. This is because they will be downsampled so we need to provide an exhaustive list of SNPs to begin with. Do not use such a list for processing WGS data and do not use reference files for WGS to process WES/TS data.
@@ -61,3 +61,31 @@ We now provide a preset for WGS data under specific conditions: hg38 assembly an
 
 ## Misc
 For more information about ASCAT and other projects of our group, please visit our [website](https://www.crick.ac.uk/research/a-z-researchers/researchers-v-y/peter-van-loo/software/).
+
+# Changes to let ASCAT run on long-read data:
+- When running `ascat.prepareHTS()`, the following two parameters must be set (options for alleleCounter): `min_base_qual=10` and `additional_allelecounter_flags="-f 0"`.
+- Also, `loci_binsize` must be set to a higher value (default=1, no binning). This activates the binning process and a value of 500 (maybe higher, depending on the average length of your reads) works well in our experience. This reduces autocorrelation in BAF/LogR for long-read sequencing.
+- If there was no PCR step in the library preparation, GC correction is not needed.
+- Increasing the penalty value in `ascat.aspcf` can help in reducing the noise.
+- Example of the new `ascat.prepareHTS` function for long-reads sequencing:
+
+```
+ascat.prepareHTS(
+  tumourseqfile = tumour_BAM,
+  normalseqfile = normal_BAM,
+  tumourname = name_tumour,
+  normalname = name_normal,
+  allelecounter_exe = allelecounter,
+  skip_allele_counting_normal = FALSE,
+  skip_allele_counting_tumour = FALSE,
+  alleles.prefix = G1000_alleles_hg38_chr,
+  loci.prefix = G1000_loci_hg38_chr,
+  gender = gender,
+  genomeVersion = "hg38",
+  nthreads = 12,
+  tumourLogR_file = "Tumor_LogR.txt",
+  tumourBAF_file = "Tumor_BAF.txt",
+  loci_binsize = 500,
+  min_base_qual= 10,
+  additional_allelecounter_flags="-f 0")
+```
