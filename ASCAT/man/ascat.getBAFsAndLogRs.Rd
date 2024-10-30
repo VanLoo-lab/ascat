@@ -20,6 +20,7 @@ ascat.getBAFsAndLogRs(
   BED_file = NA,
   probloci_file = NA,
   tumour_only_mode = FALSE,
+  loci_binsize = 1,
   seed = as.integer(Sys.time())
 )
 }
@@ -54,11 +55,13 @@ ascat.getBAFsAndLogRs(
 
 \item{tumour_only_mode}{Should the BAF and LogR be computed from tumour-only (optional, default = FALSE)}
 
+\item{loci_binsize}{Size of the bins for long-read sequencing data (optional, default = 1)}
+
 \item{seed}{A seed to be set when randomising the alleles (optional, default=as.integer(Sys.time())).}
 }
 \description{
 Obtain BAF and LogR from the allele counts.
 }
 \author{
-dw9, sd11, tl, jd
+dw9, sd11, tl, jd, rc
 }

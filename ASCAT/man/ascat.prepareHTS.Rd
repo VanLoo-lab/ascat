@@ -28,6 +28,7 @@ ascat.prepareHTS(
   additional_allelecounter_flags = NA,
   skip_allele_counting_tumour = FALSE,
   skip_allele_counting_normal = FALSE,
+  loci_binsize = 1,
   seed = as.integer(Sys.time())
 )
 }
@@ -77,6 +78,8 @@ ascat.prepareHTS(
 \item{skip_allele_counting_tumour}{Flag, set to TRUE if tumour allele counting is already complete (files are expected in the working directory on disk; optional, default=FALSE).}
 
 \item{skip_allele_counting_normal}{Flag, set to TRUE if normal allele counting is already complete (files are expected in the working directory on disk; optional, default=FALSE).}
+
+\item{loci_binsize}{Size of the bins for long-read sequencing data (optional, default=1).}
 
 \item{seed}{A seed to be set when randomising the alleles (optional, default=as.integer(Sys.time())).}
 }
