@@ -9,5 +9,6 @@
 #' @importFrom S4Vectors queryHits subjectHits width
 #' @importFrom splines ns
 #' @importFrom stats binom.test cor lm mad median na.omit residuals runif runmed sd
+#' @importFrom tools file_ext
 #' @importFrom utils head read.table write.table
 NULL

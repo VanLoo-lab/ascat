@@ -150,9 +150,9 @@ ascat.getBAFsAndLogRs = function(samplename, tumourAlleleCountsFile.prefix, norm
   tumor.BAF_unmirrored = data.frame(Chromosome=allele_data$chromosome, Position=allele_data$position, baf=tumourBAF_unmirrored, ID=rownames(allele_data), row.names=4, stringsAsFactors=FALSE)
   colnames(tumor.BAF_unmirrored)[3]=samplename
   colnames(germline.BAF_unmirrored)[3]=samplename
-  write.table(tumor.BAF_unmirrored, file=gsub("\\.txt$", "_rawBAF.txt", tumourBAF_file), row.names=TRUE, quote=FALSE, sep="\t", col.names=NA)
+  write.table(tumor.BAF_unmirrored, file=gsub(paste0("\\.", file_ext(tumourBAF_file), "$"), paste0("_rawBAF.", file_ext(tumourBAF_file)), tumourBAF_file), row.names=TRUE, quote=FALSE, sep="\t", col.names=NA)
   if (!tumour_only_mode) {
-    write.table(germline.BAF_unmirrored, file=gsub("\\.txt$", "_rawBAF.txt", normalBAF_file), row.names=TRUE, quote=FALSE, sep="\t", col.names=NA)
+    write.table(germline.BAF_unmirrored, file=gsub(paste0("\\.", file_ext(normalBAF_file), "$"), paste0("_rawBAF.", file_ext(normalBAF_file)), normalBAF_file), row.names=TRUE, quote=FALSE, sep="\t", col.names=NA)
   }
   rm(normalBAF_unmirrored, tumourBAF_unmirrored, germline.BAF_unmirrored, tumor.BAF_unmirrored)
   # Randomise A and B alleles
