@@ -110,7 +110,7 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = FALSE, y_limit = 5, 
     seg = NULL
     for (i in 1:length(goodarrays)) {
       segje = res[[goodarrays[i]]]$seg
-      seg = rbind(seg, cbind(ASCATobj$samples[goodarrays[i]], as.vector(ASCATobj$SNPpos[segje[, 1], 1]),
+      seg = rbind(seg, cbind(ASCATobj$samples[goodarrays[i]], ASCATobj$SNPpos[segje[,1],1],
                              ASCATobj$SNPpos[segje[, 1], 2],
                              ASCATobj$SNPpos[segje[, 2], 2], segje[, 3], segje[, 4]))
     }
@@ -227,7 +227,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
   b = bafsegmented
   r = lrrsegmented[names(bafsegmented)]
 
-  SNPposhet = SNPpos[names(bafsegmented), ]
+  SNPposhet = SNPpos[as.numeric(names(bafsegmented)), ]
   autoprobes = !(SNPposhet[, 1] %in% sexchromosomes)
 
   b2 = b[autoprobes]
@@ -465,7 +465,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
 
     rho = rho_opt1
     psi = psi_opt1
-    SNPposhet = SNPpos[names(bafsegmented), ]
+    SNPposhet = SNPpos[as.numeric(names(bafsegmented)), ]
     haploidchrs = unique(c(substring(gender, 1, 1), substring(gender, 2, 2)))
     if (substring(gender, 1, 1)==substring(gender, 2, 2)) {
       haploidchrs = setdiff(haploidchrs, substring(gender, 1, 1))
@@ -508,9 +508,9 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     rho = rho_opt1
     psi = psi_opt1
 
-    diploidprobes = !(SNPpos[, 1] %in% haploidchrs)
+    diploidprobes = !(SNPpos[[1]] %in% haploidchrs)
     if (!is.null(X_nonPAR) && gender=="XY") diploidprobes=diploidprobes_fixnonPAR(diploidprobes, SNPpos, X_nonPAR, lrrsegmented)
-    nullprobes = SNPpos[, 1] %in% nullchrs
+    nullprobes = SNPpos[[1]] %in% nullchrs
 
     #this replaces an occurrence of unique that caused problems
     #introduces segment spanning over chr ends, when two consecutive probes from diff chr have same logR!

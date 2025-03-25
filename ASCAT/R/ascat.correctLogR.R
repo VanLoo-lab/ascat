@@ -46,7 +46,7 @@ ascat.correctLogR = function(ASCATobj, GCcontentfile = NULL, replictimingfile = 
     Tumor_LogR = ASCATobj$Tumor_LogR[ovl, , drop=FALSE]
     Tumor_BAF = ASCATobj$Tumor_BAF[ovl, , drop=FALSE]
 
-    chrs = intersect(ASCATobj$chrs, unique(SNPpos[, 1]))
+    chrs = intersect(ASCATobj$chrs, unique(SNPpos[[1]]))
 
     Germline_LogR = NULL
     Germline_BAF = NULL
@@ -58,7 +58,7 @@ ascat.correctLogR = function(ASCATobj, GCcontentfile = NULL, replictimingfile = 
     last = 0
     ch = list()
     for (i in 1:length(ASCATobj$chrs)) {
-      chrke = SNPpos[SNPpos[, 1]==ASCATobj$chrs[i], ]
+      chrke = SNPpos[SNPpos[[1]]==ASCATobj$chrs[i], ]
       chrpos = chrke[, 2]
       names(chrpos) = rownames(chrke)
       chrpos = sort(chrpos)
