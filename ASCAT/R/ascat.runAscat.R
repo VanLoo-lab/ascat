@@ -253,7 +253,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
 
   MINPLOIDY = min_ploidy
   MAXPLOIDY = max_ploidy
-  MINRHO = 0.2
+  MINRHO = 0.1
   MINGOODNESSOFFIT = 80
   MINPERCZERO = 0.02
   MINPERCZEROABB = 0.1
