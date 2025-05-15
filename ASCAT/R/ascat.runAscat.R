@@ -110,7 +110,7 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = FALSE, y_limit = 5, 
     seg = NULL
     for (i in 1:length(goodarrays)) {
       segje = res[[goodarrays[i]]]$seg
-      seg = rbind(seg, cbind(ASCATobj$samples[goodarrays[i]], ASCATobj$SNPpos[segje[,1],1],
+      seg = rbind(seg, cbind(ASCATobj$samples[goodarrays[i]], ASCATobj$SNPpos[segje[, 1], 1],
                              ASCATobj$SNPpos[segje[, 1], 2],
                              ASCATobj$SNPpos[segje[, 2], 2], segje[, 3], segje[, 4]))
     }
@@ -124,7 +124,7 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = FALSE, y_limit = 5, 
     seg_raw = NULL
     for (i in 1:length(goodarrays)) {
       segje = res[[goodarrays[i]]]$seg_raw
-      seg_raw = rbind(seg_raw, cbind(ASCATobj$samples[goodarrays[i]], as.vector(ASCATobj$SNPpos[segje[, 1], 1]),
+      seg_raw = rbind(seg_raw, cbind(ASCATobj$samples[goodarrays[i]], ASCATobj$SNPpos[segje[, 1], 1],
                                      ASCATobj$SNPpos[segje[, 1], 2],
                                      ASCATobj$SNPpos[segje[, 2], 2], segje[, 3], segje[, 4:ncol(segje)]))
 
