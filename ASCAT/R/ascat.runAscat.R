@@ -277,7 +277,6 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
 
   if (!failedqualitycheck && is.na(rho_manual)) {
 
-  ###NJB edit 2015-05-05, Saving alternative solutions
 	inv.d <- 1/d
 	alt.ploidy <- cbind(as.numeric(rownames(inv.d)),apply(inv.d,1,max))
 	alt.cellularity <- cbind(as.numeric(colnames(inv.d)),apply(inv.d,2,max))
@@ -290,7 +289,6 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
 		rownames(alt.sol) <- 1:nrow(alt.sol)
 		alt.sol[,3] <- (1-((1/alt.sol[,3])/TheoretMaxdist)) * 100
 	}
-	#### end edit
 
     # first, try with all filters
     for (i in 4:(dim(d)[1]-3)) {
