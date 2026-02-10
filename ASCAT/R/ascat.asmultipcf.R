@@ -44,9 +44,9 @@ ascat.asmultipcf <- function(ASCATobj, ascat.gg = NULL, penalty = 70, out.dir = 
   # specific process for nonPAR in males
   if (!is.null(ASCATobj$X_nonPAR) && ASCATobj$gender[1]=="XY") {
     # select SNPs with non-NA BAF values in nonPAR region
-    nonPAR_index=which(ASCATobj$SNPpos[[1]] %in% c("chrX", "X") & ASCATobj$SNPpos[, 2]>=ASCATobj$X_nonPAR[1] & ASCATobj$SNPpos[, 2]<=ASCATobj$X_nonPAR[2] & !is.na(gg))
+    nonPAR_index=which(ASCATobj$SNPpos[, 1] %in% c("chrX", "X") & ASCATobj$SNPpos[, 2]>=ASCATobj$X_nonPAR[1] & ASCATobj$SNPpos[, 2]<=ASCATobj$X_nonPAR[2] & !is.na(gg))
     # store hmz/htz information for autosomes
-    autosomes_info=table(gg[which(ASCATobj$SNPpos[[1]] %in% setdiff(ASCATobj$chrs, ASCATobj$sexchromosomes))])
+    autosomes_info=table(gg[which(ASCATobj$SNPpos[, 1] %in% setdiff(ASCATobj$chrs, ASCATobj$sexchromosomes))])
     if (length(nonPAR_index)>5) {
       # set all to hmz
       gg[nonPAR_index]=TRUE
