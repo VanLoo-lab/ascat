@@ -107,6 +107,14 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = FALSE, y_limit = 5, 
     names(psi) = colnames(n1)
     names(goodnessOfFit) = colnames(n1)
 
+    # Save alternative solutions
+    alternative_solutions_list = list()
+    for (i in 1:length(goodarrays)) {
+      alternative_solutions_list[[i]] = res[[goodarrays[i]]]$alternative_solutions
+    }
+    alternative_solutions <- do.call("rbind", alternative_solutions_list)
+    alternative_solutions <- as.data.frame(alternative_solutions)
+
     seg = NULL
     for (i in 1:length(goodarrays)) {
       segje = res[[goodarrays[i]]]$seg
@@ -177,10 +185,12 @@ ascat.runAscat = function(ASCATobj, gamma = 0.55, pdfPlot = FALSE, y_limit = 5, 
     seg = NULL
     seg_raw = NULL
     distance_matrix = NULL
+    alternative_solutions = NULL
   }
 
   return(list(nA = n1, nB = n2, purity = tp, aberrantcellfraction = tp, ploidy = ploidy, psi = psi, goodnessOfFit = goodnessOfFit,
-              failedarrays = fa, nonaberrantarrays = naarrays, segments = seg, segments_raw = seg_raw, distance_matrix = distance_matrix))
+              failedarrays = fa, nonaberrantarrays = naarrays, segments = seg, segments_raw = seg_raw, distance_matrix = distance_matrix,
+              alternative_solutions = alternative_solutions))
 }
 
 #' @title runASCAT
@@ -266,6 +276,19 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
   optima = list()
 
   if (!failedqualitycheck && is.na(rho_manual)) {
+
+	inv.d <- 1/d
+	alt.ploidy <- cbind(as.numeric(rownames(inv.d)),apply(inv.d,1,max))
+	alt.cellularity <- cbind(as.numeric(colnames(inv.d)),apply(inv.d,2,max))
+	alt.p.indx <- which(diff(sign(diff(alt.ploidy[,2]))) == -2) + 1
+	alt.c.indx <- apply(inv.d[rownames(alt.ploidy[alt.p.indx,,drop=F]),,drop=F],1,function(x){ which(x == max(x))})
+	if(length(ascat.runAscat) > 0){
+		alt.sol <- cbind(alt.ploidy[alt.p.indx,1,drop=F], alt.cellularity[alt.c.indx,,drop=F])
+		colnames(alt.sol) <- c('psi_ploidy', 'rho_aberrant_cell_fraction', 'goodness_of_fit')
+		alt.sol <- alt.sol[order(alt.sol[,3],decreasing=T),,drop=F]
+		rownames(alt.sol) <- 1:nrow(alt.sol)
+		alt.sol[,3] <- (1-((1/alt.sol[,3])/TheoretMaxdist)) * 100
+	}
 
     # first, try with all filters
     for (i in 4:(dim(d)[1]-3)) {
@@ -742,7 +765,8 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     }
 
     return(list(rho = rho_opt1, psi = psi_opt1, goodnessOfFit = goodnessOfFit_opt1, nonaberrant = nonaberrant,
-                nA = n1all, nB = n2all, seg = seg, seg_raw = seg_raw, distance_matrix = d))
+                nA = n1all, nB = n2all, seg = seg, seg_raw = seg_raw, distance_matrix = d,
+                alternative_solutions = alt.sol))
 
   } else {
 
@@ -753,7 +777,8 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
     dev.off()
 
     warning(paste("ASCAT could not find an optimal ploidy and purity value for sample ", name, ".\n", sep=""))
-    return(list(rho = NA, psi = NA, goodnessOfFit = NA, nonaberrant = FALSE, nA = NA, nB = NA, seg = NA, seg_raw = NA, distance_matrix = NA))
+    return(list(rho = NA, psi = NA, goodnessOfFit = NA, nonaberrant = FALSE, nA = NA, nB = NA, seg = NA, seg_raw = NA, distance_matrix = NA,
+    alternative_solutions = NA))
   }
 
 }
