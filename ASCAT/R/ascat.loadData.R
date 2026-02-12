@@ -60,10 +60,10 @@ ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = 
   # make SNPpos vector that contains genomic position for all SNPs and remove all data not on chromosome 1-22, X, Y (or whatever is given in the input value of chrs)
   print.noquote("Registering SNP locations...")
   SNPpos <- Tumor_LogR[, 1:2]
-  SNPpos = SNPpos[SNPpos[[1]] %in% chrs, ]
+  SNPpos = SNPpos[SNPpos[, 1] %in% chrs, ]
 
   # if some chromosomes have no data, just remove them
-  chrs = intersect(chrs, unique(SNPpos[[1]]))
+  chrs = intersect(chrs, unique(SNPpos[, 1]))
 
   Tumor_LogR = Tumor_LogR[rownames(SNPpos), c(-1, -2), drop=FALSE]
   Tumor_BAF = Tumor_BAF[rownames(SNPpos), c(-1, -2), drop=FALSE]
@@ -87,7 +87,7 @@ ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = 
   ch = list()
   SNPorder = vector(length=dim(SNPpos)[1])
   for (i in 1:length(chrs)) {
-    chrke = SNPpos[SNPpos[[1]]==chrs[i], ]
+    chrke = SNPpos[SNPpos[, 1]==chrs[i], ]
     chrpos = chrke[, 2]
     names(chrpos) = rownames(chrke)
     chrpos = sort(chrpos)
