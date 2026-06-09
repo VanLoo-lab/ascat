@@ -18,12 +18,12 @@ plotLogRandBAF=function(Plotdir, SNPpos, LogR, BAF) {
   stopifnot(identical(rownames(LogR), rownames(SNPpos)))
   stopifnot(identical(colnames(LogR), colnames(BAF)))
   samples=colnames(LogR)
-  chrs=as.vector(unique(SNPpos[[1]]))
+  chrs=as.vector(unique(SNPpos[, 1]))
   last=0
   ch=list()
   SNPorder=vector(length=dim(SNPpos)[1])
   for (i in 1:length(chrs)) {
-    chrke=SNPpos[SNPpos[[1]]==chrs[i], ]
+    chrke=SNPpos[SNPpos[, 1]==chrs[i], ]
     chrpos=chrke[, 2]
     names(chrpos)=rownames(chrke)
     chrpos=sort(chrpos)
