@@ -274,6 +274,7 @@ runASCAT = function(lrr, baf, lrrsegmented, bafsegmented, gender, SNPpos, chromo
   nropt = 0
   localmin = NULL
   optima = list()
+  alt.sol = data.frame()
 
   if (!failedqualitycheck && is.na(rho_manual)) {
 
